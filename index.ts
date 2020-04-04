@@ -48,31 +48,16 @@ class GameOfLife {
     return rows;
   }
 
-  neighborLocationsFor(x: number, y: number): number[][][] {
+  neighborValues(x: number, y: number): number[] {
     return [
-      [
-        [x - 1, y - 1],
-        [x, y - 1],
-        [x + 1, y - 1]
-      ],
-      [
-        [x - 1, y],
-        [x, y],
-        [x + 1, y]
-      ],
-      [
-        [x - 1, y + 1],
-        [x, y + 1],
-        [x + 1, y + 1]
-      ]
-    ];
-  }
-
-  neighborValues(x: number, y: number): number[][] {
-    return [
-      [this.get(x - 1, y - 1), this.get(x, y - 1), this.get(x + 1, y - 1)],
-      [this.get(x - 1, y), this.get(x, y), this.get(x + 1, y)],
-      [this.get(x - 1, y + 1), this.get(x, y + 1), this.get(x + 1, y + 1)]
+      this.get(x - 1, y - 1),
+      this.get(x, y - 1),
+      this.get(x + 1, y - 1),
+      this.get(x - 1, y),
+      this.get(x + 1, y),
+      this.get(x - 1, y + 1),
+      this.get(x, y + 1),
+      this.get(x + 1, y + 1)
     ];
   }
 
@@ -86,19 +71,7 @@ class GameOfLife {
   }
 
   liveNeighbors(x: number, y: number): number {
-    let count = 0;
-    const values: number[][] = this.neighborValues(x, y);
-    for (var row = 0; row < values.length; row++) {
-      for (var col = 0; col < values.length; col++) {
-        if (row === 1 && col === 1) {
-        } else {
-          if (values[row][col] === 1) {
-            count++;
-          }
-        }
-      }
-    }
-    return count;
+    return this.neighborValues(x, y).filter(value => value === 1).length;
   }
 
   update() {

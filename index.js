@@ -31,25 +31,6 @@ var GameOfLife = /** @class */ (function () {
         }
         return rows;
     };
-    GameOfLife.prototype.neighborLocationsFor = function (x, y) {
-        return [
-            [
-                [x - 1, y - 1],
-                [x, y - 1],
-                [x + 1, y - 1]
-            ],
-            [
-                [x - 1, y],
-                [x, y],
-                [x + 1, y]
-            ],
-            [
-                [x - 1, y + 1],
-                [x, y + 1],
-                [x + 1, y + 1]
-            ]
-        ];
-    };
     GameOfLife.prototype.neighborValues = function (x, y) {
         return [
             [this.get(x - 1, y - 1), this.get(x, y - 1), this.get(x + 1, y - 1)],

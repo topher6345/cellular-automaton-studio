@@ -31,42 +31,27 @@ var GameOfLife = /** @class */ (function () {
     GameOfLife.prototype.set = function (x, y, value) {
         this.data[y * this.size + x] = value;
     };
-    GameOfLife.prototype.alive = function (row, col) {
-        var liveNeighbors = 0;
-        // debugger;
-        this.get(row - 1, col - 1) && liveNeighbors++;
-        this.get(row, col - 1) && liveNeighbors++;
-        this.get(row + 1, col - 1) && liveNeighbors++;
-        this.get(row - 1, col) && liveNeighbors++;
-        this.get(row + 1, col) && liveNeighbors++;
-        this.get(row - 1, col + 1) && liveNeighbors++;
-        this.get(row, col + 1) && liveNeighbors++;
-        this.get(row + 1, col + 1) && liveNeighbors++;
-        if (this.get(row, col)) {
-            // IF ALIVE
-            if (liveNeighbors < 2) {
-                return 0;
-            }
-            else if (liveNeighbors === 2 || liveNeighbors === 3) {
-                return 1;
-            }
-            else if (liveNeighbors > 3) {
-                return 0;
-            }
-        }
-        else {
-            // IF DEAD
-            if (liveNeighbors === 3) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
-        }
-    };
     GameOfLife.prototype.update = function () {
         for (var i = 0; i < this.buffer.length; i++) {
-            this.buffer[i] = this.alive(i % this.size, Math.floor(i / this.size));
+            var liveNeighbors = 0;
+            var status_1 = 0;
+            var row = i % this.size;
+            var col = Math.floor(i / this.size);
+            // Optimization - check for live neighbors
+            // Extracting this led to GC Pressure
+            // inlining seems to get better performance
+            this.get(row - 1, col - 1) && liveNeighbors++;
+            this.get(row, col - 1) && liveNeighbors++;
+            this.get(row + 1, col - 1) && liveNeighbors++;
+            this.get(row - 1, col) && liveNeighbors++;
+            this.get(row + 1, col) && liveNeighbors++;
+            this.get(row - 1, col + 1) && liveNeighbors++;
+            this.get(row, col + 1) && liveNeighbors++;
+            this.get(row + 1, col + 1) && liveNeighbors++;
+            ((this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                liveNeighbors === 3) &&
+                (status_1 = 1);
+            this.buffer[i] = status_1;
         }
         _a = [this.buffer, this.data], this.data = _a[0], this.buffer = _a[1];
         return 0;
@@ -110,7 +95,7 @@ var GameOfLife = /** @class */ (function () {
     GameOfLife.prototype.randColor = function () {
         return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
-    GameOfLife.prototype.inspect = function (blur) {
+    GameOfLife.prototype.draw = function (blur) {
         if (blur === void 0) { blur = true; }
         if (blur) {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
@@ -138,7 +123,10 @@ var GameOfLife = /** @class */ (function () {
     };
     return GameOfLife;
 }());
-var canvas = document.querySelector("canvas");
+var sel = function (s) {
+    return document.querySelector(s);
+};
+var canvas = sel("canvas");
 var gameOfLife = new GameOfLife(750, canvas);
 var past = null;
 var ms = 41.666666666666664;
@@ -148,79 +136,75 @@ function tick(now) {
         past = now;
     if (!past || (now - past > ms && masterOnOff)) {
         past = now;
-        gameOfLife.inspect();
+        gameOfLife.draw();
         gameOfLife.update();
     }
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
 canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
-document.querySelector("#delay").addEventListener("input", function (e) {
+sel("#delay").addEventListener("input", function (e) {
     gameOfLife.alpha = parseFloat(e.target.value);
 }, false);
-document.querySelector("#color").addEventListener("input", function (e) {
+sel("#color").addEventListener("input", function (e) {
     gameOfLife.color = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.inspect(false);
+    masterOnOff || gameOfLife.draw(false);
 }, false);
-document.querySelector("select").addEventListener("input", function (e) {
+sel("select").addEventListener("input", function (e) {
     gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
-document.querySelector("#rate").addEventListener("input", function (e) {
+sel("#rate").addEventListener("input", function (e) {
     ms = e.target.value;
 }, false);
 var isHovering = false;
-document.querySelector("#hover").addEventListener("change", function (e) {
+sel("#hover").addEventListener("change", function (e) {
     isHovering = !isHovering;
 });
 canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
-document
-    .querySelector("#master")
-    .addEventListener("change", function (e) { return (masterOnOff = !masterOnOff); }, false);
-document
-    .querySelector("#modal-capture-preview")
-    .addEventListener("click", function (e) {
-    document.querySelector("#modal-capture-preview").hidden = true;
-});
-document.querySelector("#screencap").addEventListener("click", function (e) {
+sel("#master").addEventListener("change", function (e) { return (masterOnOff = !masterOnOff); }, false);
+sel("#modal-capture-preview").addEventListener("click", function (e) {
+    sel("#modal-capture-preview").hidden = true;
+}, false);
+sel("#screencap").addEventListener("click", function (e) {
     var dataUrl = canvas.toDataURL("image/png");
     var img = new Image();
     img.src = dataUrl;
     img.alt = "CanvasGOL-" + Date.now();
     img.title = "\n    Right click and select \"Save Image As..\"\n    Left click to exit (all your captures are saved until refresh)\n  ";
-    document.querySelector("#modal-capture").hidden = false;
-    document.querySelector("#modal-capture-preview").prepend(img);
+    sel("#modal-capture").hidden = false;
+    sel("#modal-capture-preview").prepend(img);
 });
-document.querySelector("#reset").addEventListener("click", function (e) {
+sel("#reset").addEventListener("click", function (e) {
     gameOfLife.reset();
 });
-document.querySelector("#clear").addEventListener("click", function (e) {
+sel("#clear").addEventListener("click", function (e) {
     gameOfLife.clear();
 });
-document.querySelector("#setShape").addEventListener("change", function (e) {
+sel("#setShape").addEventListener("change", function (e) {
     gameOfLife.shape = e.target.value;
 });
-document.querySelector("#colorMode").addEventListener("change", function (e) {
+sel("#colorMode").addEventListener("change", function (e) {
     gameOfLife.colorMode = e.target.value;
     switch (e.target.value) {
         case "picker":
-            document.querySelector("#radix").style.display = "none";
-            document.querySelector("#picker").style.display = "block";
+            sel("#radix").style.display = "none";
+            sel("#picker").style.display = "block";
             break;
         default:
-            document.querySelector("#radix").style.display = "block";
-            document.querySelector("#picker").style.display = "none";
+            sel("#radix").style.display = "block";
+            sel("#picker").style.display = "none";
     }
 });
-document.querySelector("#colorRadix").addEventListener("input", function (e) {
+sel("#colorRadix").addEventListener("input", function (e) {
     gameOfLife.colorRadix = e.target.value;
 });
-document.querySelector("#colorRadixReset").addEventListener("click", function (e) {
+sel("#colorRadixReset").addEventListener("click", function (e) {
     gameOfLife.colorRadix = 16777215;
-    document.querySelector("#colorRadix").value = 16777215;
+    sel("#colorRadix").value = 16777215;
 });
 var recorders = null;
-document.querySelector("#record-video").addEventListener("change", function (e) {
+sel("#record-video").addEventListener("change", function (e) {
     if (e.target.value === "on") {
         var chunks_1 = []; // here we will store our recorded media chunks (Blobs)
         var stream = canvas.captureStream(); // grab our canvas MediaStream
@@ -246,5 +230,5 @@ function exportVid(blob) {
     a.download = "myvid.webm";
     a.href = vid.src;
     a.textContent = "download the video";
-    document.querySelector("#record").appendChild(a);
+    sel("#record").appendChild(a);
 }

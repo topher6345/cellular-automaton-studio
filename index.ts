@@ -1,5 +1,5 @@
 class GameOfLife {
-  size: any;
+  size: number;
   data: Uint8Array;
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
@@ -51,40 +51,30 @@ class GameOfLife {
     this.data[y * this.size + x] = value;
   }
 
-  alive(row: number, col: number): number {
-    let liveNeighbors = 0;
-    // debugger;
-    this.get(row - 1, col - 1) && liveNeighbors++;
-    this.get(row, col - 1) && liveNeighbors++;
-    this.get(row + 1, col - 1) && liveNeighbors++;
-    this.get(row - 1, col) && liveNeighbors++;
-    this.get(row + 1, col) && liveNeighbors++;
-    this.get(row - 1, col + 1) && liveNeighbors++;
-    this.get(row, col + 1) && liveNeighbors++;
-    this.get(row + 1, col + 1) && liveNeighbors++;
-
-    if (this.get(row, col)) {
-      // IF ALIVE
-      if (liveNeighbors < 2) {
-        return 0;
-      } else if (liveNeighbors === 2 || liveNeighbors === 3) {
-        return 1;
-      } else if (liveNeighbors > 3) {
-        return 0;
-      }
-    } else {
-      // IF DEAD
-      if (liveNeighbors === 3) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
-
   update() {
     for (let i = 0; i < this.buffer.length; i++) {
-      this.buffer[i] = this.alive(i % this.size, Math.floor(i / this.size));
+      let liveNeighbors = 0;
+      let status = 0;
+      const row = i % this.size;
+      const col = Math.floor(i / this.size);
+
+      // Optimization - check for live neighbors
+      // Extracting this led to GC Pressure
+      // inlining seems to get better performance
+      this.get(row - 1, col - 1) && liveNeighbors++;
+      this.get(row, col - 1) && liveNeighbors++;
+      this.get(row + 1, col - 1) && liveNeighbors++;
+      this.get(row - 1, col) && liveNeighbors++;
+      this.get(row + 1, col) && liveNeighbors++;
+      this.get(row - 1, col + 1) && liveNeighbors++;
+      this.get(row, col + 1) && liveNeighbors++;
+      this.get(row + 1, col + 1) && liveNeighbors++;
+
+      ((this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+        liveNeighbors === 3) &&
+        (status = 1);
+
+      this.buffer[i] = status;
     }
     [this.data, this.buffer] = [this.buffer, this.data];
     return 0;
@@ -134,7 +124,7 @@ class GameOfLife {
     return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
   }
 
-  inspect(blur = true): void {
+  draw(blur = true): void {
     if (blur) {
       this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
       this.ctx.fillRect(
@@ -173,20 +163,21 @@ class GameOfLife {
   }
 }
 
-const canvas = document.querySelector("canvas");
+const sel = (s: string): HTMLElement => {
+  return document.querySelector(s);
+};
+const canvas = sel("canvas") as HTMLCanvasElement;
 const gameOfLife = new GameOfLife(750, canvas);
 
 let past: number = null;
-
 let ms = 41.666666666666664;
-
 let masterOnOff = false;
 function tick(now: number) {
   if (!past) past = now;
 
   if (!past || (now - past > ms && masterOnOff)) {
     past = now;
-    gameOfLife.inspect();
+    gameOfLife.draw();
     gameOfLife.update();
   }
   window.requestAnimationFrame(tick);
@@ -196,7 +187,7 @@ window.requestAnimationFrame(tick);
 
 canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
-document.querySelector("#delay").addEventListener(
+sel("#delay").addEventListener(
   "input",
   (e: InputEvent) => {
     gameOfLife.alpha = parseFloat(e.target.value as any);
@@ -204,22 +195,22 @@ document.querySelector("#delay").addEventListener(
   false
 );
 
-document.querySelector("#color").addEventListener(
+sel("#color").addEventListener(
   "input",
   (e) => {
     gameOfLife.color = e.target.value as any;
 
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.inspect(false);
+    masterOnOff || gameOfLife.draw(false);
   },
   false
 );
 
-document.querySelector("select").addEventListener("input", (e) => {
+sel("select").addEventListener("input", (e) => {
   gameOfLife.ctx.globalCompositeOperation = e.target.value as any;
 });
 
-document.querySelector("#rate").addEventListener(
+sel("#rate").addEventListener(
   "input",
   (e) => {
     ms = e.target.value as any;
@@ -228,7 +219,7 @@ document.querySelector("#rate").addEventListener(
 );
 
 let isHovering = false;
-document.querySelector("#hover").addEventListener("change", (e) => {
+sel("#hover").addEventListener("change", (e) => {
   isHovering = !isHovering;
 });
 
@@ -238,17 +229,21 @@ canvas.addEventListener(
   false
 );
 
-document
-  .querySelector("#master")
-  .addEventListener("change", (e) => (masterOnOff = !masterOnOff), false);
+sel("#master").addEventListener(
+  "change",
+  (e) => (masterOnOff = !masterOnOff),
+  false
+);
 
-document
-  .querySelector("#modal-capture-preview")
-  .addEventListener("click", (e) => {
-    document.querySelector("#modal-capture-preview").hidden = true;
-  });
+sel("#modal-capture-preview").addEventListener(
+  "click",
+  (e) => {
+    sel("#modal-capture-preview").hidden = true;
+  },
+  false
+);
 
-document.querySelector("#screencap").addEventListener("click", (e) => {
+sel("#screencap").addEventListener("click", (e) => {
   const dataUrl = canvas.toDataURL("image/png");
 
   const img = new Image();
@@ -258,46 +253,46 @@ document.querySelector("#screencap").addEventListener("click", (e) => {
     Right click and select "Save Image As.."
     Left click to exit (all your captures are saved until refresh)
   `;
-  document.querySelector("#modal-capture").hidden = false;
-  document.querySelector("#modal-capture-preview").prepend(img as any);
+  sel("#modal-capture").hidden = false;
+  sel("#modal-capture-preview").prepend(img as any);
 });
 
-document.querySelector("#reset").addEventListener("click", (e) => {
+sel("#reset").addEventListener("click", (e) => {
   gameOfLife.reset();
 });
 
-document.querySelector("#clear").addEventListener("click", (e) => {
+sel("#clear").addEventListener("click", (e) => {
   gameOfLife.clear();
 });
 
-document.querySelector("#setShape").addEventListener("change", (e) => {
+sel("#setShape").addEventListener("change", (e) => {
   gameOfLife.shape = e.target.value as any;
 });
 
-document.querySelector("#colorMode").addEventListener("change", (e) => {
+sel("#colorMode").addEventListener("change", (e) => {
   gameOfLife.colorMode = e.target.value as any;
   switch (e.target.value as any) {
     case "picker":
-      document.querySelector("#radix").style.display = "none";
-      document.querySelector("#picker").style.display = "block";
+      sel("#radix").style.display = "none";
+      sel("#picker").style.display = "block";
       break;
     default:
-      document.querySelector("#radix").style.display = "block";
-      document.querySelector("#picker").style.display = "none";
+      sel("#radix").style.display = "block";
+      sel("#picker").style.display = "none";
   }
 });
 
-document.querySelector("#colorRadix").addEventListener("input", (e) => {
+sel("#colorRadix").addEventListener("input", (e) => {
   gameOfLife.colorRadix = e.target.value as any;
 });
 
-document.querySelector("#colorRadixReset").addEventListener("click", (e) => {
+sel("#colorRadixReset").addEventListener("click", (e) => {
   gameOfLife.colorRadix = 16777215;
-  document.querySelector("#colorRadix").value = 16777215;
+  sel("#colorRadix").value = 16777215;
 });
 
 let recorders: MediaRecorder = null;
-document.querySelector("#record-video").addEventListener("change", (e) => {
+sel("#record-video").addEventListener("change", (e) => {
   if ((e.target.value as any) === "on") {
     const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
     const stream = canvas.captureStream(); // grab our canvas MediaStream
@@ -324,5 +319,5 @@ function exportVid(blob: Blob) {
   a.download = "myvid.webm";
   a.href = vid.src;
   a.textContent = "download the video";
-  document.querySelector("#record").appendChild(a as any);
+  sel("#record").appendChild(a as any);
 }

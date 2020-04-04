@@ -9,10 +9,13 @@ class GameOfLife {
   shape: string;
   colorMode: string;
   colorRadix: number;
+  buffer: Uint8Array;
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
     this.data = GameOfLife.blankBoard(this.size);
+    this.buffer = new Uint8Array(size * size);
+
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
 
@@ -36,19 +39,6 @@ class GameOfLife {
     return new Uint8Array(size * size).map(_ => this.rand(0, 2));
   }
 
-  neighborValues(x: number, y: number): number[] {
-    return [
-      this.get(x - 1, y - 1),
-      this.get(x, y - 1),
-      this.get(x + 1, y - 1),
-      this.get(x - 1, y),
-      this.get(x + 1, y),
-      this.get(x - 1, y + 1),
-      this.get(x, y + 1),
-      this.get(x + 1, y + 1)
-    ];
-  }
-
   get(x: number, y: number) {
     return this.data[y * this.size + x];
   }
@@ -58,12 +48,30 @@ class GameOfLife {
     return 0;
   }
 
-  liveNeighbors(x: number, y: number): number {
-    return this.neighborValues(x, y).filter(value => value === 1).length;
-  }
-
   alive(row: number, col: number) {
-    const liveNeighbors = this.liveNeighbors(row, col);
+    // The following code seems to cause so much GC pressure it slows the fps
+    //
+    // const liveNeighbors = [
+    //   this.get(row - 1, col - 1),
+    //   this.get(row, col - 1),
+    //   this.get(row + 1, col - 1),
+    //   this.get(row - 1, col),
+    //   this.get(row + 1, col),
+    //   this.get(row - 1, col + 1),
+    //   this.get(row, col + 1),
+    //   this.get(row + 1, col + 1)
+    // ].filter(value => value === 1).length;
+
+    let liveNeighbors = 0;
+    this.get(row - 1, col - 1) && liveNeighbors++;
+    this.get(row, col - 1) && liveNeighbors++;
+    this.get(row + 1, col - 1) && liveNeighbors++;
+    this.get(row - 1, col) && liveNeighbors++;
+    this.get(row + 1, col) && liveNeighbors++;
+    this.get(row - 1, col + 1) && liveNeighbors++;
+    this.get(row, col + 1) && liveNeighbors++;
+    this.get(row + 1, col + 1) && liveNeighbors++;
+
     if (this.get(row, col) === 1) {
       // IF ALIVE
       if (liveNeighbors < 2) {
@@ -84,13 +92,12 @@ class GameOfLife {
   }
 
   update() {
-    const newGame = new GameOfLife(this.size);
     for (var row = 0; row < this.size; row++) {
       for (var col = 0; col < this.size; col++) {
-        newGame.set(row, col, this.alive(row, col));
+        this.buffer[row * this.size + col] = this.alive(row, col);
       }
     }
-    this.data = newGame.data;
+    [this.data, this.buffer] = [this.buffer, this.data];
     return 0;
   }
 

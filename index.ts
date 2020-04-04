@@ -33,13 +33,13 @@ class GameOfLife {
   }
 
   blankBoard(size: number): number[][] {
-    const rows: number[][] = [];
+    const rows: number[][] = new Array(size);
     for (let i = 0; i < size; i++) {
-      let columns = [];
+      let columns = new Array(size);
       for (let j = 0; j < size; j++) {
-        columns.push(this.rand(0, 2));
+        columns[j] = this.rand(0, 2);
       }
-      rows.push(columns);
+      rows[i] = columns;
     }
 
     return rows;

@@ -18,13 +18,13 @@ var GameOfLife = /** @class */ (function () {
         return Math.floor(Math.random() * (max - min)) + min;
     };
     GameOfLife.prototype.blankBoard = function (size) {
-        var rows = [];
+        var rows = new Array(size);
         for (var i = 0; i < size; i++) {
-            var columns = [];
+            var columns = new Array(size);
             for (var j = 0; j < size; j++) {
-                columns.push(this.rand(0, 2));
+                columns[j] = this.rand(0, 2);
             }
-            rows.push(columns);
+            rows[i] = columns;
         }
         return rows;
     };

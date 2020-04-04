@@ -34,15 +34,12 @@ class GameOfLife {
 
   blankBoard(size: number): number[][] {
     const rows: number[][] = [];
-    let columns = [];
-    let val = 0;
     for (let i = 0; i < size; i++) {
+      let columns = [];
       for (let j = 0; j < size; j++) {
-        val = this.rand(0, 2);
-        columns.push(val);
+        columns.push(this.rand(0, 2));
       }
       rows.push(columns);
-      columns = [];
     }
 
     return rows;
@@ -174,8 +171,7 @@ class GameOfLife {
       }
 
       for (var col = 0; col < this.data.length; col++) {
-        if (this.data[row][col] === 1) {
-          // this.ctx.fillStyle = this.color;
+        if (this.get(row, col) === 1) {
           if (this.colorMode === "each") {
             color =
               "#" + Math.floor(Math.random() * this.colorRadix).toString(16);

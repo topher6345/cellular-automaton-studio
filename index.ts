@@ -2,7 +2,7 @@ class GameOfLife {
   size: any;
   data: Uint8Array;
   canvas: HTMLCanvasElement;
-  ctx: any;
+  ctx: CanvasRenderingContext2D;
   alpha: number;
   color: string;
   pixelSize: number;
@@ -14,7 +14,6 @@ class GameOfLife {
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
     this.data = GameOfLife.randBoard(this.size);
-    // this.data = new Uint8Array(size * size);
     this.buffer = new Uint8Array(size * size);
 
     this.canvas = canvas;
@@ -94,44 +93,40 @@ class GameOfLife {
   getMousePos(evt: MouseEvent) {
     const rect = this.canvas.getBoundingClientRect();
     return {
-      x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top,
+      y: Math.floor((evt.clientX - rect.left) / this.pixelSize),
+      x: Math.floor((evt.clientY - rect.top) / this.pixelSize),
     };
   }
 
-  click(e: MouseEvent) {
-    const pos = this.getMousePos(e);
-    const x = Math.floor(pos.x / this.pixelSize);
-    const y = Math.floor(pos.y / this.pixelSize);
-    this.set(y, x, 1);
+  hover(e: MouseEvent) {
+    const { x, y } = this.getMousePos(e);
+    this.set(x, y, 1);
   }
 
   clickDown(e: MouseEvent) {
-    const pos = this.getMousePos(e);
-    const x = Math.floor(pos.x / this.pixelSize);
-    const y = Math.floor(pos.y / this.pixelSize);
+    const { x, y } = this.getMousePos(e);
 
     // Glider SE
 
     switch (this.shape) {
       case "gliderse":
-        this.set(y - 1, x, 1);
-        this.set(y, x + 1, 1);
-        this.set(y + 1, x - 1, 1);
-        this.set(y + 1, x, 1);
-        this.set(y + 1, x + 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x, y + 1, 1);
+        this.set(x + 1, y - 1, 1);
+        this.set(x + 1, y, 1);
+        this.set(x + 1, y + 1, 1);
         break;
       case "3x3":
       default:
-        this.set(y - 1, x - 1, 1);
-        this.set(y - 1, x, 1);
-        this.set(y - 1, x + 1, 1);
-        this.set(y, x - 1, 1);
-        this.set(y, x, 1);
-        this.set(y, x + 1, 1);
-        this.set(y - 1, x - 1, 1);
-        this.set(y - 1, x, 1);
-        this.set(y - 1, x + 1, 1);
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        this.set(x, y - 1, 1);
+        this.set(x, y, 1);
+        this.set(x, y + 1, 1);
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
     }
   }
 
@@ -220,9 +215,9 @@ document.querySelector("#color").addEventListener(
   false
 );
 
-// document.querySelector("select").addEventListener("input", (e) => {
-//   gameOfLife.ctx.globalCompositeOperation = e.target.value;
-// });
+document.querySelector("select").addEventListener("input", (e) => {
+  gameOfLife.ctx.globalCompositeOperation = e.target.value as any;
+});
 
 document.querySelector("#rate").addEventListener(
   "input",
@@ -239,7 +234,7 @@ document.querySelector("#hover").addEventListener("change", (e) => {
 
 canvas.addEventListener(
   "mousemove",
-  (e) => isHovering && gameOfLife.click(e),
+  (e) => isHovering && gameOfLife.hover(e),
   false
 );
 

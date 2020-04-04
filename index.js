@@ -2,7 +2,6 @@ var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, cavnas) {
         this.size = size;
         this.data = GameOfLife.randBoard(this.size);
-        // this.data = new Uint8Array(size * size);
         this.buffer = new Uint8Array(size * size);
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
@@ -76,40 +75,36 @@ var GameOfLife = /** @class */ (function () {
     GameOfLife.prototype.getMousePos = function (evt) {
         var rect = this.canvas.getBoundingClientRect();
         return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
+            y: Math.floor((evt.clientX - rect.left) / this.pixelSize),
+            x: Math.floor((evt.clientY - rect.top) / this.pixelSize)
         };
     };
-    GameOfLife.prototype.click = function (e) {
-        var pos = this.getMousePos(e);
-        var x = Math.floor(pos.x / this.pixelSize);
-        var y = Math.floor(pos.y / this.pixelSize);
-        this.set(y, x, 1);
+    GameOfLife.prototype.hover = function (e) {
+        var _a = this.getMousePos(e), x = _a.x, y = _a.y;
+        this.set(x, y, 1);
     };
     GameOfLife.prototype.clickDown = function (e) {
-        var pos = this.getMousePos(e);
-        var x = Math.floor(pos.x / this.pixelSize);
-        var y = Math.floor(pos.y / this.pixelSize);
+        var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         // Glider SE
         switch (this.shape) {
             case "gliderse":
-                this.set(y - 1, x, 1);
-                this.set(y, x + 1, 1);
-                this.set(y + 1, x - 1, 1);
-                this.set(y + 1, x, 1);
-                this.set(y + 1, x + 1, 1);
+                this.set(x - 1, y, 1);
+                this.set(x, y + 1, 1);
+                this.set(x + 1, y - 1, 1);
+                this.set(x + 1, y, 1);
+                this.set(x + 1, y + 1, 1);
                 break;
             case "3x3":
             default:
-                this.set(y - 1, x - 1, 1);
-                this.set(y - 1, x, 1);
-                this.set(y - 1, x + 1, 1);
-                this.set(y, x - 1, 1);
-                this.set(y, x, 1);
-                this.set(y, x + 1, 1);
-                this.set(y - 1, x - 1, 1);
-                this.set(y - 1, x, 1);
-                this.set(y - 1, x + 1, 1);
+                this.set(x - 1, y - 1, 1);
+                this.set(x - 1, y, 1);
+                this.set(x - 1, y + 1, 1);
+                this.set(x, y - 1, 1);
+                this.set(x, y, 1);
+                this.set(x, y + 1, 1);
+                this.set(x - 1, y - 1, 1);
+                this.set(x - 1, y, 1);
+                this.set(x - 1, y + 1, 1);
         }
     };
     GameOfLife.prototype.randColor = function () {
@@ -168,9 +163,9 @@ document.querySelector("#color").addEventListener("input", function (e) {
     // redraw if paused so the user can see what colors
     masterOnOff || gameOfLife.inspect(false);
 }, false);
-// document.querySelector("select").addEventListener("input", (e) => {
-//   gameOfLife.ctx.globalCompositeOperation = e.target.value;
-// });
+document.querySelector("select").addEventListener("input", function (e) {
+    gameOfLife.ctx.globalCompositeOperation = e.target.value;
+});
 document.querySelector("#rate").addEventListener("input", function (e) {
     ms = e.target.value;
 }, false);
@@ -178,7 +173,7 @@ var isHovering = false;
 document.querySelector("#hover").addEventListener("change", function (e) {
     isHovering = !isHovering;
 });
-canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.click(e); }, false);
+canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
 document
     .querySelector("#master")
     .addEventListener("change", function (e) { return (masterOnOff = !masterOnOff); }, false);

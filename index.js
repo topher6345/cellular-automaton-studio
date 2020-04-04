@@ -53,34 +53,35 @@ var GameOfLife = /** @class */ (function () {
     GameOfLife.prototype.liveNeighbors = function (x, y) {
         return this.neighborValues(x, y).filter(function (value) { return value === 1; }).length;
     };
+    GameOfLife.prototype.alive = function (row, col) {
+        var liveNeighbors = this.liveNeighbors(row, col);
+        if (this.get(row, col) === 1) {
+            // IF ALIVE
+            if (liveNeighbors < 2) {
+                return 0;
+            }
+            else if (liveNeighbors === 2 || liveNeighbors === 3) {
+                return 1;
+            }
+            else if (liveNeighbors > 3) {
+                return 0;
+            }
+        }
+        else {
+            // IF DEAD
+            if (liveNeighbors === 3) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+    };
     GameOfLife.prototype.update = function () {
         var newGame = new GameOfLife(this.size);
-        newGame.data = this.blankBoard(this.size);
-        var liveNeighbors;
         for (var row = 0; row < this.data.length; row++) {
             for (var col = 0; col < this.data.length; col++) {
-                liveNeighbors = this.liveNeighbors(row, col);
-                if (this.data[row][col] === 1) {
-                    // IF ALIVE
-                    if (liveNeighbors < 2) {
-                        newGame.set(row, col, 0);
-                    }
-                    else if (liveNeighbors === 2 || liveNeighbors === 3) {
-                        newGame.set(row, col, 1);
-                    }
-                    else if (liveNeighbors > 3) {
-                        newGame.set(row, col, 0);
-                    }
-                }
-                else {
-                    // IF DEAD
-                    if (liveNeighbors === 3) {
-                        newGame.set(row, col, 1);
-                    }
-                    else {
-                        newGame.set(row, col, 0);
-                    }
-                }
+                newGame.set(row, col, this.alive(row, col));
             }
         }
         this.data = newGame.data;

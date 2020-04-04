@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8"/>
+  <title></title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<div>
+  <div id='modal-capture'>
+    <div id='modal-capture-preview' hidden>
+    </div>
+  </div>
+  <canvas width="750" height="750"></canvas>
+  <div class="controls">
+    <div>
+      <label title="Motion blur - left is more blur, right is less." for="motion-blur">Motion Blur</label>
+      <input name="motion-blur" type="range" id="delay" min="0.0001" max="0.3" step="0.0001" value="0.0005">
+    </div>
+    <!--     <div>
+      <label for="setBlendMode">Blend Mode</label>
+      <select name="setBlendMode">
+        <option value="source-over">source-over</option>
+        <option value="source-in">source-in</option>
+        <option value="source-out">source-out</option>
+        <option value="source-atop">source-atop</option>
+        <option value="destination-over">destination-over</option>
+        <option value="destination-in">destination-in</option>
+        <option value="destination-out">destination-out</option>
+        <option value="destination-atop">destination-atop</option>
+        <option value="lighter">lighter</option>
+        <option value="copy">copy</option>
+        <option value="xor">xor</option>
+        <option value="multiply">multiply</option>
+        <option value="screen">screen</option>
+        <option value="overlay">overlay</option>
+        <option value="darken">darken</option>
+        <option value="lighten">lighten</option>
+        <option value="color-dodge">color-dodge</option>
+        <option value="color-burn">color-burn</option>
+        <option value="hard-light">hard-light</option>
+        <option value="soft-light">soft-light</option>
+        <option value="difference">difference</option>
+        <option value="exclusion">exclusion</option>
+        <option value="hue">hue</option>
+        <option value="saturation">saturation</option>
+        <option value="luminosity">luminosity</option>
+      </select>
+    </div> -->
+    <div>
+      <label title="Speed - left is faster, right is slower" for="rate">Speed</label>
+      <input type="range" name="rate" id="rate" min="17" max="250">
+    </div>
+    <div>
+      <label title="When checked, hovering over the canvas will draw a pixel" for="hover">Hover</label>
+      <input title="Hover" name="hover" type="checkbox" id="hover">
+    </div>
+    <div>
+      <label title="When checked, the simulation is paused" for="master">Play/Pause</label>
+      <input name="master" type="checkbox" id="master">
+    </div>
+    <div>
+      <label>Image Capture</label>
+      <button id="screencap">📷</button>
+    </div>
+    <div>
+      <button id="reset">Reset</button>
+    </div>
+    <div>
+      <label for="setShape">Shape</label>
+      <select name="setShape" id="setShape">
+        <option value="gliderse">Glider SE</option>
+        <option value="3x3">3x3</option>
+      </select>
+    </div>
+    <div>
+      <label for="colorMode">ColorMode</label>
+      <select name="colorMode" id="colorMode">
+        <option value="picker">picker</option>
+        <option value="full">full</option>
+        <option value="row">row</option>
+        <option value="each">each</option>
+      </select>
+    </div>
+    <div id="radix" style="display: none;">
+      <label for="colorRadix">color Radix</label>
+      <input name="colorRadix" id="colorRadix" type="number" value="16777215">
+      <button id="colorRadixReset">reset</button>
+    </div>
+    <div id="picker">
+      <label title="The color of the new pixels." for="color">Color</label>
+      <input type="color" id="color" name="color" value="#e66465">
+    </div>
+    <div id='record'>
+     <label title="Record Video" for="record-video">Record Video</label>
+      <input type="checkbox" id="record-video" name="record-video">
+  </div>
+    <div id="preview"></div>
+  </div>
+    <script src="index.js"></script>
+
+</div>
+</body>
+</html>

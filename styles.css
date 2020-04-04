@@ -1,0 +1,58 @@
+canvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+body {
+  background-color: black;
+}
+
+.controls {
+  position: absolute;
+  top: 0px;
+  left: 750px;
+}
+
+.controls div {
+  display: block;
+  border-color: black;
+  padding: 0;
+  margin: 0;
+  border: 1px solid black;
+  background-color: grey;
+}
+
+.controls input,
+.controls select,
+.controls button {
+  display: block;
+}
+
+.controls label:hover {
+  cursor: help;
+}
+
+
+#modal-capture {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+#modal-capture-preview {
+    width: 900px;
+  display: flex;
+  align-content: center;
+  background-color: darkgrey;
+  align-items: center;
+  flex-direction: column;
+}
+
+#modal-capture-preview img {
+  margin: 40px 0;
+}

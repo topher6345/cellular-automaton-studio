@@ -68,7 +68,7 @@ class GameOfLife {
     ];
   }
 
-  neighborValues(x: number, y: number) {
+  neighborValues(x: number, y: number): number[][] {
     return [
       [this.get(x - 1, y - 1), this.get(x, y - 1), this.get(x + 1, y - 1)],
       [this.get(x - 1, y), this.get(x, y), this.get(x + 1, y)],
@@ -87,7 +87,7 @@ class GameOfLife {
 
   liveNeighbors(x: number, y: number): number {
     let count = 0;
-    const values = this.neighborValues(x, y);
+    const values: number[][] = this.neighborValues(x, y);
     for (var row = 0; row < values.length; row++) {
       for (var col = 0; col < values.length; col++) {
         if (row === 1 && col === 1) {

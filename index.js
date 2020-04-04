@@ -1,7 +1,7 @@
 var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, cavnas) {
         this.size = size;
-        this.data = this.blankBoard(this.size);
+        this.data = GameOfLife.blankBoard(this.size);
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
         this.alpha = 0.006;
@@ -12,21 +12,14 @@ var GameOfLife = /** @class */ (function () {
         this.colorRadix = 16777215;
     }
     GameOfLife.prototype.reset = function () {
-        this.data = this.blankBoard(this.size);
+        this.data = GameOfLife.blankBoard(this.size);
     };
-    GameOfLife.prototype.rand = function (min, max) {
+    GameOfLife.rand = function (min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
-    GameOfLife.prototype.blankBoard = function (size) {
-        var rows = new Array(size);
-        for (var i = 0; i < size; i++) {
-            var columns = new Array(size);
-            for (var j = 0; j < size; j++) {
-                columns[j] = this.rand(0, 2);
-            }
-            rows[i] = columns;
-        }
-        return rows;
+    GameOfLife.blankBoard = function (size) {
+        var _this = this;
+        return new Uint8Array(size * size).map(function (_) { return _this.rand(0, 2); });
     };
     GameOfLife.prototype.neighborValues = function (x, y) {
         return [
@@ -41,10 +34,10 @@ var GameOfLife = /** @class */ (function () {
         ];
     };
     GameOfLife.prototype.get = function (x, y) {
-        return this.data[Math.abs(x % this.size)][Math.abs(y % this.size)];
+        return this.data[y * this.size + x];
     };
     GameOfLife.prototype.set = function (x, y, value) {
-        this.data[Math.abs(x % this.size)][Math.abs(y % this.size)] = value;
+        this.data[y * this.size + x] = value;
         return 0;
     };
     GameOfLife.prototype.liveNeighbors = function (x, y) {
@@ -76,8 +69,8 @@ var GameOfLife = /** @class */ (function () {
     };
     GameOfLife.prototype.update = function () {
         var newGame = new GameOfLife(this.size);
-        for (var row = 0; row < this.data.length; row++) {
-            for (var col = 0; col < this.data.length; col++) {
+        for (var row = 0; row < this.size; row++) {
+            for (var col = 0; col < this.size; col++) {
                 newGame.set(row, col, this.alive(row, col));
             }
         }
@@ -136,11 +129,11 @@ var GameOfLife = /** @class */ (function () {
         else if (this.colorMode === "picker") {
             color = this.color;
         }
-        for (var row = 0; row < this.data.length; row++) {
+        for (var row = 0; row < this.size; row++) {
             if (this.colorMode === "row") {
                 color = "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
             }
-            for (var col = 0; col < this.data.length; col++) {
+            for (var col = 0; col < this.size; col++) {
                 if (this.get(row, col) === 1) {
                     if (this.colorMode === "each") {
                         color =

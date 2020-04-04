@@ -1,6 +1,6 @@
 class GameOfLife {
   size: any;
-  data: number[][];
+  data: Uint8Array;
   canvas: HTMLCanvasElement;
   ctx: any;
   alpha: number;
@@ -12,7 +12,7 @@ class GameOfLife {
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
-    this.data = this.blankBoard(this.size);
+    this.data = GameOfLife.blankBoard(this.size);
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
 
@@ -25,24 +25,15 @@ class GameOfLife {
   }
 
   reset() {
-    this.data = this.blankBoard(this.size);
+    this.data = GameOfLife.blankBoard(this.size);
   }
 
-  rand(min: number, max: number) {
+  static rand(min: number, max: number) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  blankBoard(size: number): number[][] {
-    const rows: number[][] = new Array(size);
-    for (let i = 0; i < size; i++) {
-      let columns = new Array(size);
-      for (let j = 0; j < size; j++) {
-        columns[j] = this.rand(0, 2);
-      }
-      rows[i] = columns;
-    }
-
-    return rows;
+  static blankBoard(size: number): Uint8Array {
+    return new Uint8Array(size * size).map(_ => this.rand(0, 2));
   }
 
   neighborValues(x: number, y: number): number[] {
@@ -59,11 +50,11 @@ class GameOfLife {
   }
 
   get(x: number, y: number) {
-    return this.data[Math.abs(x % this.size)][Math.abs(y % this.size)];
+    return this.data[y * this.size + x];
   }
 
   set(x: number, y: number, value: number) {
-    this.data[Math.abs(x % this.size)][Math.abs(y % this.size)] = value;
+    this.data[y * this.size + x] = value;
     return 0;
   }
 
@@ -94,8 +85,8 @@ class GameOfLife {
 
   update() {
     const newGame = new GameOfLife(this.size);
-    for (var row = 0; row < this.data.length; row++) {
-      for (var col = 0; col < this.data.length; col++) {
+    for (var row = 0; row < this.size; row++) {
+      for (var col = 0; col < this.size; col++) {
         newGame.set(row, col, this.alive(row, col));
       }
     }
@@ -165,12 +156,12 @@ class GameOfLife {
       color = this.color;
     }
 
-    for (var row = 0; row < this.data.length; row++) {
+    for (var row = 0; row < this.size; row++) {
       if (this.colorMode === "row") {
         color = "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
       }
 
-      for (var col = 0; col < this.data.length; col++) {
+      for (var col = 0; col < this.size; col++) {
         if (this.get(row, col) === 1) {
           if (this.colorMode === "each") {
             color =

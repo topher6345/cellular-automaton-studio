@@ -1,7 +1,8 @@
 var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, cavnas) {
         this.size = size;
-        this.data = GameOfLife.blankBoard(this.size);
+        // this.data = GameOfLife.randBoard(this.size);
+        this.data = new Uint8Array(size * size);
         this.buffer = new Uint8Array(size * size);
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
@@ -13,12 +14,12 @@ var GameOfLife = /** @class */ (function () {
         this.colorRadix = 16777215;
     }
     GameOfLife.prototype.reset = function () {
-        this.data = GameOfLife.blankBoard(this.size);
+        this.data = GameOfLife.randBoard(this.size);
     };
     GameOfLife.rand = function (min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
-    GameOfLife.blankBoard = function (size) {
+    GameOfLife.randBoard = function (size) {
         var _this = this;
         return new Uint8Array(size * size).map(function (_) { return _this.rand(0, 2); });
     };
@@ -30,19 +31,8 @@ var GameOfLife = /** @class */ (function () {
         return 0;
     };
     GameOfLife.prototype.alive = function (row, col) {
-        // The following code seems to cause so much GC pressure it slows the fps
-        //
-        // const liveNeighbors = [
-        //   this.get(row - 1, col - 1),
-        //   this.get(row, col - 1),
-        //   this.get(row + 1, col - 1),
-        //   this.get(row - 1, col),
-        //   this.get(row + 1, col),
-        //   this.get(row - 1, col + 1),
-        //   this.get(row, col + 1),
-        //   this.get(row + 1, col + 1)
-        // ].filter(value => value === 1).length;
         var liveNeighbors = 0;
+        // debugger;
         this.get(row - 1, col - 1) && liveNeighbors++;
         this.get(row, col - 1) && liveNeighbors++;
         this.get(row + 1, col - 1) && liveNeighbors++;
@@ -74,10 +64,8 @@ var GameOfLife = /** @class */ (function () {
         }
     };
     GameOfLife.prototype.update = function () {
-        for (var row = 0; row < this.size; row++) {
-            for (var col = 0; col < this.size; col++) {
-                this.buffer[row * this.size + col] = this.alive(row, col);
-            }
+        for (var i = 0; i < this.buffer.length; i++) {
+            this.buffer[i] = this.alive(i % this.size, Math.floor(i / this.size));
         }
         _a = [this.buffer, this.data], this.data = _a[0], this.buffer = _a[1];
         return 0;
@@ -92,8 +80,8 @@ var GameOfLife = /** @class */ (function () {
     };
     GameOfLife.prototype.click = function (e) {
         var pos = this.getMousePos(e);
-        var x = Math.floor(pos.x / 3);
-        var y = Math.floor(pos.y / 3);
+        var x = Math.floor(pos.x / this.pixelSize);
+        var y = Math.floor(pos.y / this.pixelSize);
         this.set(y, x, 1);
     };
     GameOfLife.prototype.clickDown = function (e) {

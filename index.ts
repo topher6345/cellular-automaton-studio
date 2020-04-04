@@ -13,7 +13,8 @@ class GameOfLife {
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
-    this.data = GameOfLife.blankBoard(this.size);
+    // this.data = GameOfLife.randBoard(this.size);
+    this.data = new Uint8Array(size * size);
     this.buffer = new Uint8Array(size * size);
 
     this.canvas = canvas;
@@ -28,15 +29,15 @@ class GameOfLife {
   }
 
   reset() {
-    this.data = GameOfLife.blankBoard(this.size);
+    this.data = GameOfLife.randBoard(this.size);
   }
 
   static rand(min: number, max: number) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  static blankBoard(size: number): Uint8Array {
-    return new Uint8Array(size * size).map(_ => this.rand(0, 2));
+  static randBoard(size: number): Uint8Array {
+    return new Uint8Array(size * size).map((_) => this.rand(0, 2));
   }
 
   get(x: number, y: number) {
@@ -49,20 +50,8 @@ class GameOfLife {
   }
 
   alive(row: number, col: number) {
-    // The following code seems to cause so much GC pressure it slows the fps
-    //
-    // const liveNeighbors = [
-    //   this.get(row - 1, col - 1),
-    //   this.get(row, col - 1),
-    //   this.get(row + 1, col - 1),
-    //   this.get(row - 1, col),
-    //   this.get(row + 1, col),
-    //   this.get(row - 1, col + 1),
-    //   this.get(row, col + 1),
-    //   this.get(row + 1, col + 1)
-    // ].filter(value => value === 1).length;
-
     let liveNeighbors = 0;
+    // debugger;
     this.get(row - 1, col - 1) && liveNeighbors++;
     this.get(row, col - 1) && liveNeighbors++;
     this.get(row + 1, col - 1) && liveNeighbors++;
@@ -92,10 +81,8 @@ class GameOfLife {
   }
 
   update() {
-    for (var row = 0; row < this.size; row++) {
-      for (var col = 0; col < this.size; col++) {
-        this.buffer[row * this.size + col] = this.alive(row, col);
-      }
+    for (let i = 0; i < this.buffer.length; i++) {
+      this.buffer[i] = this.alive(i % this.size, Math.floor(i / this.size));
     }
     [this.data, this.buffer] = [this.buffer, this.data];
     return 0;
@@ -105,14 +92,14 @@ class GameOfLife {
     var rect = this.canvas.getBoundingClientRect();
     return {
       x: evt.clientX - rect.left,
-      y: evt.clientY - rect.top
+      y: evt.clientY - rect.top,
     };
   }
 
   click(e: MouseEvent) {
     const pos = this.getMousePos(e);
-    const x = Math.floor(pos.x / 3);
-    const y = Math.floor(pos.y / 3);
+    const x = Math.floor(pos.x / this.pixelSize);
+    const y = Math.floor(pos.y / this.pixelSize);
     this.set(y, x, 1);
   }
 
@@ -209,7 +196,7 @@ function tick(now: number) {
 
 window.requestAnimationFrame(tick);
 
-canvas.addEventListener("click", e => gameOfLife.clickDown(e), false);
+canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
 const slider = document.querySelector("#delay");
 
@@ -223,7 +210,7 @@ slider.addEventListener(
 
 document.querySelector("#color").addEventListener(
   "input",
-  e => {
+  (e) => {
     gameOfLife.color = e.target.value as any;
 
     // redraw if paused so the user can see what colors
@@ -238,34 +225,34 @@ document.querySelector("#color").addEventListener(
 
 document.querySelector("#rate").addEventListener(
   "input",
-  e => {
+  (e) => {
     ms = e.target.value as any;
   },
   false
 );
 
 let isHovering = false;
-document.querySelector("#hover").addEventListener("change", e => {
+document.querySelector("#hover").addEventListener("change", (e) => {
   isHovering = !isHovering;
 });
 
 canvas.addEventListener(
   "mousemove",
-  e => isHovering && gameOfLife.click(e),
+  (e) => isHovering && gameOfLife.click(e),
   false
 );
 
 document
   .querySelector("#master")
-  .addEventListener("change", e => (masterOnOff = !masterOnOff), false);
+  .addEventListener("change", (e) => (masterOnOff = !masterOnOff), false);
 
 document
   .querySelector("#modal-capture-preview")
-  .addEventListener("click", e => {
+  .addEventListener("click", (e) => {
     document.querySelector("#modal-capture-preview").hidden = true;
   });
 
-document.querySelector("#screencap").addEventListener("click", e => {
+document.querySelector("#screencap").addEventListener("click", (e) => {
   var dataUrl = canvas.toDataURL("image/png");
 
   var img = new Image();
@@ -279,15 +266,15 @@ document.querySelector("#screencap").addEventListener("click", e => {
   document.querySelector("#modal-capture-preview").prepend(img as any);
 });
 
-document.querySelector("#reset").addEventListener("click", e => {
+document.querySelector("#reset").addEventListener("click", (e) => {
   gameOfLife.reset();
 });
 
-document.querySelector("#setShape").addEventListener("change", e => {
+document.querySelector("#setShape").addEventListener("change", (e) => {
   gameOfLife.shape = e.target.value as any;
 });
 
-document.querySelector("#colorMode").addEventListener("change", e => {
+document.querySelector("#colorMode").addEventListener("change", (e) => {
   gameOfLife.colorMode = e.target.value as any;
   switch (e.target.value as any) {
     case "picker":
@@ -300,26 +287,26 @@ document.querySelector("#colorMode").addEventListener("change", e => {
   }
 });
 
-document.querySelector("#colorRadix").addEventListener("input", e => {
+document.querySelector("#colorRadix").addEventListener("input", (e) => {
   gameOfLife.colorRadix = e.target.value as any;
 });
 
-document.querySelector("#colorRadixReset").addEventListener("click", e => {
+document.querySelector("#colorRadixReset").addEventListener("click", (e) => {
   gameOfLife.colorRadix = 16777215;
   document.querySelector("#colorRadix").value = 16777215;
 });
 
 let recorders: MediaRecorder = null;
-document.querySelector("#record-video").addEventListener("change", e => {
+document.querySelector("#record-video").addEventListener("change", (e) => {
   if ((e.target.value as any) === "on") {
     const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
     const stream = canvas.captureStream(); // grab our canvas MediaStream
     const rec = new MediaRecorder(stream); // init the recorder
     // every time the recorder has new data, we will store it in our array
     recorders = rec;
-    rec.ondataavailable = e => chunks.push(e.data);
+    rec.ondataavailable = (e) => chunks.push(e.data);
     // only when the recorder stops, we construct a complete Blob from all the chunks
-    rec.onstop = e => exportVid(new Blob(chunks, { type: "video/webm" }));
+    rec.onstop = (e) => exportVid(new Blob(chunks, { type: "video/webm" }));
 
     rec.start();
     setTimeout(() => rec.stop(), 30000); // stop recording in 30s

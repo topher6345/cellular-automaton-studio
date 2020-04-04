@@ -43,7 +43,7 @@ var GameOfLife = /** @class */ (function () {
         this.get(row - 1, col + 1) && liveNeighbors++;
         this.get(row, col + 1) && liveNeighbors++;
         this.get(row + 1, col + 1) && liveNeighbors++;
-        if (this.get(row, col) === 1) {
+        if (this.get(row, col)) {
             // IF ALIVE
             if (liveNeighbors < 2) {
                 return 0;

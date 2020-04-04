@@ -13,8 +13,8 @@ class GameOfLife {
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
-    // this.data = GameOfLife.randBoard(this.size);
-    this.data = new Uint8Array(size * size);
+    this.data = GameOfLife.randBoard(this.size);
+    // this.data = new Uint8Array(size * size);
     this.buffer = new Uint8Array(size * size);
 
     this.canvas = canvas;
@@ -28,8 +28,12 @@ class GameOfLife {
     this.colorRadix = 16777215;
   }
 
-  reset() {
+  reset(): void {
     this.data = GameOfLife.randBoard(this.size);
+  }
+
+  clear(): void {
+    this.data = new Uint8Array(this.size * this.size);
   }
 
   static rand(min: number, max: number) {
@@ -40,16 +44,15 @@ class GameOfLife {
     return new Uint8Array(size * size).map((_) => this.rand(0, 2));
   }
 
-  get(x: number, y: number) {
+  get(x: number, y: number): number {
     return this.data[y * this.size + x];
   }
 
-  set(x: number, y: number, value: number) {
+  set(x: number, y: number, value: number): void {
     this.data[y * this.size + x] = value;
-    return 0;
   }
 
-  alive(row: number, col: number) {
+  alive(row: number, col: number): number {
     let liveNeighbors = 0;
     // debugger;
     this.get(row - 1, col - 1) && liveNeighbors++;
@@ -89,7 +92,7 @@ class GameOfLife {
   }
 
   getMousePos(evt: MouseEvent) {
-    var rect = this.canvas.getBoundingClientRect();
+    const rect = this.canvas.getBoundingClientRect();
     return {
       x: evt.clientX - rect.left,
       y: evt.clientY - rect.top,
@@ -132,7 +135,11 @@ class GameOfLife {
     }
   }
 
-  inspect(blur = true) {
+  randColor(): string {
+    return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+  }
+
+  inspect(blur = true): void {
     if (blur) {
       this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
       this.ctx.fillRect(
@@ -142,27 +149,23 @@ class GameOfLife {
         this.size * this.pixelSize
       );
     }
-    let color;
-
     if (this.colorMode === "full") {
-      color = "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+      this.ctx.fillStyle = this.randColor();
     } else if (this.colorMode === "picker") {
-      color = this.color;
+      this.ctx.fillStyle = this.color;
     }
 
-    for (var row = 0; row < this.size; row++) {
+    for (let row = 0; row < this.size; row++) {
       if (this.colorMode === "row") {
-        color = "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+        this.ctx.fillStyle = this.randColor();
       }
 
-      for (var col = 0; col < this.size; col++) {
+      for (let col = 0; col < this.size; col++) {
         if (this.get(row, col) === 1) {
           if (this.colorMode === "each") {
-            color =
-              "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+            this.ctx.fillStyle = this.randColor();
           }
 
-          this.ctx.fillStyle = color;
           this.ctx.fillRect(
             col * this.pixelSize,
             row * this.pixelSize,
@@ -198,9 +201,7 @@ window.requestAnimationFrame(tick);
 
 canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
-const slider = document.querySelector("#delay");
-
-slider.addEventListener(
+document.querySelector("#delay").addEventListener(
   "input",
   (e: InputEvent) => {
     gameOfLife.alpha = parseFloat(e.target.value as any);
@@ -253,9 +254,9 @@ document
   });
 
 document.querySelector("#screencap").addEventListener("click", (e) => {
-  var dataUrl = canvas.toDataURL("image/png");
+  const dataUrl = canvas.toDataURL("image/png");
 
-  var img = new Image();
+  const img = new Image();
   img.src = dataUrl;
   img.alt = `CanvasGOL-${Date.now()}`;
   img.title = `
@@ -268,6 +269,10 @@ document.querySelector("#screencap").addEventListener("click", (e) => {
 
 document.querySelector("#reset").addEventListener("click", (e) => {
   gameOfLife.reset();
+});
+
+document.querySelector("#clear").addEventListener("click", (e) => {
+  gameOfLife.clear();
 });
 
 document.querySelector("#setShape").addEventListener("change", (e) => {

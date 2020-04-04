@@ -1,8 +1,8 @@
 var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, cavnas) {
         this.size = size;
-        // this.data = GameOfLife.randBoard(this.size);
-        this.data = new Uint8Array(size * size);
+        this.data = GameOfLife.randBoard(this.size);
+        // this.data = new Uint8Array(size * size);
         this.buffer = new Uint8Array(size * size);
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
@@ -16,6 +16,9 @@ var GameOfLife = /** @class */ (function () {
     GameOfLife.prototype.reset = function () {
         this.data = GameOfLife.randBoard(this.size);
     };
+    GameOfLife.prototype.clear = function () {
+        this.data = new Uint8Array(this.size * this.size);
+    };
     GameOfLife.rand = function (min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
@@ -28,7 +31,6 @@ var GameOfLife = /** @class */ (function () {
     };
     GameOfLife.prototype.set = function (x, y, value) {
         this.data[y * this.size + x] = value;
-        return 0;
     };
     GameOfLife.prototype.alive = function (row, col) {
         var liveNeighbors = 0;
@@ -110,30 +112,30 @@ var GameOfLife = /** @class */ (function () {
                 this.set(y - 1, x + 1, 1);
         }
     };
+    GameOfLife.prototype.randColor = function () {
+        return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+    };
     GameOfLife.prototype.inspect = function (blur) {
         if (blur === void 0) { blur = true; }
         if (blur) {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
             this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
         }
-        var color;
         if (this.colorMode === "full") {
-            color = "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+            this.ctx.fillStyle = this.randColor();
         }
         else if (this.colorMode === "picker") {
-            color = this.color;
+            this.ctx.fillStyle = this.color;
         }
         for (var row = 0; row < this.size; row++) {
             if (this.colorMode === "row") {
-                color = "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+                this.ctx.fillStyle = this.randColor();
             }
             for (var col = 0; col < this.size; col++) {
                 if (this.get(row, col) === 1) {
                     if (this.colorMode === "each") {
-                        color =
-                            "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+                        this.ctx.fillStyle = this.randColor();
                     }
-                    this.ctx.fillStyle = color;
                     this.ctx.fillRect(col * this.pixelSize, row * this.pixelSize, this.pixelSize, this.pixelSize);
                 }
             }
@@ -158,8 +160,7 @@ function tick(now) {
 }
 window.requestAnimationFrame(tick);
 canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
-var slider = document.querySelector("#delay");
-slider.addEventListener("input", function (e) {
+document.querySelector("#delay").addEventListener("input", function (e) {
     gameOfLife.alpha = parseFloat(e.target.value);
 }, false);
 document.querySelector("#color").addEventListener("input", function (e) {
@@ -197,6 +198,9 @@ document.querySelector("#screencap").addEventListener("click", function (e) {
 });
 document.querySelector("#reset").addEventListener("click", function (e) {
     gameOfLife.reset();
+});
+document.querySelector("#clear").addEventListener("click", function (e) {
+    gameOfLife.clear();
 });
 document.querySelector("#setShape").addEventListener("change", function (e) {
     gameOfLife.shape = e.target.value;

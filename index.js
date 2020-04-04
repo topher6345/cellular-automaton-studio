@@ -33,9 +33,14 @@ var GameOfLife = /** @class */ (function () {
     };
     GameOfLife.prototype.neighborValues = function (x, y) {
         return [
-            [this.get(x - 1, y - 1), this.get(x, y - 1), this.get(x + 1, y - 1)],
-            [this.get(x - 1, y), this.get(x, y), this.get(x + 1, y)],
-            [this.get(x - 1, y + 1), this.get(x, y + 1), this.get(x + 1, y + 1)]
+            this.get(x - 1, y - 1),
+            this.get(x, y - 1),
+            this.get(x + 1, y - 1),
+            this.get(x - 1, y),
+            this.get(x + 1, y),
+            this.get(x - 1, y + 1),
+            this.get(x, y + 1),
+            this.get(x + 1, y + 1)
         ];
     };
     GameOfLife.prototype.get = function (x, y) {
@@ -46,20 +51,7 @@ var GameOfLife = /** @class */ (function () {
         return 0;
     };
     GameOfLife.prototype.liveNeighbors = function (x, y) {
-        var count = 0;
-        var values = this.neighborValues(x, y);
-        for (var row = 0; row < values.length; row++) {
-            for (var col = 0; col < values.length; col++) {
-                if (row === 1 && col === 1) {
-                }
-                else {
-                    if (values[row][col] === 1) {
-                        count++;
-                    }
-                }
-            }
-        }
-        return count;
+        return this.neighborValues(x, y).filter(function (value) { return value === 1; }).length;
     };
     GameOfLife.prototype.update = function () {
         var newGame = new GameOfLife(this.size);

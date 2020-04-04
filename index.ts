@@ -1,6 +1,5 @@
 class GameOfLife {
   size: any;
-  generation: number;
   data: number[][];
   canvas: HTMLCanvasElement;
   ctx: any;
@@ -13,7 +12,6 @@ class GameOfLife {
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
-    this.generation = 0;
     this.data = this.blankBoard(this.size);
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
@@ -107,7 +105,6 @@ class GameOfLife {
     const newGame = new GameOfLife(this.size);
     newGame.data = this.blankBoard(this.size);
     let liveNeighbors: number;
-    this.generation += 1;
 
     for (var row = 0; row < this.data.length; row++) {
       for (var col = 0; col < this.data.length; col++) {

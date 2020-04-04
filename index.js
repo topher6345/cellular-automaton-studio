@@ -1,7 +1,6 @@
 var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, cavnas) {
         this.size = size;
-        this.generation = 0;
         this.data = this.blankBoard(this.size);
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
@@ -85,7 +84,6 @@ var GameOfLife = /** @class */ (function () {
         var newGame = new GameOfLife(this.size);
         newGame.data = this.blankBoard(this.size);
         var liveNeighbors;
-        this.generation += 1;
         for (var row = 0; row < this.data.length; row++) {
             for (var col = 0; col < this.data.length; col++) {
                 liveNeighbors = this.liveNeighbors(row, col);

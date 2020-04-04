@@ -32,8 +32,8 @@ class GameOfLife {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
-  blankBoard(size: number) {
-    const rows = [];
+  blankBoard(size: number): number[][] {
+    const rows: number[][] = [];
     let columns = [];
     let val = 0;
     for (let i = 0; i < size; i++) {
@@ -48,7 +48,7 @@ class GameOfLife {
     return rows;
   }
 
-  neighborLocationsFor(x: number, y: number) {
+  neighborLocationsFor(x: number, y: number): number[][][] {
     return [
       [
         [x - 1, y - 1],

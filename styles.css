@@ -33,7 +33,6 @@ body {
   cursor: help;
 }
 
-
 #modal-capture {
   position: absolute;
   width: 100%;
@@ -45,7 +44,7 @@ body {
   display: flex;
 }
 #modal-capture-preview {
-    width: 900px;
+  width: 900px;
   display: flex;
   align-content: center;
   background-color: darkgrey;

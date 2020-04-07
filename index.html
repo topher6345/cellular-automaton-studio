@@ -18,6 +18,7 @@
             for="motion-blur"
             >Motion Blur</label
           >
+
           <input
             name="motion-blur"
             type="range"
@@ -27,20 +28,37 @@
             step="0.0001"
             value="0.0005"
           />
+          <label title="Motion blur - on/off" for="blurEnabled">Enabled</label>
+          <input
+            title="blurEnabled"
+            name="blurEnabled"
+            type="checkbox"
+            id="blurEnabled"
+            checked
+          />
+          <label title="Clear every draw" for="blurEnabled"
+            >Clear Every Frame</label
+          >
+          <input
+            title="clearFrame"
+            name="clearFrame"
+            type="checkbox"
+            id="clearFrame"
+          />
         </div>
         <div>
           <label for="setBlendMode">Blend Mode</label>
           <select name="setBlendMode">
             <option value="source-over">source-over</option>
-            <option value="source-in">source-in</option>
-            <option value="source-out">source-out</option>
+            <!-- <option value="source-in">source-in</option>
+            <option value="source-out">source-out</option> -->
             <option value="source-atop">source-atop</option>
-            <option value="destination-over">destination-over</option>
-            <option value="destination-in">destination-in</option>
-            <option value="destination-out">destination-out</option>
-            <option value="destination-atop">destination-atop</option>
+            <!-- <option value="destination-over">destination-over</option> -->
+            <!-- <option value="destination-in">destination-in</option> -->
+            <!-- <option value="destination-out">destination-out</option> -->
+            <!-- <option value="destination-atop">destination-atop</option> -->
             <option value="lighter">lighter</option>
-            <option value="copy">copy</option>
+            <!-- <option value="copy">copy</option> -->
             <option value="xor">xor</option>
             <option value="multiply">multiply</option>
             <option value="screen">screen</option>
@@ -109,6 +127,15 @@
             id="colorRadix"
             type="number"
             value="16777215"
+          />
+          <label for="randCycle">Random Color Cycle Length</label>
+          <input
+            name="randCycle"
+            type="nubmer"
+            min="1"
+            max="500"
+            id="randCycle"
+            value="1000"
           />
           <button id="colorRadixReset">reset</button>
         </div>

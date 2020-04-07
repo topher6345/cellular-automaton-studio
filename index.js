@@ -5,12 +5,20 @@ var GameOfLife = /** @class */ (function () {
         this.buffer = new Uint8Array(size * size);
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
+        this.ctx.imageSmoothingEnabled = true;
         this.alpha = 0.006;
+        this.blurEnabled = true;
+        this.clearEveryFrame = false;
         this.color = "orange";
         this.pixelSize = 1;
         this.shape = "gliderse";
         this.colorMode = "picker";
         this.colorRadix = 16777215;
+        this.ctx.fillStyle = "rgba(0,0,0,1)";
+        this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
+        this.colorRateFps = 1000;
+        this.colorRateCounter = 0;
+        this.colorCache = this.randColorString();
     }
     GameOfLife.prototype.reset = function () {
         this.data = GameOfLife.randBoard(this.size);
@@ -39,7 +47,7 @@ var GameOfLife = /** @class */ (function () {
             var col = Math.floor(i / this.size);
             // Optimization - check for live neighbors
             // Extracting this led to GC Pressure
-            // inlining seems to get better performance
+            // inlining seemsPerFrame to get better performance
             this.get(row - 1, col - 1) && liveNeighbors++;
             this.get(row, col - 1) && liveNeighbors++;
             this.get(row + 1, col - 1) && liveNeighbors++;
@@ -66,7 +74,15 @@ var GameOfLife = /** @class */ (function () {
     };
     GameOfLife.prototype.hover = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        this.set(x, y - 1, 1);
         this.set(x, y, 1);
+        this.set(x, y + 1, 1);
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
     };
     GameOfLife.prototype.clickDown = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
@@ -93,6 +109,15 @@ var GameOfLife = /** @class */ (function () {
         }
     };
     GameOfLife.prototype.randColor = function () {
+        if (this.colorRateCounter > this.colorRateFps) {
+            debugger;
+            this.colorCache = this.randColorString();
+            this.colorRateCounter = 0;
+        }
+        this.colorRateCounter = this.colorRateCounter + 1;
+        return this.colorCache;
+    };
+    GameOfLife.prototype.randColorString = function () {
         return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
     GameOfLife.prototype.draw = function (blur) {
@@ -101,6 +126,8 @@ var GameOfLife = /** @class */ (function () {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
             this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
         }
+        if (this.clearEveryFrame)
+            this.ctx.clearRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
         if (this.colorMode === "full") {
             this.ctx.fillStyle = this.randColor();
         }
@@ -128,15 +155,15 @@ var sel = function (s) {
 };
 var canvas = sel("canvas");
 var gameOfLife = new GameOfLife(750, canvas);
-var past = null;
-var ms = 41.666666666666664;
+var msPast = null;
+var msPerFrame = 41.666666666666664;
 var masterOnOff = false;
 function tick(now) {
-    if (!past)
-        past = now;
-    if (!past || (now - past > ms && masterOnOff)) {
-        past = now;
-        gameOfLife.draw();
+    if (!msPast)
+        msPast = now;
+    if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+        msPast = now;
+        gameOfLife.draw(gameOfLife.blurEnabled);
         gameOfLife.update();
     }
     window.requestAnimationFrame(tick);
@@ -152,10 +179,14 @@ sel("#color").addEventListener("input", function (e) {
     masterOnOff || gameOfLife.draw(false);
 }, false);
 sel("select").addEventListener("input", function (e) {
+    var currentState = masterOnOff;
+    if (currentState)
+        masterOnOff = false;
     gameOfLife.ctx.globalCompositeOperation = e.target.value;
+    masterOnOff = currentState;
 });
 sel("#rate").addEventListener("input", function (e) {
-    ms = e.target.value;
+    msPerFrame = e.target.value;
 }, false);
 var isHovering = false;
 sel("#hover").addEventListener("change", function (e) {
@@ -232,3 +263,13 @@ function exportVid(blob) {
     a.textContent = "download the video";
     sel("#record").appendChild(a);
 }
+sel("#blurEnabled").addEventListener("change", function (e) {
+    gameOfLife.blurEnabled = e.target.checked;
+});
+sel("#clearFrame").addEventListener("change", function (e) {
+    gameOfLife.clearEveryFrame = e.target.checked;
+});
+sel("#randCycle").addEventListener("input", function (e) {
+    gameOfLife.colorRateFps = parseInt(e.target.value);
+    gameOfLife.colorRateCounter = 0;
+});

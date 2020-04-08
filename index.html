@@ -120,7 +120,7 @@
             <option value="each">each</option>
           </select>
         </div>
-        <div id="radix" style="display: none;">
+        <div id="radix" >
           <label for="colorRadix">color Radix</label>
           <input
             name="colorRadix"
@@ -131,7 +131,7 @@
           <label for="randCycle">Random Color Cycle Length</label>
           <input
             name="randCycle"
-            type="nubmer"
+            type="number"
             min="1"
             max="500"
             id="randCycle"
@@ -139,13 +139,26 @@
           />
           <button id="colorRadixReset">reset</button>
         </div>
-        <div id="picker">
+        <div id="picker" style="display: none;">
           <label title="The color of the new pixels." for="color">Color</label>
           <input type="color" id="color" name="color" value="#e66465" />
         </div>
         <div id="record">
           <label title="Record Video" for="record-video">Record Video</label>
           <input type="checkbox" id="record-video" name="record-video" />
+        </div>
+        <div id="noise">
+          <label title="noiseEnabled"" for="noiseEnabled">Noise</label>
+          <input type="checkbox" id="noiseEnabled" name="noiseEnabled" />
+          <label title="Noise"" for="noiseRangeValue">Noise Amount</label>
+          <input
+            name="noiseRangeValue"
+            type="range"
+            min="0"
+            max="15"
+            id="noiseRangeValue"
+            value="0"
+          />
         </div>
         <div id="preview"></div>
       </div>

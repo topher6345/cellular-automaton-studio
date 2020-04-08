@@ -15,6 +15,8 @@ class GameOfLife {
   colorRateFps: number;
   colorCache: string;
   colorRateCounter: number;
+  spontaneousRegeneration: boolean;
+  noiseRangeValue: number;
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
@@ -30,7 +32,7 @@ class GameOfLife {
     this.color = "orange";
     this.pixelSize = 1;
     this.shape = "gliderse";
-    this.colorMode = "picker";
+    this.colorMode = "full";
     this.colorRadix = 16777215;
     this.ctx.fillStyle = `rgba(0,0,0,1)`;
     this.ctx.fillRect(
@@ -40,9 +42,11 @@ class GameOfLife {
       this.size * this.pixelSize
     );
 
-    this.colorRateFps = 1000;
+    this.colorRateFps = 100;
     this.colorRateCounter = 0;
     this.colorCache = this.randColorString();
+    this.spontaneousRegeneration = false;
+    this.noiseRangeValue = 0;
   }
 
   reset(): void {
@@ -88,9 +92,16 @@ class GameOfLife {
       this.get(row, col + 1) && liveNeighbors++;
       this.get(row + 1, col + 1) && liveNeighbors++;
 
-      ((this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-        liveNeighbors === 3) &&
-        (status = 1);
+      // prettier-ignore
+      ( // Alive and 2-3 live neighbors
+        (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+        // Dead and 3 live neighbors
+        liveNeighbors === 3 ||
+        // spontaneous generation
+        (this.spontaneousRegeneration && (
+          GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+        )
+      ) && (status = 1);
 
       this.buffer[i] = status;
     }
@@ -148,7 +159,6 @@ class GameOfLife {
 
   randColor(): string {
     if (this.colorRateCounter > this.colorRateFps) {
-      debugger;
       this.colorCache = this.randColorString();
       this.colorRateCounter = 0;
     }
@@ -215,7 +225,7 @@ const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;
 let msPerFrame: number = 41.666666666666664;
-let masterOnOff: boolean = false;
+let masterOnOff: boolean = true;
 
 function tick(now: number) {
   if (!msPast) msPast = now;
@@ -382,4 +392,12 @@ sel("#clearFrame").addEventListener("change", (e) => {
 sel("#randCycle").addEventListener("input", (e) => {
   gameOfLife.colorRateFps = parseInt((e.target as any).value as any);
   gameOfLife.colorRateCounter = 0;
+});
+
+sel("#noiseRangeValue").addEventListener("input", (e) => {
+  gameOfLife.noiseRangeValue = parseInt((e.target as any).value as any);
+});
+
+sel("#noiseEnabled").addEventListener("change", (e) => {
+  gameOfLife.spontaneousRegeneration = (e.target as any).checked as any;
 });

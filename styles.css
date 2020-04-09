@@ -1,23 +1,29 @@
 canvas {
-  position: absolute;
-  top: 0px;
-  left: 0px;
+  min-width: 750px;
 }
 
 body {
   background-color: black;
 }
 
-.controls {
+#root {
+  display: flex;
+  max-width: 100%;
   position: absolute;
-  top: 0px;
-  left: 750px;
+  top: 0;
+  left: 0;
+}
+
+.controls {
+  display: flex;
+  align-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .controls div {
   display: block;
   border-color: black;
-  padding: 0;
+  padding: 0.5em;
   margin: 0;
   border: 1px solid black;
   background-color: grey;

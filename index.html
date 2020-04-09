@@ -6,17 +6,43 @@
     <link href="styles.css" rel="stylesheet" />
   </head>
   <body>
-    <div id='root'>
+    <div id="root">
       <div id="modal-capture">
-        <div id="modal-capture-preview" hidden></div>
+        <div id="modal-capture-preview"></div>
       </div>
       <canvas width="750" height="750"></canvas>
       <div class="controls">
+        <h1>Conway's Game of Life</h1>
         <div>
+          <label title="When checked, the simulation is paused" for="master"
+            >On/Off</label
+          >
+          <input name="master" type="checkbox" id="master" checked />
+        </div>
+        <div>
+          <label title="Clear every draw" for="blurEnabled">Clear Frame</label>
+          <input
+            title="clearFrame"
+            name="clearFrame"
+            type="checkbox"
+            id="clearFrame"
+          />
+        </div>
+        <div>
+          <label title="Motion blur - on/off" for="blurEnabled"
+            >Blur Enabled</label
+          >
+          <input
+            title="blurEnabled"
+            name="blurEnabled"
+            type="checkbox"
+            id="blurEnabled"
+            checked
+          />
           <label
             title="Motion blur - left is more blur, right is less."
             for="motion-blur"
-            >Motion Blur</label
+            >Blur Amount</label
           >
 
           <input
@@ -27,23 +53,6 @@
             max="0.3"
             step="0.0001"
             value="0.0005"
-          />
-          <label title="Motion blur - on/off" for="blurEnabled">Enabled</label>
-          <input
-            title="blurEnabled"
-            name="blurEnabled"
-            type="checkbox"
-            id="blurEnabled"
-            checked
-          />
-          <label title="Clear every draw" for="blurEnabled"
-            >Clear Every Frame</label
-          >
-          <input
-            title="clearFrame"
-            name="clearFrame"
-            type="checkbox"
-            id="clearFrame"
           />
         </div>
         <div>
@@ -90,18 +99,14 @@
           >
           <input title="Hover" name="hover" type="checkbox" id="hover" />
         </div>
-        <div>
-          <label title="When checked, the simulation is paused" for="master"
-            >Play/Pause</label
-          >
-          <input name="master" type="checkbox" id="master" />
-        </div>
+
         <div>
           <label>Image Capture</label>
           <button id="screencap">📷</button>
         </div>
         <div>
-          <button id="reset">Reset Random</button>
+          <label>Screen</label>
+          <button id="reset">Random</button>
           <button id="clear">Clear</button>
         </div>
         <div>
@@ -114,33 +119,34 @@
         <div>
           <label for="colorMode">ColorMode</label>
           <select name="colorMode" id="colorMode">
-            <option value="picker">picker</option>
-            <option value="full">full</option>
-            <option value="row">row</option>
-            <option value="each">each</option>
+            <option value="picker">Color Picker</option>
+            <option value="full" selected>Random Frame</option>
+            <option value="row">Random Row</option>
+            <option value="each">Random Pixel</option>
           </select>
         </div>
-        <div id="radix" >
-          <label for="colorRadix">color Radix</label>
+        <div id="radix">
+          <label for="colorRadix">Color Span</label>
           <input
             name="colorRadix"
             id="colorRadix"
-            type="number"
+            type="range"
+            min="1"
+            max="16777215"
             value="16777215"
           />
-          <label for="randCycle">Random Color Cycle Length</label>
+          <label for="randCycle">Color Rate</label>
           <input
             name="randCycle"
-            type="number"
+            type="range"
             min="1"
             max="500"
             id="randCycle"
             value="1000"
           />
-          <button id="colorRadixReset">reset</button>
         </div>
         <div id="picker" style="display: none;">
-          <label title="The color of the new pixels." for="color">Color</label>
+          <label title="The color of the new pixels." for="color">Picker</label>
           <input type="color" id="color" name="color" value="#e66465" />
         </div>
         <div id="record">
@@ -148,9 +154,9 @@
           <input type="checkbox" id="record-video" name="record-video" />
         </div>
         <div id="noise">
-          <label title="noiseEnabled"" for="noiseEnabled">Noise</label>
+          <label title="noiseEnabled" for="noiseEnabled">Noise Enabled</label>
           <input type="checkbox" id="noiseEnabled" name="noiseEnabled" />
-          <label title="Noise"" for="noiseRangeValue">Noise Amount</label>
+          <label title="Noise" for="noiseRangeValue">Amount</label>
           <input
             name="noiseRangeValue"
             type="range"
@@ -160,7 +166,6 @@
             value="0"
           />
         </div>
-        <div id="preview"></div>
       </div>
       <script src="index.js"></script>
     </div>

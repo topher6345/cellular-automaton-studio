@@ -297,7 +297,7 @@ sel("#master").addEventListener(
 sel("#modal-capture-preview").addEventListener(
   "click",
   (e) => {
-    sel("#modal-capture-preview").hidden = true;
+    sel("#modal-capture ").style.display = "none";
   },
   false
 );
@@ -312,8 +312,13 @@ sel("#screencap").addEventListener("click", (e) => {
     Right click and select "Save Image As.."
     Left click to exit (all your captures are saved until refresh)
   `;
-  sel("#modal-capture").hidden = false;
-  sel("#modal-capture-preview").prepend(img as any);
+
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.append(img as any);
+  a.download = `CanvasGOL-${Date.now()}.png`;
+  sel("#modal-capture").style.display = "flex";
+  sel("#modal-capture-preview").prepend(a as any);
 });
 
 sel("#reset").addEventListener("click", (e) => {
@@ -345,11 +350,6 @@ sel("#colorRadix").addEventListener("input", (e) => {
   gameOfLife.colorRadix = e.target.value as any;
 });
 
-sel("#colorRadixReset").addEventListener("click", (e) => {
-  gameOfLife.colorRadix = 16777215;
-  sel("#colorRadix").value = 16777215;
-});
-
 let recorders: MediaRecorder = null;
 sel("#record-video").addEventListener("change", (e) => {
   if ((e.target.value as any) === "on") {
@@ -363,9 +363,10 @@ sel("#record-video").addEventListener("change", (e) => {
     rec.onstop = (e) => exportVid(new Blob(chunks, { type: "video/webm" }));
 
     rec.start();
-    setTimeout(() => rec.stop(), 30000); // stop recording in 30s
+    setTimeout(() => recorders && recorders.stop(), 30000); // stop recording in 30s
   } else {
     recorders.stop();
+    recorders = null;
   }
 });
 
@@ -373,12 +374,7 @@ function exportVid(blob: Blob) {
   const vid = document.createElement("video");
   vid.src = URL.createObjectURL(blob);
   vid.controls = true;
-  document.body.appendChild(vid as any);
-  const a = document.createElement("a");
-  a.download = "myvid.webm";
-  a.href = vid.src;
-  a.textContent = "download the video";
-  sel("#record").appendChild(a as any);
+  sel("#modal-capture-preview").prepend(vid as any);
 }
 
 sel("#blurEnabled").addEventListener("change", (e) => {

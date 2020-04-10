@@ -95,7 +95,31 @@ class GameOfLife {
       this.get(row + 1, col + 1) && liveNeighbors++;
 
       switch (this.mode) {
-        case "b2s":
+        case "34life":
+          // prettier-ignore
+          ( // S34
+            (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+            // B34
+            (liveNeighbors === 3 || liveNeighbors === 4) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "B25/S4":
+          // prettier-ignore
+          ( // S4
+            (this.get(row, col) && (liveNeighbors === 4)) ||
+            // B25
+            (liveNeighbors === 2 || liveNeighbors === 5) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "seeds":
           // prettier-ignore
           ( // S
             (this.get(row, col) ) ||

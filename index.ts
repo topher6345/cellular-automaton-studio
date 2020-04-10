@@ -95,6 +95,30 @@ class GameOfLife {
       this.get(row + 1, col + 1) && liveNeighbors++;
 
       switch (this.mode) {
+        case "b2s":
+          // prettier-ignore
+          ( // S
+            (this.get(row, col) ) ||
+            // B2
+            (liveNeighbors === 2) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "replicator":
+          // prettier-ignore
+          ( // S1357
+            (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+            // B1357
+            (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
         case "highlife":
           // prettier-ignore
           ( // Alive and 2-3 live neighbors
@@ -118,6 +142,7 @@ class GameOfLife {
             GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
           )
         ) && (status = 1);
+          break;
       }
 
       this.buffer[i] = status;

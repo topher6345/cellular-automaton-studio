@@ -83,8 +83,7 @@ class GameOfLife {
       const col = Math.floor(i / this.size);
 
       // Optimization - check for live neighbors
-      // Extracting this led to GC Pressure
-      // inlining seemsPerFrame to get better performance
+      // An array-based algorithm led to GC Pressure and low frame rate
       this.get(row - 1, col - 1) && liveNeighbors++;
       this.get(row, col - 1) && liveNeighbors++;
       this.get(row + 1, col - 1) && liveNeighbors++;

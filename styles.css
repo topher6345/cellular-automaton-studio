@@ -41,6 +41,10 @@ h1 {
   background-color: grey;
 }
 
+.controls div:first-child {
+  max-width: 80px;
+}
+
 .controls input,
 .controls select,
 .controls button {

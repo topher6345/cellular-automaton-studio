@@ -278,8 +278,12 @@ sel("#rate").addEventListener(
 );
 
 let isHovering = false;
-sel("#hover").addEventListener("change", (e) => {
-  isHovering = !isHovering;
+sel("#hoverOn").addEventListener("input", (e) => {
+  isHovering = true;
+});
+
+sel("#hoverOff").addEventListener("input", (e) => {
+  isHovering = false;
 });
 
 canvas.addEventListener(

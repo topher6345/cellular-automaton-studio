@@ -415,7 +415,12 @@ sel("#noiseRangeValue").addEventListener("input", (e) => {
   gameOfLife.noiseRangeValue = parseInt((e.target as any).value as any);
 });
 
-sel("#noiseEnabled").addEventListener("change", (e) => {
-  gameOfLife.spontaneousRegeneration = (e.target as any).checked as any;
+sel("#noiseOn").addEventListener("change", (e) => {
+  gameOfLife.spontaneousRegeneration = true;
+  (sel("#noiseRangeValue") as any).disabled = (!e.target as any).checked as any;
+});
+
+sel("#noiseOff").addEventListener("change", (e) => {
+  gameOfLife.spontaneousRegeneration = false;
   (sel("#noiseRangeValue") as any).disabled = (!e.target as any).checked as any;
 });

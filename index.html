@@ -14,37 +14,25 @@
       <div class="controls">
         <h1>Conway's Game of Life</h1>
         <div>
-          <label title="When checked, the simulation is paused" for="master"
-            >On/Off</label
-          >
-          <input name="master" type="checkbox" id="master" checked />
+          <label for="huey">On</label>
+          <input type="radio" id="masterOn" name="drone" value="on" checked />
+          <label for="dewey">Off</label>
+          <input type="radio" id="masterOff" name="drone" value="off" />
         </div>
         <div>
+          <label title="" for="blurOn">Blur</label>
+          <input type="radio" id="blurOn" name="radio" value="on" checked />
+
+          <label title="" for="blurOff">Overlay</label>
+          <input type="radio" id="blurOff" name="radio" />
+
           <label title="Clear every draw" for="blurEnabled">Clear Frame</label>
-          <input
-            title="clearFrame"
-            name="clearFrame"
-            type="checkbox"
-            id="clearFrame"
-          />
-        </div>
-        <div>
-          <label title="Motion blur - on/off" for="blurEnabled"
-            >Blur Enabled</label
-          >
-          <input
-            title="blurEnabled"
-            name="blurEnabled"
-            type="checkbox"
-            id="blurEnabled"
-            checked
-          />
+          <input title="clearFrame" name="radio" type="radio" id="clearFrame" />
           <label
             title="Motion blur - left is more blur, right is less."
             for="motion-blur"
-            >Blur Amount</label
-          >
-
+            >Blur Amount
+          </label>
           <input
             name="motion-blur"
             type="range"
@@ -164,6 +152,7 @@
             max="15"
             id="noiseRangeValue"
             value="0"
+            disabled="true"
           />
         </div>
       </div>

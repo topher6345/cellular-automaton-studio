@@ -288,9 +288,11 @@ canvas.addEventListener(
   false
 );
 
-sel("#master").addEventListener(
+sel("#masterOn").addEventListener("change", (e) => (masterOnOff = true), false);
+
+sel("#masterOff").addEventListener(
   "change",
-  (e) => (masterOnOff = !masterOnOff),
+  (e) => (masterOnOff = false),
   false
 );
 
@@ -377,12 +379,21 @@ function exportVid(blob: Blob) {
   sel("#modal-capture-preview").prepend(vid as any);
 }
 
-sel("#blurEnabled").addEventListener("change", (e) => {
-  gameOfLife.blurEnabled = (e.target as any).checked as any;
+sel("#blurOn").addEventListener("input", (e) => {
+  gameOfLife.blurEnabled = true;
+  gameOfLife.clearEveryFrame = false;
+  (sel("#delay") as any).disabled = false;
 });
 
+sel("#blurOff").addEventListener("input", (e) => {
+  gameOfLife.blurEnabled = false;
+  gameOfLife.clearEveryFrame = false;
+  (sel("#delay") as any).disabled = true;
+});
 sel("#clearFrame").addEventListener("change", (e) => {
-  gameOfLife.clearEveryFrame = (e.target as any).checked as any;
+  gameOfLife.clearEveryFrame = true;
+  gameOfLife.blurEnabled = false;
+  (sel("#delay") as any).disabled = true;
 });
 
 sel("#randCycle").addEventListener("input", (e) => {
@@ -396,4 +407,5 @@ sel("#noiseRangeValue").addEventListener("input", (e) => {
 
 sel("#noiseEnabled").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = (e.target as any).checked as any;
+  (sel("#noiseRangeValue") as any).disabled = (!e.target as any).checked as any;
 });

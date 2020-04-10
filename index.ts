@@ -17,6 +17,7 @@ class GameOfLife {
   colorRateCounter: number;
   spontaneousRegeneration: boolean;
   noiseRangeValue: number;
+  mode: string;
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
@@ -47,6 +48,7 @@ class GameOfLife {
     this.colorCache = this.randColorString();
     this.spontaneousRegeneration = false;
     this.noiseRangeValue = 0;
+    this.mode = "life";
   }
 
   reset(): void {
@@ -92,16 +94,31 @@ class GameOfLife {
       this.get(row, col + 1) && liveNeighbors++;
       this.get(row + 1, col + 1) && liveNeighbors++;
 
-      // prettier-ignore
-      ( // Alive and 2-3 live neighbors
-        (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-        // Dead and 3 live neighbors
-        liveNeighbors === 3 ||
-        // spontaneous generation
-        (this.spontaneousRegeneration && (
-          GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-        )
-      ) && (status = 1);
+      switch (this.mode) {
+        case "highlife":
+          // prettier-ignore
+          ( // Alive and 2-3 live neighbors
+          (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+          // Dead and 3 live neighbors
+          (liveNeighbors === 3 || liveNeighbors === 6) || 
+          // spontaneous generation
+          (this.spontaneousRegeneration && (
+            GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+          )
+        ) && (status = 1);
+          break;
+        case "life":
+          // prettier-ignore
+          (// Alive and 2-3 live neighbors
+          (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+          // Dead and 3 live neighbors
+          liveNeighbors === 3 || 
+          // spontaneous generation
+          (this.spontaneousRegeneration && (
+            GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+          )
+        ) && (status = 1);
+      }
 
       this.buffer[i] = status;
     }
@@ -431,4 +448,8 @@ sel("#noiseOn").addEventListener("change", (e) => {
 sel("#noiseOff").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = false;
   (sel("#noiseRangeValue") as any).disabled = true;
+});
+
+sel("#gameType").addEventListener("change", (e) => {
+  gameOfLife.mode = e.target.value as any;
 });

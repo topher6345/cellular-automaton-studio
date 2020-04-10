@@ -226,6 +226,7 @@ const gameOfLife = new GameOfLife(750, canvas);
 let msPast: number = null;
 let msPerFrame: number = 41.666666666666664;
 let masterOnOff: boolean = true;
+let masterCacheState: boolean = masterOnOff;
 
 function tick(now: number) {
   if (!msPast) msPast = now;
@@ -304,6 +305,7 @@ sel("#modal-capture-preview").addEventListener(
   "click",
   (e) => {
     sel("#modal-capture ").style.display = "none";
+    masterOnOff = masterCacheState;
   },
   false
 );
@@ -357,31 +359,35 @@ sel("#colorRadix").addEventListener("input", (e) => {
 });
 
 let recorders: MediaRecorder = null;
-sel("#record-video").addEventListener("change", (e) => {
-  if ((e.target.value as any) === "on") {
-    const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
-    const stream = canvas.captureStream(); // grab our canvas MediaStream
-    const rec = new MediaRecorder(stream); // init the recorder
-    // every time the recorder has new data, we will store it in our array
-    recorders = rec;
-    rec.ondataavailable = (e) => chunks.push(e.data);
-    // only when the recorder stops, we construct a complete Blob from all the chunks
-    rec.onstop = (e) => exportVid(new Blob(chunks, { type: "video/webm" }));
+sel("#recStart").addEventListener("change", (e) => {
+  const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
+  const stream = canvas.captureStream(); // grab our canvas MediaStream
+  const rec = new MediaRecorder(stream); // init the recorder
+  // every time the recorder has new data, we will store it in our array
+  recorders = rec;
+  rec.ondataavailable = (chunk) => chunks.push(chunk.data);
+  // only when the recorder stops, we construct a complete Blob from all the chunks
+  rec.onstop = () => {
+    const vid = document.createElement("video");
+    vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
+    vid.controls = true;
+    sel("#modal-capture-preview").prepend(vid as any);
+    masterCacheState = masterOnOff;
+    masterOnOff = false;
+  };
 
-    rec.start();
-    setTimeout(() => recorders && recorders.stop(), 30000); // stop recording in 30s
-  } else {
-    recorders.stop();
-    recorders = null;
-  }
+  rec.start();
+  setTimeout(() => {
+    recorders && recorders.stop();
+    (sel("#recStop") as any).checked = true;
+    (sel("#recStop") as any).checked = true;
+  }, 30000); // stop recording in 30s
 });
 
-function exportVid(blob: Blob) {
-  const vid = document.createElement("video");
-  vid.src = URL.createObjectURL(blob);
-  vid.controls = true;
-  sel("#modal-capture-preview").prepend(vid as any);
-}
+sel("#recStop").addEventListener("change", () => {
+  recorders.stop();
+  recorders = null;
+});
 
 sel("#blurOn").addEventListener("input", (e) => {
   gameOfLife.blurEnabled = true;

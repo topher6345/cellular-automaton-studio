@@ -75,8 +75,3 @@ select,
 button {
   margin-top: 1em;
 }
-
-
-input[type="range"] ~ {
-  
-}

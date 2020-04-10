@@ -79,6 +79,23 @@
           >
           <input type="range" name="rate" id="rate" min="17" max="250" />
         </div>
+
+        <div>
+          <label>Screenshot</label>
+          <button id="screencap">📷</button>
+        </div>
+        <div>
+          <label>Redraw</label>
+          <button id="reset">Random</button>
+          <button id="clear">Clear</button>
+        </div>
+        <div>
+          <label for="setShape">Click Shape</label>
+          <select name="setShape" id="setShape">
+            <option value="gliderse">Glider SE</option>
+            <option value="3x3">3x3</option>
+          </select>
+        </div>
         <div>
           <label
             title="When checked, hovering over the canvas will draw a pixel"
@@ -92,23 +109,6 @@
             >Hover Off</label
           >
           <input title="Hover" name="hover" type="radio" id="hoverOff" />
-        </div>
-
-        <div>
-          <label>Screenshot</label>
-          <button id="screencap">📷</button>
-        </div>
-        <div>
-          <label>Screen</label>
-          <button id="reset">Random</button>
-          <button id="clear">Clear</button>
-        </div>
-        <div>
-          <label for="setShape">Shape</label>
-          <select name="setShape" id="setShape">
-            <option value="gliderse">Glider SE</option>
-            <option value="3x3">3x3</option>
-          </select>
         </div>
         <div>
           <label for="colorMode">ColorMode</label>
@@ -144,8 +144,10 @@
           <input type="color" id="color" name="color" value="#e66465" />
         </div>
         <div id="record">
-          <label title="Record Video" for="record-video">Record Video</label>
-          <input type="checkbox" id="record-video" name="record-video" />
+          <label title="Record Video" for="record-video">Recording</label>
+          <input type="radio" id="recStart" name="record-video" />
+          <label title="Record Video" for="record-video">Stopped</label>
+          <input type="radio" id="recStop" name="record-video" checked />
         </div>
         <div id="noise">
           <label title="noiseEnabled" for="noiseEnabled">Noise Enabled</label>

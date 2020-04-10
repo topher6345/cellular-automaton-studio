@@ -95,6 +95,66 @@ class GameOfLife {
       this.get(row + 1, col + 1) && liveNeighbors++;
 
       switch (this.mode) {
+        case "anneal":
+          // prettier-ignore
+          ( // S35678
+            (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)) ||
+            // B4678
+            (liveNeighbors === 4 || liveNeighbors === 6|| liveNeighbors === 7 || liveNeighbors === 8) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "morley":
+          // prettier-ignore
+          ( // S245
+            (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+            // B368
+            (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 8) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "day&night":
+          // prettier-ignore
+          ( // S34678
+            (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6  || liveNeighbors === 7 || liveNeighbors === 8)) ||
+            // B3678
+            (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "2x2":
+          // prettier-ignore
+          ( // S125
+            (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+            // B36
+            (liveNeighbors === 3 || liveNeighbors === 6) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
+        case "diamoeba":
+          // prettier-ignore
+          ( // S5678 
+            (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7|| liveNeighbors === 8)) ||
+            // B35678
+            (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) || 
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
         case "34life":
           // prettier-ignore
           ( // S34

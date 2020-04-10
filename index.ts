@@ -94,6 +94,16 @@ class GameOfLife {
       this.get(row + 1, col + 1) && liveNeighbors++;
 
       switch (this.mode) {
+        case "famine":
+          // prettier-ignore
+          ( // S8
+            (this.get(row, col) && (liveNeighbors > 5)) ||
+            // spontaneous generation
+            (this.spontaneousRegeneration && (
+              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            )
+          ) && (status = 1);
+          break;
         case "anneal":
           // prettier-ignore
           ( // S35678

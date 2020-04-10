@@ -4,7 +4,7 @@ canvas {
 
 body {
   background-color: black;
-  font-family: sans-serif;
+  font-family: Futura;
 }
 input {
   margin: 1em 0;
@@ -15,9 +15,15 @@ select {
 }
 
 h1 {
-  text-align: center;
   color: white;
   width: 100%;
+  font-size: 1em;
+}
+
+a {
+  font-size: 0.5em;
+  text-decoration: none;
+  color: white;
 }
 
 #root {
@@ -38,11 +44,24 @@ h1 {
   display: block;
   padding: 0.5em;
   border: 1px solid black;
-  background-color: grey;
+  color: white;
+  background: rgba(30, 30, 30, 0.9);
+  flex-grow: 2;
+}
+
+.controls div:hover {
+  background: rgba(130, 130, 130, 0.9);
+  color: black;
 }
 
 .controls div:first-child {
-  max-width: 80px;
+  max-width: 6em;
+  font-weight: 800;
+  flex-grow: 1;
+}
+
+.controls div:last-child {
+  max-width: 90px;
 }
 
 .controls input,

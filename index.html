@@ -12,24 +12,42 @@
       </div>
       <canvas width="750" height="750"></canvas>
       <div class="controls">
-        <h1>Conway's Game of Life</h1>
+        <h1>Conway's Game of Life Studio</h1>
         <div>
-          <label for="huey">On</label>
-          <input type="radio" id="masterOn" name="drone" value="on" checked />
-          <label for="dewey">Off</label>
-          <input type="radio" id="masterOff" name="drone" value="off" />
+          <label
+            for="masterOn"
+            title="When selected, the simulation is animating"
+            >On</label
+          >
+          <input type="radio" id="masterOn" name="master" value="on" checked />
+          <label
+            for="masterOff"
+            title="When selected, the simulation is not animating."
+            >Off</label
+          >
+          <input type="radio" id="masterOff" name="master" value="off" />
         </div>
         <div>
-          <label title="" for="blurOn">Blur</label>
+          <label
+            title="Blur only partially erases each frame, leaving visual trails"
+            for="blurOn"
+            >Blur</label
+          >
           <input type="radio" id="blurOn" name="radio" value="on" checked />
 
-          <label title="" for="blurOff">Overlay</label>
+          <label title="Each new frame is drawn over the last" for="blurOff"
+            >Overlay</label
+          >
           <input type="radio" id="blurOff" name="radio" />
 
-          <label title="Clear every draw" for="blurEnabled">Clear Frame</label>
+          <label
+            title="Each frame is erased and redrawn from scratch"
+            for="blurEnabled"
+            >Clear Frame</label
+          >
           <input title="clearFrame" name="radio" type="radio" id="clearFrame" />
           <label
-            title="Motion blur - left is more blur, right is less."
+            title="Blur Amount: left is more blur and longer trails, right is less blur and shorter trails."
             for="motion-blur"
             >Blur Amount
           </label>
@@ -44,7 +62,11 @@
           />
         </div>
         <div>
-          <label for="setBlendMode">Blend Mode</label>
+          <label
+            title="Blend Mode: the compositing or blending operation used in blending the new frame with the old."
+            for="setBlendMode"
+            >Blend Mode</label
+          >
           <select name="setBlendMode">
             <option value="source-over">source-over</option>
             <!-- <option value="source-in">source-in</option>
@@ -118,8 +140,6 @@
             <option value="row">Random Row</option>
             <option value="each">Random Pixel</option>
           </select>
-        </div>
-        <div id="radix">
           <label for="colorRadix">Color Span</label>
           <input
             name="colorRadix"
@@ -138,10 +158,19 @@
             id="randCycle"
             value="1000"
           />
-        </div>
-        <div id="picker" style="display: none;">
-          <label title="The color of the new pixels." for="color">Picker</label>
-          <input type="color" id="color" name="color" value="#e66465" />
+          <label
+            style="display: none;"
+            title="The color of the new pixels."
+            for="color"
+            >Picker</label
+          >
+          <input
+            style="display: none;"
+            type="color"
+            id="color"
+            name="color"
+            value="#e66465"
+          />
         </div>
         <div id="record">
           <label title="Record Video" for="record-video">Recording</label>
@@ -163,7 +192,7 @@
             max="15"
             id="noiseRangeValue"
             value="0"
-            disabled="true"
+            disabled=""
           />
         </div>
       </div>

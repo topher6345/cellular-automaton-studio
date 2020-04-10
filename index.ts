@@ -316,10 +316,9 @@ sel("#screencap").addEventListener("click", (e) => {
   const img = new Image();
   img.src = dataUrl;
   img.alt = `CanvasGOL-${Date.now()}`;
-  img.title = `
-    Right click and select "Save Image As.."
-    Left click to exit (all your captures are saved until refresh)
-  `;
+  img.title = `Right click and select "Save Image As.."
+Left click to exit (all your captures are saved until refresh)
+`;
 
   const a = document.createElement("a");
   a.href = dataUrl;
@@ -345,12 +344,21 @@ sel("#colorMode").addEventListener("change", (e) => {
   gameOfLife.colorMode = e.target.value as any;
   switch (e.target.value as any) {
     case "picker":
-      sel("#radix").style.display = "none";
-      sel("#picker").style.display = "block";
+      sel("#colorRadix").style.display = "none";
+      sel('label[for="colorRadix"]').style.display = "none";
+      sel("#randCycle").style.display = "none";
+      sel('label[for="randCycle"').style.display = "none";
+
+      sel("#color").style.display = "block";
+      sel('label[for="color"]').style.display = "block";
       break;
     default:
-      sel("#radix").style.display = "block";
-      sel("#picker").style.display = "none";
+      sel("#colorRadix").style.display = "block";
+      sel('label[for="colorRadix"]').style.display = "block";
+      sel("#randCycle").style.display = "block";
+      sel('label[for="randCycle"]').style.display = "block";
+      sel("#color").style.display = "none";
+      sel('label[for="color"]').style.display = "none";
   }
 });
 
@@ -417,10 +425,10 @@ sel("#noiseRangeValue").addEventListener("input", (e) => {
 
 sel("#noiseOn").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = true;
-  (sel("#noiseRangeValue") as any).disabled = (!e.target as any).checked as any;
+  (sel("#noiseRangeValue") as any).disabled = false;
 });
 
 sel("#noiseOff").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = false;
-  (sel("#noiseRangeValue") as any).disabled = (!e.target as any).checked as any;
+  (sel("#noiseRangeValue") as any).disabled = true;
 });

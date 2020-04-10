@@ -103,16 +103,25 @@
         </div>
 
         <div>
-          <label>Screenshot</label>
+          <label
+            title="Screenshot: Take as screenshot of the canvas for downloading as a .png file."
+            >Screenshot</label
+          >
           <button id="screencap">📷</button>
         </div>
         <div>
-          <label>Redraw</label>
+          <label title="Redraw: Add or remove cells in the simluation"
+            >Redraw</label
+          >
           <button id="reset">Random</button>
           <button id="clear">Clear</button>
         </div>
         <div>
-          <label for="setShape">Click Shape</label>
+          <label
+            title="Click Shape: the shape of new live cells in the animation when you click"
+            for="setShape"
+            >Click Shape</label
+          >
           <select name="setShape" id="setShape">
             <option value="gliderse">Glider SE</option>
             <option value="3x3">3x3</option>
@@ -120,27 +129,35 @@
         </div>
         <div>
           <label
-            title="When checked, hovering over the canvas will draw a pixel"
+            title="When checked, hovering the mouse over the canvas will draw a pixel"
             for="hover"
             >Hover On</label
           >
           <input title="Hover" name="hover" type="radio" id="hoverOn" />
           <label
-            title="When checked, hovering over the canvas will draw a pixel"
+            title="When checked, hovering the mouse over the canvas will draw a pixel"
             for="hover"
             >Hover Off</label
           >
           <input title="Hover" name="hover" type="radio" id="hoverOff" />
         </div>
         <div>
-          <label for="colorMode">ColorMode</label>
+          <label
+            title="Color Mode: Different options for how new colors appear in the animation"
+            for="colorMode"
+            >Color Mode</label
+          >
           <select name="colorMode" id="colorMode">
             <option value="picker">Color Picker</option>
             <option value="full" selected>Random Frame</option>
             <option value="row">Random Row</option>
             <option value="each">Random Pixel</option>
           </select>
-          <label for="colorRadix">Color Span</label>
+          <label
+            title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
+            for="colorRadix"
+            >Color Range</label
+          >
           <input
             name="colorRadix"
             id="colorRadix"
@@ -149,7 +166,11 @@
             max="16777215"
             value="16777215"
           />
-          <label for="randCycle">Color Rate</label>
+          <label
+            title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
+            for="randCycle"
+            >Color Rate</label
+          >
           <input
             name="randCycle"
             type="range"
@@ -173,18 +194,36 @@
           />
         </div>
         <div id="record">
-          <label title="Record Video" for="record-video">Recording</label>
+          <label
+            title="Recording: This will start recording video, automatically stops after 30 seconds"
+            for="record-video"
+            >Recording</label
+          >
           <input type="radio" id="recStart" name="record-video" />
-          <label title="Record Video" for="record-video">Stopped</label>
+          <label
+            title="Stop the currently recording video and open the gallery"
+            for="record-video"
+            >Stopped</label
+          >
           <input type="radio" id="recStop" name="record-video" checked />
         </div>
         <div id="noise">
-          <label title="noiseEnabled" for="noiseOn">Noise On</label>
+          <label title="Adds random live cells to the simulation" for="noiseOn"
+            >Noise On</label
+          >
           <input type="radio" id="noiseOn" name="noise" />
 
-          <label title="noiseEnabled" for="noiseOff">Noise Off</label>
+          <label
+            title="Disables random live cells in the simulation"
+            for="noiseOff"
+            >Noise Off</label
+          >
           <input type="radio" id="noiseOff" name="noise" checked />
-          <label title="Noise" for="noiseRangeValue">Amount</label>
+          <label
+            title="How likely live cells spontaneously appear"
+            for="noiseRangeValue"
+            >Amount</label
+          >
           <input
             name="noiseRangeValue"
             type="range"

@@ -560,12 +560,10 @@ sel("#noiseRangeValue").addEventListener("input", (e) => {
 
 sel("#noiseOn").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = true;
-  (sel("#noiseRangeValue") as any).disabled = false;
 });
 
 sel("#noiseOff").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = false;
-  (sel("#noiseRangeValue") as any).disabled = true;
 });
 
 sel("#gameType").addEventListener("change", (e) => {

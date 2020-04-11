@@ -61,7 +61,7 @@ a {
 }
 
 .controls div:last-child {
-  max-width: 90px;
+  max-width: 8em;
 }
 
 .controls input,

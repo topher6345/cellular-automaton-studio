@@ -656,7 +656,7 @@ function render() {
     }
     window.requestAnimationFrame(render);
 }
-function step() {
+var step = function () {
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, currentState, 0);
     gl.bindTexture(gl.TEXTURE_2D, lastState);
@@ -664,8 +664,8 @@ function step() {
     var temp = lastState;
     lastState = currentState;
     currentState = temp;
-}
-function onResize() {
+};
+var onResize = function () {
     paused = true;
     ccanvas.width = ccanvas.clientWidth;
     ccanvas.height = ccanvas.clientHeight;
@@ -682,7 +682,7 @@ function onResize() {
     var rgba = new Uint8Array(width * height * 4);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, makeRandomArray(rgba));
     paused = false;
-}
+};
 function onMouseMove(e) {
     gl.uniform2f(mouseCoordLocation, e.clientX / width, e.clientY / height);
 }

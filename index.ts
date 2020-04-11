@@ -891,7 +891,7 @@ function render() {
   window.requestAnimationFrame(render);
 }
 
-function step() {
+const step = () => {
   gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
   gl.framebufferTexture2D(
     gl.FRAMEBUFFER,
@@ -908,9 +908,9 @@ function step() {
   var temp = lastState;
   lastState = currentState;
   currentState = temp;
-}
+};
 
-function onResize() {
+const onResize = () => {
   paused = true;
 
   ccanvas.width = ccanvas.clientWidth;
@@ -953,7 +953,7 @@ function onResize() {
   );
 
   paused = false;
-}
+};
 
 function onMouseMove(e: MouseEvent) {
   gl.uniform2f(mouseCoordLocation, e.clientX / width, e.clientY / height);

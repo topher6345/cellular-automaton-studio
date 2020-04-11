@@ -355,7 +355,7 @@ class GameOfLife {
 const sel = (s: string): HTMLElement => {
   return document.querySelector(s);
 };
-const canvas = sel("canvas") as HTMLCanvasElement;
+const canvas = sel("#2dcanvas") as HTMLCanvasElement;
 const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;

@@ -259,7 +259,7 @@ var GameOfLife = /** @class */ (function () {
 var sel = function (s) {
     return document.querySelector(s);
 };
-var canvas = sel("canvas");
+var canvas = sel("#2dcanvas");
 var gameOfLife = new GameOfLife(750, canvas);
 var msPast = null;
 var msPerFrame = 41.666666666666664;

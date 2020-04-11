@@ -355,33 +355,33 @@ class GameOfLife {
 const sel = (s: string): HTMLElement => {
   return document.querySelector(s);
 };
-const canvas = sel("#twodcanvas") as HTMLCanvasElement;
-const gameOfLife = new GameOfLife(750, canvas);
+// const canvas = sel("#twodcanvas") as HTMLCanvasElement;
+// const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;
 let msPerFrame: number = 41.666666666666664;
 let masterOnOff: boolean = true;
 let masterCacheState: boolean = masterOnOff;
 
-function tick(now: number) {
-  if (!msPast) msPast = now;
+// function tick(now: number) {
+//   if (!msPast) msPast = now;
 
-  if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
-    msPast = now;
-    gameOfLife.draw(gameOfLife.blurEnabled);
-    gameOfLife.update();
-  }
-  window.requestAnimationFrame(tick);
-}
+//   if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+//     msPast = now;
+//     gameOfLife.draw(gameOfLife.blurEnabled);
+//     gameOfLife.update();
+//   }
+//   window.requestAnimationFrame(tick);
+// }
 
-window.requestAnimationFrame(tick);
+// window.requestAnimationFrame(tick);
 
-canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
+// canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
 sel("#delay").addEventListener(
   "input",
   (e: InputEvent) => {
-    gameOfLife.alpha = parseFloat(e.target.value as any);
+    // gameOfLife.alpha = parseFloat(e.target.value as any);
   },
   false
 );
@@ -389,10 +389,9 @@ sel("#delay").addEventListener(
 sel("#color").addEventListener(
   "input",
   (e) => {
-    gameOfLife.color = e.target.value as any;
-
+    // gameOfLife.color = e.target.value as any;
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
+    // masterOnOff || gameOfLife.draw(false);
   },
   false
 );
@@ -400,7 +399,7 @@ sel("#color").addEventListener(
 sel("select").addEventListener("input", (e) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
-  gameOfLife.ctx.globalCompositeOperation = e.target.value as any;
+  // gameOfLife.ctx.globalCompositeOperation = e.target.value as any;
 
   masterOnOff = currentState;
 });
@@ -422,11 +421,11 @@ sel("#hoverOff").addEventListener("input", (e) => {
   isHovering = false;
 });
 
-canvas.addEventListener(
-  "mousemove",
-  (e) => isHovering && gameOfLife.hover(e),
-  false
-);
+// canvas.addEventListener(
+//   "mousemove",
+//   (e) => isHovering && gameOfLife.hover(e),
+//   false
+// );
 
 sel("#masterOn").addEventListener("change", (e) => (masterOnOff = true), false);
 
@@ -445,38 +444,38 @@ sel("#modal-capture-preview").addEventListener(
   false
 );
 
-sel("#screencap").addEventListener("click", (e) => {
-  const dataUrl = canvas.toDataURL("image/png");
+// sel("#screencap").addEventListener("click", (e) => {
+//   const dataUrl = canvas.toDataURL("image/png");
 
-  const img = new Image();
-  img.src = dataUrl;
-  img.alt = `CanvasGOL-${Date.now()}`;
-  img.title = `Right click and select "Save Image As.."
-Left click to exit (all your captures are saved until refresh)
-`;
+//   const img = new Image();
+//   img.src = dataUrl;
+//   img.alt = `CanvasGOL-${Date.now()}`;
+//   img.title = `Right click and select "Save Image As.."
+// Left click to exit (all your captures are saved until refresh)
+// `;
 
-  const a = document.createElement("a");
-  a.href = dataUrl;
-  a.append(img as any);
-  a.download = `CanvasGOL-${Date.now()}.png`;
-  sel("#modal-capture").style.display = "flex";
-  sel("#modal-capture-preview").prepend(a as any);
-});
+//   const a = document.createElement("a");
+//   a.href = dataUrl;
+//   a.append(img as any);
+//   a.download = `CanvasGOL-${Date.now()}.png`;
+//   sel("#modal-capture").style.display = "flex";
+//   sel("#modal-capture-preview").prepend(a as any);
+// });
 
 sel("#reset").addEventListener("click", (e) => {
-  gameOfLife.reset();
+  // gameOfLife.reset();
 });
 
 sel("#clear").addEventListener("click", (e) => {
-  gameOfLife.clear();
+  // gameOfLife.clear();
 });
 
 sel("#setShape").addEventListener("change", (e) => {
-  gameOfLife.shape = e.target.value as any;
+  // gameOfLife.shape = e.target.value as any;
 });
 
 sel("#colorMode").addEventListener("change", (e) => {
-  gameOfLife.colorMode = e.target.value as any;
+  // gameOfLife.colorMode = e.target.value as any;
   switch (e.target.value as any) {
     case "picker":
       sel("#colorRadix").style.display = "none";
@@ -498,34 +497,34 @@ sel("#colorMode").addEventListener("change", (e) => {
 });
 
 sel("#colorRadix").addEventListener("input", (e) => {
-  gameOfLife.colorRadix = e.target.value as any;
+  // gameOfLife.colorRadix = e.target.value as any;
 });
 
 let recorders: MediaRecorder = null;
-sel("#recStart").addEventListener("change", (e) => {
-  const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
-  const stream = canvas.captureStream(); // grab our canvas MediaStream
-  const rec = new MediaRecorder(stream); // init the recorder
-  // every time the recorder has new data, we will store it in our array
-  recorders = rec;
-  rec.ondataavailable = (chunk) => chunks.push(chunk.data);
-  // only when the recorder stops, we construct a complete Blob from all the chunks
-  rec.onstop = () => {
-    const vid = document.createElement("video");
-    vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
-    vid.controls = true;
-    sel("#modal-capture-preview").prepend(vid as any);
-    masterCacheState = masterOnOff;
-    masterOnOff = false;
-  };
+// sel("#recStart").addEventListener("change", (e) => {
+//   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
+//   const stream = canvas.captureStream(); // grab our canvas MediaStream
+//   const rec = new MediaRecorder(stream); // init the recorder
+//   // every time the recorder has new data, we will store it in our array
+//   recorders = rec;
+//   rec.ondataavailable = (chunk) => chunks.push(chunk.data);
+//   // only when the recorder stops, we construct a complete Blob from all the chunks
+//   rec.onstop = () => {
+//     const vid = document.createElement("video");
+//     vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
+//     vid.controls = true;
+//     sel("#modal-capture-preview").prepend(vid as any);
+//     masterCacheState = masterOnOff;
+//     masterOnOff = false;
+//   };
 
-  rec.start();
-  setTimeout(() => {
-    recorders && recorders.stop();
-    (sel("#recStop") as any).checked = true;
-    (sel("#recStop") as any).checked = true;
-  }, 30000); // stop recording in 30s
-});
+//   rec.start();
+//   setTimeout(() => {
+//     recorders && recorders.stop();
+//     (sel("#recStop") as any).checked = true;
+//     (sel("#recStop") as any).checked = true;
+//   }, 30000); // stop recording in 30s
+// });
 
 sel("#recStop").addEventListener("change", () => {
   recorders.stop();
@@ -533,43 +532,43 @@ sel("#recStop").addEventListener("change", () => {
 });
 
 sel("#blurOn").addEventListener("input", (e) => {
-  gameOfLife.blurEnabled = true;
-  gameOfLife.clearEveryFrame = false;
+  // gameOfLife.blurEnabled = true;
+  // gameOfLife.clearEveryFrame = false;
   (sel("#delay") as any).disabled = false;
 });
 
 sel("#blurOff").addEventListener("input", (e) => {
-  gameOfLife.blurEnabled = false;
-  gameOfLife.clearEveryFrame = false;
+  // gameOfLife.blurEnabled = false;
+  // gameOfLife.clearEveryFrame = false;
   (sel("#delay") as any).disabled = true;
 });
 sel("#clearFrame").addEventListener("change", (e) => {
-  gameOfLife.clearEveryFrame = true;
-  gameOfLife.blurEnabled = false;
+  // gameOfLife.clearEveryFrame = true;
+  // gameOfLife.blurEnabled = false;
   (sel("#delay") as any).disabled = true;
 });
 
 sel("#randCycle").addEventListener("input", (e) => {
-  gameOfLife.colorRateFps = parseInt((e.target as any).value as any);
-  gameOfLife.colorRateCounter = 0;
+  // gameOfLife.colorRateFps = parseInt((e.target as any).value as any);
+  // gameOfLife.colorRateCounter = 0;
 });
 
 sel("#noiseRangeValue").addEventListener("input", (e) => {
-  gameOfLife.noiseRangeValue = parseInt((e.target as any).value as any);
+  // gameOfLife.noiseRangeValue = parseInt((e.target as any).value as any);
 });
 
 sel("#noiseOn").addEventListener("change", (e) => {
-  gameOfLife.spontaneousRegeneration = true;
+  // gameOfLife.spontaneousRegeneration = true;
   (sel("#noiseRangeValue") as any).disabled = false;
 });
 
 sel("#noiseOff").addEventListener("change", (e) => {
-  gameOfLife.spontaneousRegeneration = false;
+  // gameOfLife.spontaneousRegeneration = false;
   (sel("#noiseRangeValue") as any).disabled = true;
 });
 
 sel("#gameType").addEventListener("change", (e) => {
-  gameOfLife.mode = e.target.value as any;
+  // gameOfLife.mode = e.target.value as any;
 });
 
 //from http://webglfundamentals.org/webgl/lessons/webgl-boilerplate.html

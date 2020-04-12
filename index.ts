@@ -482,7 +482,7 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#colorRadix").style.display = "none";
       sel('label[for="colorRadix"]').style.display = "none";
       sel("#randCycle").style.display = "none";
-      sel('label[for="randCycle"').style.display = "none";
+      sel('label[for="randCycle"]').style.display = "none";
 
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";

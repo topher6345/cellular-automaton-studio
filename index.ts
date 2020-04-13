@@ -715,6 +715,7 @@ var height: number;
 var flipYLocation: WebGLUniformLocation;
 var textureSizeLocation: WebGLUniformLocation;
 var mouseCoordLocation: WebGLUniformLocation;
+var newColor: WebGLUniformLocation;
 
 var paused = false; //while window is resizing
 
@@ -798,6 +799,9 @@ function initGL() {
   textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
 
   mouseCoordLocation = gl.getUniformLocation(program, "u_mouseCoord");
+
+  newColor = gl.getUniformLocation(program, "u_newColor");
+  gl.uniform3fv(newColor, [1.0, 1.0, 1.0]);
 
   // provide texture coordinates for the rectangle.
   var texCoordBuffer = gl.createBuffer();
@@ -966,10 +970,17 @@ function onTouchMove(e: TouchEvent) {
 
 sel("#color").addEventListener(
   "input",
-  (e) => {
+  (event) => {
+    const [_, a, b, c, d, e, f] = (event.target.value as any).split("");
     // gameOfLife.color = e.target.value as any;
     // redraw if paused so the user can see what colors
     // masterOnOff || gameOfLife.draw(false);
+    const value = [
+      parseInt(a + b, 16) / 255.0,
+      parseInt(c + d, 16) / 255.0,
+      parseInt(e + f, 16) / 255.0,
+    ];
+    gl.uniform3fv(newColor, value);
   },
   false
 );

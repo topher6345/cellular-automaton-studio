@@ -98,6 +98,8 @@
       varying vec2 v_texCoord;
       uniform vec2 u_textureSize;
 
+      uniform vec3 u_newColor;
+
       uniform vec2 u_mouseCoord;
 
       void main() {
@@ -108,7 +110,7 @@
 
           float tol = 0.005;
           if (pxDistFromMouse.x < tol && pxDistFromMouse.y < tol){
-              gl_FragColor = vec4(1.0,1.0,1.0,1);
+            gl_FragColor = vec4(u_newColor.r, u_newColor.g, u_newColor.b, 1);
               return;
           }
 
@@ -127,11 +129,12 @@
 
 
           if (count == 3) {
-              gl_FragColor = vec4(1.0,1.0,1.0,1);
+              gl_FragColor = vec4(1.0, u_newColor.g, u_newColor.b, 1);
+
               return;
           }
-          if (rawTextureData.x == 1.0 && count == 2){
-              gl_FragColor = vec4(1.0,0.0,1.0,1);
+          if (rawTextureData.r == 1.0 && count == 2){
+              gl_FragColor = vec4(1.0, u_newColor.g, u_newColor.b, 1);
               return;
           }
           gl_FragColor = vec4(0,0,0,1);

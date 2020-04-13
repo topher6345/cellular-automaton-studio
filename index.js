@@ -530,6 +530,7 @@ var height;
 var flipYLocation;
 var textureSizeLocation;
 var mouseCoordLocation;
+var newColor;
 var paused = false; //while window is resizing
 window.onload = initGL;
 function initGL() {
@@ -590,6 +591,8 @@ function initGL() {
     var texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
     textureSizeLocation = gl.getUniformLocation(program, "u_textureSize");
     mouseCoordLocation = gl.getUniformLocation(program, "u_mouseCoord");
+    newColor = gl.getUniformLocation(program, "u_newColor");
+    gl.uniform3fv(newColor, [1.0, 1.0, 1.0]);
     // provide texture coordinates for the rectangle.
     var texCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
@@ -696,3 +699,15 @@ function onTouchMove(e) {
     var touch = e.touches[0];
     gl.uniform2f(mouseCoordLocation, touch.pageX / width, touch.pageY / height);
 }
+sel("#color").addEventListener("input", function (event) {
+    var _a = event.target.value.split(""), _ = _a[0], a = _a[1], b = _a[2], c = _a[3], d = _a[4], e = _a[5], f = _a[6];
+    // gameOfLife.color = e.target.value as any;
+    // redraw if paused so the user can see what colors
+    // masterOnOff || gameOfLife.draw(false);
+    var value = [
+        parseInt(a + b, 16) / 255.0,
+        parseInt(c + d, 16) / 255.0,
+        parseInt(e + f, 16) / 255.0,
+    ];
+    gl.uniform3fv(newColor, value);
+}, false);

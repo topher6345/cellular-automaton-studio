@@ -9,6 +9,19 @@
       // Vertext Shader
       // ==============
       //
+      //     https://webglfundamentals.org/webgl/lessons/webgl-how-it-works.html
+      // A Vertex Shader's job is to generate clip space coordinates.
+      // It always takes the form
+      //
+      //     void main() {
+      //       gl_Position = doMathToMakeClipspaceCoordinates
+      //     }
+      //
+      // Vertex shaders need data. They can get that data in 3 ways.
+
+      // * Attributes (data pulled from buffers)
+      // * Uniforms (values that stay the same for all vertices of a single draw call)
+      // * Textures (data from pixels/texels)
 
       // NEWB:
       //    attribute

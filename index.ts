@@ -963,3 +963,13 @@ function onTouchMove(e: TouchEvent) {
   var touch = e.touches[0];
   gl.uniform2f(mouseCoordLocation, touch.pageX / width, touch.pageY / height);
 }
+
+sel("#color").addEventListener(
+  "input",
+  (e) => {
+    // gameOfLife.color = e.target.value as any;
+    // redraw if paused so the user can see what colors
+    // masterOnOff || gameOfLife.draw(false);
+  },
+  false
+);

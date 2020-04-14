@@ -260,7 +260,7 @@ var sel = function (s) {
     return document.querySelector(s);
 };
 var canvas = sel("canvas");
-var gameOfLife = new GameOfLife(750, canvas);
+var gameOfLife = new GameOfLife(1000, canvas);
 var msPast = null;
 var msPerFrame = 41.666666666666664;
 var masterOnOff = true;
@@ -338,7 +338,7 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#colorRadix").style.display = "none";
             sel('label[for="colorRadix"]').style.display = "none";
             sel("#randCycle").style.display = "none";
-            sel('label[for="randCycle"').style.display = "none";
+            sel('label[for="randCycle"]').style.display = "none";
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
             break;
@@ -406,11 +406,9 @@ sel("#noiseRangeValue").addEventListener("input", function (e) {
 });
 sel("#noiseOn").addEventListener("change", function (e) {
     gameOfLife.spontaneousRegeneration = true;
-    sel("#noiseRangeValue").disabled = false;
 });
 sel("#noiseOff").addEventListener("change", function (e) {
     gameOfLife.spontaneousRegeneration = false;
-    sel("#noiseRangeValue").disabled = true;
 });
 sel("#gameType").addEventListener("change", function (e) {
     gameOfLife.mode = e.target.value;

@@ -356,7 +356,7 @@ const sel = (s: string): HTMLElement => {
   return document.querySelector(s);
 };
 const canvas = sel("canvas") as HTMLCanvasElement;
-const gameOfLife = new GameOfLife(750, canvas);
+const gameOfLife = new GameOfLife(1000, canvas);
 
 let msPast: number = null;
 let msPerFrame: number = 41.666666666666664;

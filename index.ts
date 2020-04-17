@@ -33,7 +33,7 @@ class GameOfLife {
     this.color = "orange";
     this.pixelSize = 1;
     this.shape = "gliderse";
-    this.colorMode = "full";
+    this.colorMode = "picker";
     this.colorRadix = 16777215;
     this.ctx.fillStyle = `rgba(0,0,0,1)`;
     this.ctx.fillRect(
@@ -356,7 +356,7 @@ const sel = (s: string): HTMLElement => {
   return document.querySelector(s);
 };
 const canvas = sel("canvas") as HTMLCanvasElement;
-const gameOfLife = new GameOfLife(1000, canvas);
+const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;
 let msPerFrame: number = 41.666666666666664;
@@ -386,7 +386,7 @@ sel("#delay").addEventListener(
   false
 );
 
-sel("#color").addEventListener(
+sel(".input-hex").addEventListener(
   "input",
   (e) => {
     gameOfLife.color = e.target.value as any;

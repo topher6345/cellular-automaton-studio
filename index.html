@@ -4,13 +4,14 @@
     <meta charset="utf-8" />
     <title></title>
     <link href="styles.css" rel="stylesheet" />
+    <script src="picker.js" type="text/javascript"></script>
   </head>
   <body>
     <div id="root">
       <div id="modal-capture">
         <div id="modal-capture-preview"></div>
       </div>
-      <canvas width="1000" height="1000"></canvas>
+      <canvas id="game" width="750" height="750"></canvas>
       <div class="controls">
         <div>
           <h1>Cellular Automaton Studio</h1>
@@ -263,6 +264,69 @@
             id="noiseRangeValue"
             value="0"
           />
+        </div>
+        <div id="picker">
+          <div id="display">
+            <canvas
+              style="position: absolute; left: 0;"
+              height="400"
+              width="400"
+            ></canvas>
+            <svg
+              style="position: absolute; left: 0;"
+              height="400"
+              width="400"
+            ></svg>
+          </div>
+          <table>
+            <tr id="control-h">
+              <td class="cell-input">
+                <input
+                  type="number"
+                  min="0"
+                  max="360"
+                  step="any"
+                  class="counter counter-hue"
+                  tabindex="0"
+                />
+              </td>
+              <td><div class="range-slider"></div></td>
+              <td class="picker-label">H</td>
+            </tr>
+            <tr id="control-s">
+              <td class="cell-input">
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  max="100"
+                  class="counter counter-saturation"
+                />
+              </td>
+              <td><div class="range-slider"></div></td>
+              <td class="picker-label">S</td>
+            </tr>
+            <tr id="control-l">
+              <td class="cell-input">
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  max="100"
+                  class="counter counter-lightness"
+                />
+              </td>
+              <td><div class="range-slider"></div></td>
+              <td class="picker-label">L</td>
+            </tr>
+            <tr>
+              <td class="cell-input cell-input-hex">
+                <input class="input-hex" pattern="#?[0-9a-fA-F]{6}" />
+              </td>
+              <td><div class="swatch"></div></td>
+              <td></td>
+            </tr>
+          </table>
         </div>
       </div>
       <script src="index.js"></script>

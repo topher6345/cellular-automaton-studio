@@ -12,7 +12,7 @@ var GameOfLife = /** @class */ (function () {
         this.color = "orange";
         this.pixelSize = 1;
         this.shape = "gliderse";
-        this.colorMode = "full";
+        this.colorMode = "picker";
         this.colorRadix = 16777215;
         this.ctx.fillStyle = "rgba(0,0,0,1)";
         this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
@@ -260,7 +260,7 @@ var sel = function (s) {
     return document.querySelector(s);
 };
 var canvas = sel("canvas");
-var gameOfLife = new GameOfLife(1000, canvas);
+var gameOfLife = new GameOfLife(750, canvas);
 var msPast = null;
 var msPerFrame = 41.666666666666664;
 var masterOnOff = true;
@@ -280,7 +280,7 @@ canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); 
 sel("#delay").addEventListener("input", function (e) {
     gameOfLife.alpha = parseFloat(e.target.value);
 }, false);
-sel("#color").addEventListener("input", function (e) {
+sel(".input-hex").addEventListener("input", function (e) {
     gameOfLife.color = e.target.value;
     // redraw if paused so the user can see what colors
     masterOnOff || gameOfLife.draw(false);

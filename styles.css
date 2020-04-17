@@ -1,5 +1,6 @@
-canvas {
+#game {
   min-width: 750px;
+  max-height: 750px;
 }
 
 body {
@@ -54,14 +55,14 @@ a {
   color: black;
 }
 
-.controls div:first-child {
+.controls > div:first-child {
   max-width: 6em;
   font-weight: 800;
   flex-grow: 1;
 }
 
 .controls div:last-child {
-  max-width: 8em;
+  /* max-width: 8em; */
 }
 
 .controls input,
@@ -101,4 +102,83 @@ a {
 select,
 button {
   margin-top: 1em;
+}
+
+#display {
+  position: relative;
+  width: 400px;
+  height: 400px;
+}
+
+#picker {
+  width: 400px;
+  margin: auto;
+}
+
+#picker td.cell-input {
+  width: 80px;
+  padding-right: 20px;
+}
+
+#picker td.cell-input input {
+  margin: 0;
+  height: 22px;
+  background: transparent;
+  color: #888;
+  outline: none;
+  border: 1px solid #333;
+  border-radius: 0;
+  text-align: right;
+  width: 100%;
+  padding: 0 5px;
+}
+
+#picker td.cell-input.cell-input-hex input {
+  font-family: monospace;
+  border-color: #555;
+}
+
+#picker table {
+  margin-top: 20px;
+  width: 100%;
+}
+
+#picker table td {
+  padding: 5px 5px;
+  vertical-align: top;
+  border: none;
+}
+
+#picker table td.picker-label {
+  color: #eeeeee;
+  width: 30px;
+  line-height: 22px;
+}
+
+#picker table .swatch {
+  height: 100px;
+}
+
+#picker .explanation-text {
+  margin-bottom: 60px;
+  margin-top: 100px;
+}
+
+.range-slider {
+  height: 22px;
+  display: block;
+  position: relative;
+}
+
+.range-slider-handle {
+  display: inline-block;
+  position: absolute;
+  width: 6px;
+  top: -2px;
+  left: -5px;
+  height: 100%;
+  cursor: default;
+  border: 2px solid #fff;
+  touch-action: pan-y;
+  -ms-touch-action: pan-y;
 }

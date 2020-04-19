@@ -1,16 +1,18 @@
 var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, cavnas) {
         this.size = size;
+        this.pixelSize = 1;
+        this.pixelScalar = 2;
         this.data = GameOfLife.randBoard(this.size);
-        this.buffer = new Uint8Array(size * size);
+        this.buffer = new Uint8Array(this.size * this.size);
+        this.bufferLength = this.size * this.size;
         this.canvas = canvas;
-        this.ctx = this.canvas.getContext("2d");
+        this.ctx = this.canvas.getContext("2d", { alpha: false });
         this.ctx.imageSmoothingEnabled = true;
         this.alpha = 0.006;
         this.blurEnabled = true;
         this.clearEveryFrame = false;
         this.color = "orange";
-        this.pixelSize = 1;
         this.shape = "gliderse";
         this.colorMode = "picker";
         this.colorRadix = 16777215;
@@ -36,134 +38,145 @@ var GameOfLife = /** @class */ (function () {
         var _this = this;
         return new Uint8Array(size * size).map(function (_) { return _this.rand(0, 2); });
     };
-    GameOfLife.prototype.get = function (x, y) {
-        return this.data[y * this.size + x];
-    };
     GameOfLife.prototype.set = function (x, y, value) {
-        this.data[y * this.size + x] = value;
+        var yy = y > this.size ? this.size - y : y;
+        var yyy = yy < 0 ? this.size + yy : yy;
+        var xx = x > this.size ? this.size - x : x;
+        var xxx = xx < 0 ? this.size + xx : xx;
+        this.data[yyy * this.size + xxx] = value;
     };
     GameOfLife.prototype.update = function () {
-        for (var i = 0; i < this.buffer.length; i++) {
+        var size = this.size;
+        var length = this.bufferLength;
+        for (var i = length; i >= 0; i--) {
             var liveNeighbors = 0;
             var status_1 = 0;
-            var row = i % this.size;
-            var col = Math.floor(i / this.size);
+            var data = this.data;
+            var row = i % size;
+            var rowPrev = row - 1 < 0 ? size + row : row - 1;
+            var rowNext = row + 1 > size ? size - row : row + 1;
+            var col = Math.floor(i / size);
+            var colPrev = col - 1 < 0 ? size + col : col - 1;
+            var colNext = col + 1 > size ? size - col : col + 1;
+            var alive = data[row * size + col];
+            var noise = this.spontaneousRegeneration &&
+                GameOfLife.rand(0, 1000) > 985 + this.noiseRangeValue;
             // Optimization - check for live neighbors
             // An array-based algorithm led to GC Pressure and low frame rate
-            this.get(row - 1, col - 1) && liveNeighbors++;
-            this.get(row, col - 1) && liveNeighbors++;
-            this.get(row + 1, col - 1) && liveNeighbors++;
-            this.get(row - 1, col) && liveNeighbors++;
-            this.get(row + 1, col) && liveNeighbors++;
-            this.get(row - 1, col + 1) && liveNeighbors++;
-            this.get(row, col + 1) && liveNeighbors++;
-            this.get(row + 1, col + 1) && liveNeighbors++;
+            data[rowPrev * size + colPrev] && liveNeighbors++;
+            data[row * size + colPrev] && liveNeighbors++;
+            data[rowNext * size + colPrev] && liveNeighbors++;
+            data[rowPrev * size + col] && liveNeighbors++;
+            data[rowNext * size + col] && liveNeighbors++;
+            data[rowPrev * size + colNext] && liveNeighbors++;
+            data[row * size + colNext] && liveNeighbors++;
+            data[rowNext * size + colNext] && liveNeighbors++;
             switch (this.mode) {
                 case "famine":
                     // prettier-ignore
                     ( // S8
-                    (this.get(row, col) && (liveNeighbors > 5)) ||
+                    (alive && (liveNeighbors > 5)) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "anneal":
                     // prettier-ignore
                     ( // S35678
-                    (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B4678
                         (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "morley":
                     // prettier-ignore
                     ( // S245
-                    (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
                         // B368
                         (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "day&night":
                     // prettier-ignore
                     ( // S34678
-                    (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B3678
                         (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "2x2":
                     // prettier-ignore
                     ( // S125
-                    (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+                    (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
                         // B36
                         (liveNeighbors === 3 || liveNeighbors === 6) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "diamoeba":
                     // prettier-ignore
                     ( // S5678 
-                    (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B35678
                         (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "34life":
                     // prettier-ignore
                     ( // S34
-                    (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
                         (liveNeighbors === 3 || liveNeighbors === 4) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "B25/S4":
                     // prettier-ignore
                     ( // S4
-                    (this.get(row, col) && (liveNeighbors === 4)) ||
+                    (alive && (liveNeighbors === 4)) ||
                         // B25
                         (liveNeighbors === 2 || liveNeighbors === 5) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "seeds":
                     // prettier-ignore
                     ( // S
-                    (this.get(row, col)) ||
+                    (alive) ||
                         // B2
                         (liveNeighbors === 2) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "replicator":
                     // prettier-ignore
                     ( // S1357
-                    (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+                    (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
                         // B1357
                         (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "highlife":
                     // prettier-ignore
                     ( // Alive and 2-3 live neighbors
-                    (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // Dead and 3 live neighbors
                         (liveNeighbors === 3 || liveNeighbors === 6) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
                 case "life":
                     // prettier-ignore
                     ( // Alive and 2-3 live neighbors
-                    (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // Dead and 3 live neighbors
                         liveNeighbors === 3 ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        noise) && (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -175,8 +188,8 @@ var GameOfLife = /** @class */ (function () {
     GameOfLife.prototype.getMousePos = function (evt) {
         var rect = this.canvas.getBoundingClientRect();
         return {
-            y: Math.floor((evt.clientX - rect.left) / this.pixelSize),
-            x: Math.floor((evt.clientY - rect.top) / this.pixelSize)
+            y: Math.floor(((evt.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
+            x: Math.floor(((evt.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
         };
     };
     GameOfLife.prototype.hover = function (e) {
@@ -228,29 +241,31 @@ var GameOfLife = /** @class */ (function () {
     };
     GameOfLife.prototype.draw = function (blur) {
         if (blur === void 0) { blur = true; }
+        var size = this.size;
+        var pixelSize = this.pixelSize;
+        var width = size * pixelSize;
+        var ctx = this.ctx;
+        var data = this.data;
+        var colorMode = this.colorMode;
+        var length = this.bufferLength;
         if (blur) {
-            this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
-            this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
+            ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
+            ctx.fillRect(0, 0, width, width);
         }
-        if (this.clearEveryFrame)
-            this.ctx.clearRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
-        if (this.colorMode === "full") {
-            this.ctx.fillStyle = this.randColor();
+        else if (this.clearEveryFrame) {
+            ctx.clearRect(0, 0, width, width);
         }
-        else if (this.colorMode === "picker") {
-            this.ctx.fillStyle = this.color;
-        }
-        for (var row = 0; row < this.size; row++) {
-            if (this.colorMode === "row") {
-                this.ctx.fillStyle = this.randColor();
-            }
-            for (var col = 0; col < this.size; col++) {
-                if (this.get(row, col) === 1) {
-                    if (this.colorMode === "each") {
-                        this.ctx.fillStyle = this.randColor();
-                    }
-                    this.ctx.fillRect(col * this.pixelSize, row * this.pixelSize, this.pixelSize, this.pixelSize);
-                }
+        if (colorMode === "full")
+            ctx.fillStyle = this.randColor();
+        if (colorMode === "picker")
+            ctx.fillStyle = this.color;
+        for (var i = length; i >= 0; i--) {
+            if (data[i]) {
+                var row = i % size;
+                var col = Math.floor(i / size);
+                if (colorMode === "each")
+                    ctx.fillStyle = this.randColor();
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
             }
         }
     };
@@ -260,9 +275,10 @@ var sel = function (s) {
     return document.querySelector(s);
 };
 var canvas = sel("canvas");
+canvas;
 var gameOfLife = new GameOfLife(750, canvas);
 var msPast = null;
-var msPerFrame = 41.666666666666664;
+var msPerFrame = 1;
 var masterOnOff = true;
 var masterCacheState = masterOnOff;
 function tick(now) {

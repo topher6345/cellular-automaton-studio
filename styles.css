@@ -97,6 +97,7 @@ a {
 #modal-capture-preview img {
   margin: 40px 0;
   border: 5px solid black;
+  width: 750px;
 }
 
 select,

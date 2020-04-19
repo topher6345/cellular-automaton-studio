@@ -17,21 +17,26 @@ class GameOfLife {
   colorRateCounter: number;
   spontaneousRegeneration: boolean;
   noiseRangeValue: number;
+  pixelScalar: number;
+  bufferLength: number;
   mode: string;
 
   constructor(size: number, cavnas?: HTMLCanvasElement) {
     this.size = size;
+    this.pixelSize = 1;
+    this.pixelScalar = 2;
     this.data = GameOfLife.randBoard(this.size);
-    this.buffer = new Uint8Array(size * size);
+    this.buffer = new Uint8Array(this.size * this.size);
+    this.bufferLength = this.size * this.size;
 
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext("2d");
+    this.ctx = this.canvas.getContext("2d", { alpha: false });
     this.ctx.imageSmoothingEnabled = true;
     this.alpha = 0.006;
     this.blurEnabled = true;
     this.clearEveryFrame = false;
     this.color = "orange";
-    this.pixelSize = 1;
+
     this.shape = "gliderse";
     this.colorMode = "picker";
     this.colorRadix = 16777215;
@@ -67,173 +72,165 @@ class GameOfLife {
     return new Uint8Array(size * size).map((_) => this.rand(0, 2));
   }
 
-  get(x: number, y: number): number {
-    return this.data[y * this.size + x];
-  }
-
   set(x: number, y: number, value: number): void {
-    this.data[y * this.size + x] = value;
+    const yy = y > this.size ? this.size - y : y;
+
+    const yyy = yy < 0 ? this.size + yy : yy;
+
+    const xx = x > this.size ? this.size - x : x;
+
+    const xxx = xx < 0 ? this.size + xx : xx;
+
+    this.data[yyy * this.size + xxx] = value;
   }
 
   update() {
-    for (let i = 0; i < this.buffer.length; i++) {
+    const size = this.size;
+    const length = this.bufferLength;
+    for (let i = length; i >= 0; i--) {
       let liveNeighbors = 0;
       let status = 0;
-      const row = i % this.size;
-      const col = Math.floor(i / this.size);
+      const data = this.data;
+      const row = i % size;
+      const rowPrev = row - 1 < 0 ? size + row : row - 1;
+      const rowNext = row + 1 > size ? size - row : row + 1;
+      const col = Math.floor(i / size);
+      const colPrev = col - 1 < 0 ? size + col : col - 1;
+      const colNext = col + 1 > size ? size - col : col + 1;
+      const alive = data[row * size + col];
+      const noise =
+        this.spontaneousRegeneration &&
+        GameOfLife.rand(0, 1000) > 985 + this.noiseRangeValue;
 
       // Optimization - check for live neighbors
       // An array-based algorithm led to GC Pressure and low frame rate
-      this.get(row - 1, col - 1) && liveNeighbors++;
-      this.get(row, col - 1) && liveNeighbors++;
-      this.get(row + 1, col - 1) && liveNeighbors++;
-      this.get(row - 1, col) && liveNeighbors++;
-      this.get(row + 1, col) && liveNeighbors++;
-      this.get(row - 1, col + 1) && liveNeighbors++;
-      this.get(row, col + 1) && liveNeighbors++;
-      this.get(row + 1, col + 1) && liveNeighbors++;
+
+      data[rowPrev * size + colPrev] && liveNeighbors++;
+      data[row * size + colPrev] && liveNeighbors++;
+      data[rowNext * size + colPrev] && liveNeighbors++;
+      data[rowPrev * size + col] && liveNeighbors++;
+      data[rowNext * size + col] && liveNeighbors++;
+      data[rowPrev * size + colNext] && liveNeighbors++;
+      data[row * size + colNext] && liveNeighbors++;
+      data[rowNext * size + colNext] && liveNeighbors++;
 
       switch (this.mode) {
         case "famine":
           // prettier-ignore
           ( // S8
-            (this.get(row, col) && (liveNeighbors > 5)) ||
+            (alive && (liveNeighbors > 5)) ||
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "anneal":
           // prettier-ignore
           ( // S35678
-            (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)) ||
+            (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)) ||
             // B4678
             (liveNeighbors === 4 || liveNeighbors === 6|| liveNeighbors === 7 || liveNeighbors === 8) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "morley":
           // prettier-ignore
           ( // S245
-            (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+            (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
             // B368
             (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 8) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "day&night":
           // prettier-ignore
           ( // S34678
-            (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6  || liveNeighbors === 7 || liveNeighbors === 8)) ||
+            (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6  || liveNeighbors === 7 || liveNeighbors === 8)) ||
             // B3678
             (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "2x2":
           // prettier-ignore
           ( // S125
-            (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+            (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
             // B36
             (liveNeighbors === 3 || liveNeighbors === 6) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "diamoeba":
           // prettier-ignore
           ( // S5678 
-            (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7|| liveNeighbors === 8)) ||
+            (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7|| liveNeighbors === 8)) ||
             // B35678
             (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "34life":
           // prettier-ignore
           ( // S34
-            (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+            (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
             // B34
             (liveNeighbors === 3 || liveNeighbors === 4) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "B25/S4":
           // prettier-ignore
           ( // S4
-            (this.get(row, col) && (liveNeighbors === 4)) ||
+            (alive && (liveNeighbors === 4)) ||
             // B25
             (liveNeighbors === 2 || liveNeighbors === 5) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "seeds":
           // prettier-ignore
           ( // S
-            (this.get(row, col) ) ||
+            (alive ) ||
             // B2
             (liveNeighbors === 2) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "replicator":
           // prettier-ignore
           ( // S1357
-            (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+            (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
             // B1357
             (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) || 
             // spontaneous generation
-            (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            noise
           ) && (status = 1);
           break;
         case "highlife":
           // prettier-ignore
           ( // Alive and 2-3 live neighbors
-          (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+          (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
           // Dead and 3 live neighbors
           (liveNeighbors === 3 || liveNeighbors === 6) || 
           // spontaneous generation
-          (this.spontaneousRegeneration && (
-            GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-          )
+          noise
         ) && (status = 1);
           break;
         case "life":
           // prettier-ignore
           (// Alive and 2-3 live neighbors
-          (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+          (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
           // Dead and 3 live neighbors
           liveNeighbors === 3 || 
           // spontaneous generation
-          (this.spontaneousRegeneration && (
-            GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
-          )
+          noise
         ) && (status = 1);
           break;
       }
@@ -247,8 +244,12 @@ class GameOfLife {
   getMousePos(evt: MouseEvent) {
     const rect = this.canvas.getBoundingClientRect();
     return {
-      y: Math.floor((evt.clientX - rect.left) / this.pixelSize),
-      x: Math.floor((evt.clientY - rect.top) / this.pixelSize),
+      y: Math.floor(
+        ((evt.clientX - rect.left) / this.pixelSize) * this.pixelScalar
+      ),
+      x: Math.floor(
+        ((evt.clientY - rect.top) / this.pixelSize) * this.pixelScalar
+      ),
     };
   }
 
@@ -300,53 +301,37 @@ class GameOfLife {
     this.colorRateCounter = this.colorRateCounter + 1;
     return this.colorCache;
   }
+
   randColorString(): string {
     return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
   }
 
   draw(blur = true): void {
+    const size = this.size;
+    const pixelSize = this.pixelSize;
+    const width = size * pixelSize;
+    const ctx = this.ctx;
+    const data = this.data;
+    const colorMode = this.colorMode;
+    const length = this.bufferLength;
+
     if (blur) {
-      this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
-      this.ctx.fillRect(
-        0,
-        0,
-        this.size * this.pixelSize,
-        this.size * this.pixelSize
-      );
+      ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
+      ctx.fillRect(0, 0, width, width);
+    } else if (this.clearEveryFrame) {
+      ctx.clearRect(0, 0, width, width);
     }
 
-    if (this.clearEveryFrame)
-      this.ctx.clearRect(
-        0,
-        0,
-        this.size * this.pixelSize,
-        this.size * this.pixelSize
-      );
+    if (colorMode === "full") ctx.fillStyle = this.randColor();
+    if (colorMode === "picker") ctx.fillStyle = this.color;
 
-    if (this.colorMode === "full") {
-      this.ctx.fillStyle = this.randColor();
-    } else if (this.colorMode === "picker") {
-      this.ctx.fillStyle = this.color;
-    }
+    for (let i = length; i >= 0; i--) {
+      if (data[i]) {
+        const row = i % size;
+        const col = Math.floor(i / size);
+        if (colorMode === "each") ctx.fillStyle = this.randColor();
 
-    for (let row = 0; row < this.size; row++) {
-      if (this.colorMode === "row") {
-        this.ctx.fillStyle = this.randColor();
-      }
-
-      for (let col = 0; col < this.size; col++) {
-        if (this.get(row, col) === 1) {
-          if (this.colorMode === "each") {
-            this.ctx.fillStyle = this.randColor();
-          }
-
-          this.ctx.fillRect(
-            col * this.pixelSize,
-            row * this.pixelSize,
-            this.pixelSize,
-            this.pixelSize
-          );
-        }
+        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
       }
     }
   }
@@ -356,10 +341,11 @@ const sel = (s: string): HTMLElement => {
   return document.querySelector(s);
 };
 const canvas = sel("canvas") as HTMLCanvasElement;
+canvas
 const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;
-let msPerFrame: number = 41.666666666666664;
+let msPerFrame: number = 1;
 let masterOnOff: boolean = true;
 let masterCacheState: boolean = masterOnOff;
 
@@ -380,7 +366,7 @@ canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
 sel("#delay").addEventListener(
   "input",
-  (e: InputEvent) => {
+  (e: any) => {
     gameOfLife.alpha = parseFloat(e.target.value as any);
   },
   false
@@ -388,7 +374,7 @@ sel("#delay").addEventListener(
 
 sel(".input-hex").addEventListener(
   "input",
-  (e) => {
+  (e: any) => {
     gameOfLife.color = e.target.value as any;
 
     // redraw if paused so the user can see what colors
@@ -397,7 +383,7 @@ sel(".input-hex").addEventListener(
   false
 );
 
-sel("select").addEventListener("input", (e) => {
+sel("select").addEventListener("input", (e: any) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
   gameOfLife.ctx.globalCompositeOperation = e.target.value as any;
@@ -407,7 +393,7 @@ sel("select").addEventListener("input", (e) => {
 
 sel("#rate").addEventListener(
   "input",
-  (e) => {
+  (e: any) => {
     msPerFrame = e.target.value as any;
   },
   false
@@ -455,7 +441,7 @@ sel("#screencap").addEventListener("click", (e) => {
 Left click to exit (all your captures are saved until refresh)
 `;
 
-  const a = document.createElement("a");
+  const a: any = document.createElement("a");
   a.href = dataUrl;
   a.append(img as any);
   a.download = `CanvasGOL-${Date.now()}.png`;
@@ -471,11 +457,11 @@ sel("#clear").addEventListener("click", (e) => {
   gameOfLife.clear();
 });
 
-sel("#setShape").addEventListener("change", (e) => {
+sel("#setShape").addEventListener("change", (e: any) => {
   gameOfLife.shape = e.target.value as any;
 });
 
-sel("#colorMode").addEventListener("change", (e) => {
+sel("#colorMode").addEventListener("change", (e: any) => {
   gameOfLife.colorMode = e.target.value as any;
   switch (e.target.value as any) {
     case "picker":
@@ -497,7 +483,7 @@ sel("#colorMode").addEventListener("change", (e) => {
   }
 });
 
-sel("#colorRadix").addEventListener("input", (e) => {
+sel("#colorRadix").addEventListener("input", (e: any) => {
   gameOfLife.colorRadix = e.target.value as any;
 });
 
@@ -566,6 +552,6 @@ sel("#noiseOff").addEventListener("change", (e) => {
   gameOfLife.spontaneousRegeneration = false;
 });
 
-sel("#gameType").addEventListener("change", (e) => {
+sel("#gameType").addEventListener("change", (e: any) => {
   gameOfLife.mode = e.target.value as any;
 });

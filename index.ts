@@ -21,7 +21,7 @@ class GameOfLife {
   bufferLength: number;
   mode: string;
 
-  constructor(size: number, cavnas?: HTMLCanvasElement) {
+  constructor(size: number, canvas?: HTMLCanvasElement) {
     this.size = size;
     this.pixelSize = 1;
     this.pixelScalar = 2;
@@ -341,7 +341,7 @@ const sel = (s: string): HTMLElement => {
   return document.querySelector(s);
 };
 const canvas = sel("canvas") as HTMLCanvasElement;
-canvas
+canvas;
 const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;

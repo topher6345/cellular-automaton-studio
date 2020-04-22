@@ -323,7 +323,8 @@ class GameOfLife {
     }
 
     if (colorMode === "full") ctx.fillStyle = this.randColor();
-    if (colorMode === "picker") ctx.fillStyle = this.color;
+    if (colorMode === "picker" || colorMode === "hsluv")
+      ctx.fillStyle = this.color;
 
     for (let i = length; i >= 0; i--) {
       if (data[i]) {
@@ -461,6 +462,17 @@ sel("#setShape").addEventListener("change", (e: any) => {
   gameOfLife.shape = e.target.value as any;
 });
 
+sel("#color").addEventListener(
+  "input",
+  (e: any) => {
+    gameOfLife.color = e.target.value as any;
+
+    // redraw if paused so the user can see what colors
+    masterOnOff || gameOfLife.draw(false);
+  },
+  false
+);
+
 sel("#colorMode").addEventListener("change", (e: any) => {
   gameOfLife.colorMode = e.target.value as any;
   switch (e.target.value as any) {
@@ -469,9 +481,19 @@ sel("#colorMode").addEventListener("change", (e: any) => {
       sel('label[for="colorRadix"]').style.display = "none";
       sel("#randCycle").style.display = "none";
       sel('label[for="randCycle"]').style.display = "none";
+      sel("#picker").style.display = "none";
 
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
+      break;
+    case "hsluv":
+      sel("#colorRadix").style.display = "none";
+      sel('label[for="colorRadix"]').style.display = "none";
+      sel("#randCycle").style.display = "none";
+      sel('label[for="randCycle"]').style.display = "none";
+      sel('label[for="color"]').style.display = "none";
+      debugger;
+      sel("#picker").style.display = "block";
       break;
     default:
       sel("#colorRadix").style.display = "block";
@@ -479,6 +501,7 @@ sel("#colorMode").addEventListener("change", (e: any) => {
       sel("#randCycle").style.display = "block";
       sel('label[for="randCycle"]').style.display = "block";
       sel("#color").style.display = "none";
+      sel("#picker").style.display = "none";
       sel('label[for="color"]').style.display = "none";
   }
 });

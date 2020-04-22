@@ -1,5 +1,5 @@
 var GameOfLife = /** @class */ (function () {
-    function GameOfLife(size, cavnas) {
+    function GameOfLife(size, canvas) {
         this.size = size;
         this.pixelSize = 1;
         this.pixelScalar = 2;
@@ -257,7 +257,7 @@ var GameOfLife = /** @class */ (function () {
         }
         if (colorMode === "full")
             ctx.fillStyle = this.randColor();
-        if (colorMode === "picker")
+        if (colorMode === "picker" || colorMode === "hsluv")
             ctx.fillStyle = this.color;
         for (var i = length; i >= 0; i--) {
             if (data[i]) {
@@ -347,6 +347,11 @@ sel("#clear").addEventListener("click", function (e) {
 sel("#setShape").addEventListener("change", function (e) {
     gameOfLife.shape = e.target.value;
 });
+sel("#color").addEventListener("input", function (e) {
+    gameOfLife.color = e.target.value;
+    // redraw if paused so the user can see what colors
+    masterOnOff || gameOfLife.draw(false);
+}, false);
 sel("#colorMode").addEventListener("change", function (e) {
     gameOfLife.colorMode = e.target.value;
     switch (e.target.value) {
@@ -355,8 +360,18 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="colorRadix"]').style.display = "none";
             sel("#randCycle").style.display = "none";
             sel('label[for="randCycle"]').style.display = "none";
+            sel("#picker").style.display = "none";
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
+            break;
+        case "hsluv":
+            sel("#colorRadix").style.display = "none";
+            sel('label[for="colorRadix"]').style.display = "none";
+            sel("#randCycle").style.display = "none";
+            sel('label[for="randCycle"]').style.display = "none";
+            sel('label[for="color"]').style.display = "none";
+            debugger;
+            sel("#picker").style.display = "block";
             break;
         default:
             sel("#colorRadix").style.display = "block";
@@ -364,6 +379,7 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#randCycle").style.display = "block";
             sel('label[for="randCycle"]').style.display = "block";
             sel("#color").style.display = "none";
+            sel("#picker").style.display = "none";
             sel('label[for="color"]').style.display = "none";
     }
 });

@@ -181,6 +181,7 @@
           >
           <select name="colorMode" id="colorMode">
             <option value="picker">Color Picker</option>
+            <option value="hsluv">HSLUV</option>
             <option value="full" selected>Random Frame</option>
             <option value="row">Random Row</option>
             <option value="each">Random Pixel</option>
@@ -265,7 +266,7 @@
             value="0"
           />
         </div>
-        <div id="picker">
+        <div id="picker" style="display: none;">
           <div id="display">
             <canvas
               style="position: absolute; left: 0;"

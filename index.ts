@@ -490,7 +490,7 @@ sel("#colorRadix").addEventListener("input", (e: any) => {
 let recorders: MediaRecorder = null;
 sel("#recStart").addEventListener("change", (e) => {
   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
-  const stream = canvas.captureStream(); // grab our canvas MediaStream
+  const stream = (canvas as any).captureStream(); // grab our canvas MediaStream
   const rec = new MediaRecorder(stream); // init the recorder
   // every time the recorder has new data, we will store it in our array
   recorders = rec;

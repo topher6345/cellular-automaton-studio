@@ -24,7 +24,7 @@ class GameOfLife {
   constructor(size: number, canvas?: HTMLCanvasElement) {
     this.size = size;
     this.pixelSize = 1;
-    this.pixelScalar = 2;
+    this.pixelScalar = 1;
     this.data = GameOfLife.randBoard(this.size);
     this.buffer = new Uint8Array(this.size * this.size);
     this.bufferLength = this.size * this.size;
@@ -33,12 +33,12 @@ class GameOfLife {
     this.ctx = this.canvas.getContext("2d", { alpha: false });
     this.ctx.imageSmoothingEnabled = true;
     this.alpha = 0.006;
-    this.blurEnabled = true;
+    this.blurEnabled = false;
     this.clearEveryFrame = false;
     this.color = "orange";
 
     this.shape = "gliderse";
-    this.colorMode = "picker";
+    this.colorMode = "full";
     this.colorRadix = 16777215;
     this.ctx.fillStyle = `rgba(0,0,0,1)`;
     this.ctx.fillRect(
@@ -48,7 +48,7 @@ class GameOfLife {
       this.size * this.pixelSize
     );
 
-    this.colorRateFps = 100;
+    this.colorRateFps = 120;
     this.colorRateCounter = 0;
     this.colorCache = this.randColorString();
     this.spontaneousRegeneration = false;
@@ -84,6 +84,7 @@ class GameOfLife {
     this.data[yyy * this.size + xxx] = value;
   }
 
+  
   update() {
     const size = this.size;
     const length = this.bufferLength;
@@ -346,7 +347,7 @@ canvas;
 const gameOfLife = new GameOfLife(750, canvas);
 
 let msPast: number = null;
-let msPerFrame: number = 1;
+let msPerFrame: number = 7;
 let masterOnOff: boolean = true;
 let masterCacheState: boolean = masterOnOff;
 
@@ -395,7 +396,7 @@ sel("select").addEventListener("input", (e: any) => {
 sel("#rate").addEventListener(
   "input",
   (e: any) => {
-    msPerFrame = e.target.value as any;
+    msPerFrame = parseInt(e.target.value as any);
   },
   false
 );

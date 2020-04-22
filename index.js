@@ -2,7 +2,7 @@ var GameOfLife = /** @class */ (function () {
     function GameOfLife(size, canvas) {
         this.size = size;
         this.pixelSize = 1;
-        this.pixelScalar = 2;
+        this.pixelScalar = 1;
         this.data = GameOfLife.randBoard(this.size);
         this.buffer = new Uint8Array(this.size * this.size);
         this.bufferLength = this.size * this.size;
@@ -10,15 +10,15 @@ var GameOfLife = /** @class */ (function () {
         this.ctx = this.canvas.getContext("2d", { alpha: false });
         this.ctx.imageSmoothingEnabled = true;
         this.alpha = 0.006;
-        this.blurEnabled = true;
+        this.blurEnabled = false;
         this.clearEveryFrame = false;
         this.color = "orange";
         this.shape = "gliderse";
-        this.colorMode = "picker";
+        this.colorMode = "full";
         this.colorRadix = 16777215;
         this.ctx.fillStyle = "rgba(0,0,0,1)";
         this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
-        this.colorRateFps = 100;
+        this.colorRateFps = 120;
         this.colorRateCounter = 0;
         this.colorCache = this.randColorString();
         this.spontaneousRegeneration = false;
@@ -278,7 +278,7 @@ var canvas = sel("canvas");
 canvas;
 var gameOfLife = new GameOfLife(750, canvas);
 var msPast = null;
-var msPerFrame = 1;
+var msPerFrame = 7;
 var masterOnOff = true;
 var masterCacheState = masterOnOff;
 function tick(now) {
@@ -309,7 +309,7 @@ sel("select").addEventListener("input", function (e) {
     masterOnOff = currentState;
 });
 sel("#rate").addEventListener("input", function (e) {
-    msPerFrame = e.target.value;
+    msPerFrame = parseInt(e.target.value);
 }, false);
 var isHovering = false;
 sel("#hoverOn").addEventListener("input", function (e) {

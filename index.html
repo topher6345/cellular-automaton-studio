@@ -59,9 +59,12 @@
             for="blurOn"
             >Blur</label
           >
-          <input type="radio" id="blurOn" name="radio" value="on" checked />
+          <input type="radio" id="blurOn" name="radio" value="on" />
 
-          <label title="Each new frame is drawn over the last" for="blurOff"
+          <label
+            title="Each new frame is drawn over the last"
+            for="blurOff"
+            checked
             >Overlay</label
           >
           <input type="radio" id="blurOff" name="radio" />
@@ -125,7 +128,7 @@
           <label title="Speed - left is faster, right is slower" for="rate"
             >Speed</label
           >
-          <input type="range" name="rate" id="rate" min="17" max="250" />
+          <input type="range" name="rate" id="rate" min="1" max="1000" />
         </div>
 
         <div>
@@ -267,6 +270,7 @@
           />
         </div>
         <div id="picker" style="display: none;">
+          <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
           <div id="display">
             <canvas
               style="position: absolute; left: 0;"

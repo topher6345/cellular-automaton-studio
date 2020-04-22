@@ -1,9 +1,9 @@
 var GameOfLife = /** @class */ (function () {
-    function GameOfLife(size, cavnas) {
+    function GameOfLife(size, canvas) {
+        this.canvas = canvas;
         this.size = size;
         this.data = GameOfLife.randBoard(this.size);
         this.buffer = new Uint8Array(size * size);
-        this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
         this.ctx.imageSmoothingEnabled = true;
         this.alpha = 0.006;
@@ -532,8 +532,7 @@ var textureSizeLocation;
 var mouseCoordLocation;
 var newColor;
 var paused = false; //while window is resizing
-window.onload = initGL;
-function initGL() {
+window.onload = function () {
     // Get A WebGL context
     ccanvas = document.getElementById("glcanvas");
     ccanvas.width = ccanvas.clientWidth;
@@ -620,7 +619,7 @@ function initGL() {
     frameBuffer = gl.createFramebuffer();
     gl.bindTexture(gl.TEXTURE_2D, lastState); //original texture
     render();
-}
+};
 function makeRandomArray(rgba) {
     var numPixels = rgba.length / 4;
     var probability = 0.15;

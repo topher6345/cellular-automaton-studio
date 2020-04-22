@@ -19,12 +19,12 @@ class GameOfLife {
   noiseRangeValue: number;
   mode: string;
 
-  constructor(size: number, cavnas?: HTMLCanvasElement) {
+  constructor(size: number, canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     this.size = size;
     this.data = GameOfLife.randBoard(this.size);
     this.buffer = new Uint8Array(size * size);
 
-    this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d");
     this.ctx.imageSmoothingEnabled = true;
     this.alpha = 0.006;
@@ -406,7 +406,7 @@ sel("select").addEventListener("input", (e) => {
 
 sel("#rate").addEventListener(
   "input",
-  (e) => {
+  (e: any) => {
     msPerFrame = e.target.value as any;
   },
   false
@@ -474,9 +474,9 @@ sel("#setShape").addEventListener("change", (e) => {
   // gameOfLife.shape = e.target.value as any;
 });
 
-sel("#colorMode").addEventListener("change", (e) => {
+sel("#colorMode").addEventListener("change", (e: any) => {
   // gameOfLife.colorMode = e.target.value as any;
-  switch (e.target.value as any) {
+  switch (e.target.value) {
     case "picker":
       sel("#colorRadix").style.display = "none";
       sel('label[for="colorRadix"]').style.display = "none";
@@ -719,9 +719,7 @@ var newColor: WebGLUniformLocation;
 
 var paused = false; //while window is resizing
 
-window.onload = initGL;
-
-function initGL() {
+window.onload = () => {
   // Get A WebGL context
   ccanvas = document.getElementById("glcanvas") as HTMLCanvasElement;
   ccanvas.width = ccanvas.clientWidth;
@@ -755,7 +753,7 @@ function initGL() {
   gl.disable(gl.DEPTH_TEST);
 
   // setup a GLSL program
-  var program = createProgramFromScripts(
+  const program = createProgramFromScripts(
     gl,
     "2d-vertex-shader",
     "2d-fragment-shader"
@@ -839,7 +837,7 @@ function initGL() {
   gl.bindTexture(gl.TEXTURE_2D, lastState); //original texture
 
   render();
-}
+};
 
 function makeRandomArray(rgba: Uint8Array) {
   var numPixels = rgba.length / 4;
@@ -970,7 +968,7 @@ function onTouchMove(e: TouchEvent) {
 
 sel("#color").addEventListener(
   "input",
-  (event) => {
+  (event: any) => {
     const [_, a, b, c, d, e, f] = (event.target.value as any).split("");
     // gameOfLife.color = e.target.value as any;
     // redraw if paused so the user can see what colors

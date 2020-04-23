@@ -1,6 +1,7 @@
 #game {
   min-width: 750px;
   max-height: 750px;
+  border: 1px solid white;
 }
 
 body {

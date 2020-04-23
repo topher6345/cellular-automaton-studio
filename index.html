@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <title></title>
     <link href="styles.css" rel="stylesheet" />
-    <script src="picker.js" type="text/javascript"></script>
   </head>
   <body>
     <div id="root">
@@ -52,6 +51,123 @@
             <option value="anneal">anneal</option>
             <option value="famine">famine</option>
           </select>
+        </div>
+        <div id="picker" style="display: none;">
+          <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
+          <div id="display">
+            <canvas
+              style="position: absolute; left: 0;"
+              height="400"
+              width="400"
+            ></canvas>
+            <svg
+              style="position: absolute; left: 0;"
+              height="400"
+              width="400"
+            ></svg>
+          </div>
+          <table>
+            <tr id="control-h">
+              <td class="cell-input">
+                <input
+                  type="number"
+                  min="0"
+                  max="360"
+                  step="any"
+                  class="counter counter-hue"
+                  tabindex="0"
+                />
+              </td>
+              <td><div class="range-slider"></div></td>
+              <td class="picker-label">H</td>
+            </tr>
+            <tr id="control-s">
+              <td class="cell-input">
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  max="100"
+                  class="counter counter-saturation"
+                />
+              </td>
+              <td><div class="range-slider"></div></td>
+              <td class="picker-label">S</td>
+            </tr>
+            <tr id="control-l">
+              <td class="cell-input">
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  max="100"
+                  class="counter counter-lightness"
+                />
+              </td>
+              <td><div class="range-slider"></div></td>
+              <td class="picker-label">L</td>
+            </tr>
+            <tr>
+              <td class="cell-input cell-input-hex">
+                <input class="input-hex" pattern="#?[0-9a-fA-F]{6}" />
+              </td>
+              <td><div class="swatch"></div></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
+        <div>
+          <label
+            title="Color Mode: Different options for how new colors appear in the animation"
+            for="colorMode"
+            >Color Mode</label
+          >
+          <select name="colorMode" id="colorMode">
+            <option value="picker">Color Picker</option>
+            <option value="hsluv">HSLUV</option>
+            <option value="full" selected>Random Frame</option>
+            <option value="row">Random Row</option>
+            <option value="each">Random Pixel</option>
+          </select>
+          <label
+            title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
+            for="colorRadix"
+            >Color Range</label
+          >
+          <input
+            name="colorRadix"
+            id="colorRadix"
+            type="range"
+            min="1"
+            max="16777215"
+            value="16777215"
+          />
+          <label
+            title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
+            for="randCycle"
+            >Color Rate</label
+          >
+          <input
+            name="randCycle"
+            type="range"
+            min="1"
+            max="500"
+            id="randCycle"
+            value="1000"
+          />
+          <label
+            style="display: none;"
+            title="The color of the new pixels."
+            for="color"
+            >Picker</label
+          >
+          <input
+            style="display: none;"
+            type="color"
+            id="color"
+            name="color"
+            value="#e66465"
+          />
         </div>
         <div>
           <label
@@ -176,59 +292,7 @@
             checked
           />
         </div>
-        <div>
-          <label
-            title="Color Mode: Different options for how new colors appear in the animation"
-            for="colorMode"
-            >Color Mode</label
-          >
-          <select name="colorMode" id="colorMode">
-            <option value="picker">Color Picker</option>
-            <option value="hsluv">HSLUV</option>
-            <option value="full" selected>Random Frame</option>
-            <option value="row">Random Row</option>
-            <option value="each">Random Pixel</option>
-          </select>
-          <label
-            title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
-            for="colorRadix"
-            >Color Range</label
-          >
-          <input
-            name="colorRadix"
-            id="colorRadix"
-            type="range"
-            min="1"
-            max="16777215"
-            value="16777215"
-          />
-          <label
-            title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
-            for="randCycle"
-            >Color Rate</label
-          >
-          <input
-            name="randCycle"
-            type="range"
-            min="1"
-            max="500"
-            id="randCycle"
-            value="1000"
-          />
-          <label
-            style="display: none;"
-            title="The color of the new pixels."
-            for="color"
-            >Picker</label
-          >
-          <input
-            style="display: none;"
-            type="color"
-            id="color"
-            name="color"
-            value="#e66465"
-          />
-        </div>
+
         <div id="record">
           <label
             title="Recording: This will start recording video, automatically stops after 30 seconds"
@@ -269,72 +333,9 @@
             value="0"
           />
         </div>
-        <div id="picker" style="display: none;">
-          <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
-          <div id="display">
-            <canvas
-              style="position: absolute; left: 0;"
-              height="400"
-              width="400"
-            ></canvas>
-            <svg
-              style="position: absolute; left: 0;"
-              height="400"
-              width="400"
-            ></svg>
-          </div>
-          <table>
-            <tr id="control-h">
-              <td class="cell-input">
-                <input
-                  type="number"
-                  min="0"
-                  max="360"
-                  step="any"
-                  class="counter counter-hue"
-                  tabindex="0"
-                />
-              </td>
-              <td><div class="range-slider"></div></td>
-              <td class="picker-label">H</td>
-            </tr>
-            <tr id="control-s">
-              <td class="cell-input">
-                <input
-                  type="number"
-                  step="any"
-                  min="0"
-                  max="100"
-                  class="counter counter-saturation"
-                />
-              </td>
-              <td><div class="range-slider"></div></td>
-              <td class="picker-label">S</td>
-            </tr>
-            <tr id="control-l">
-              <td class="cell-input">
-                <input
-                  type="number"
-                  step="any"
-                  min="0"
-                  max="100"
-                  class="counter counter-lightness"
-                />
-              </td>
-              <td><div class="range-slider"></div></td>
-              <td class="picker-label">L</td>
-            </tr>
-            <tr>
-              <td class="cell-input cell-input-hex">
-                <input class="input-hex" pattern="#?[0-9a-fA-F]{6}" />
-              </td>
-              <td><div class="swatch"></div></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
       </div>
-      <script src="index.js"></script>
     </div>
+    <script src="index.js"></script>
+    <script src="picker.js" type="text/javascript"></script>
   </body>
 </html>

@@ -41,7 +41,7 @@ a {
   flex-wrap: wrap;
 }
 
-.controls div {
+.controls > div {
   display: block;
   padding: 0.5em;
   border: 1px solid black;
@@ -50,7 +50,7 @@ a {
   flex-grow: 2;
 }
 
-.controls div:hover {
+.controls > div:hover {
   background: rgba(130, 130, 130, 0.9);
   color: black;
 }
@@ -61,7 +61,7 @@ a {
   flex-grow: 1;
 }
 
-.controls div:last-child {
+.controls > div:last-child {
   /* max-width: 8em; */
 }
 
@@ -71,7 +71,7 @@ a {
   display: block;
 }
 
-.controls label:hover {
+.controls > label:hover {
   cursor: help;
 }
 

@@ -338,7 +338,7 @@ class GameOfLife {
 
     if (this.colorMode === "full") {
       this.ctx.fillStyle = this.randColor();
-    } else if (this.colorMode === "picker") {
+    } else if (this.colorMode === "picker" || this.colorMode === "hsluv") {
       this.ctx.fillStyle = this.color;
     }
 

@@ -242,7 +242,7 @@ var GameOfLife = /** @class */ (function () {
         if (this.colorMode === "full") {
             this.ctx.fillStyle = this.randColor();
         }
-        else if (this.colorMode === "picker") {
+        else if (this.colorMode === "picker" || this.colorMode === "hsluv") {
             this.ctx.fillStyle = this.color;
         }
         for (var row = 0; row < this.size; row++) {

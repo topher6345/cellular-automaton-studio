@@ -349,6 +349,9 @@ sel("#screencap").addEventListener("click", function (e) {
     sel("#modal-capture").style.display = "flex";
     sel("#modal-capture-preview").prepend(a);
 });
+sel("#showGallery").addEventListener("click", function (e) {
+    sel("#modal-capture").style.display = "flex";
+});
 sel("#reset").addEventListener("click", function (e) {
     gameOfLife.reset();
 });
@@ -439,6 +442,10 @@ sel("#clearFrame").addEventListener("change", function (e) {
     gameOfLife.clearEveryFrame = true;
     gameOfLife.blurEnabled = false;
     sel("#delay").disabled = true;
+});
+sel("#setBlendMode").addEventListener("change", function (e) {
+    debugger;
+    gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
 sel("#randCycle").addEventListener("input", function (e) {
     gameOfLife.colorRateFps = parseInt(e.target.value);

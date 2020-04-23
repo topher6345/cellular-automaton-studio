@@ -497,6 +497,9 @@ Left click to exit (all your captures are saved until refresh)
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a as any);
 });
+sel("#showGallery").addEventListener("click", (e: any) => {
+  sel("#modal-capture").style.display = "flex";
+});
 
 sel("#reset").addEventListener("click", (e) => {
   gameOfLife.reset();
@@ -604,6 +607,11 @@ sel("#clearFrame").addEventListener("change", (e) => {
   gameOfLife.clearEveryFrame = true;
   gameOfLife.blurEnabled = false;
   (sel("#delay") as any).disabled = true;
+});
+
+sel("#setBlendMode").addEventListener("change", (e: any) => {
+  debugger;
+  gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
 
 sel("#randCycle").addEventListener("input", (e) => {

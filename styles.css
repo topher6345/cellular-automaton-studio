@@ -184,3 +184,26 @@ button {
   touch-action: pan-y;
   -ms-touch-action: pan-y;
 }
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  49% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+#masterOff:checked {
+  animation: blink 1s infinite;
+}
+
+#masterOff:checked {
+  animation: blink 1s infinite;
+}
+
+#recStart:checked {
+  animation: blink 1s infinite;
+}

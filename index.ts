@@ -290,6 +290,27 @@ class GameOfLife {
         this.set(x + 1, y, 1);
         this.set(x + 1, y + 1, 1);
         break;
+      case "glidersw":
+        this.set(x - 1, y, 1);
+        this.set(x, y - 1, 1);
+        this.set(x + 1, y - 1, 1);
+        this.set(x + 1, y, 1);
+        this.set(x + 1, y + 1, 1);
+        break;
+      case "gliderne":
+        this.set(x + 1, y, 1);
+        this.set(x, y + 1, 1);
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        break;
+      case "glidernw":
+        this.set(x + 1, y, 1);
+        this.set(x, y - 1, 1);
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        break;
       case "3x3":
       default:
         this.set(x - 1, y - 1, 1);

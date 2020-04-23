@@ -207,3 +207,11 @@ button {
 #recStart:checked {
   animation: blink 1s infinite;
 }
+
+#noiseOn:checked {
+  animation: blink 1s infinite;
+}
+
+#hoverOn:checked {
+  animation: blink 1s infinite;
+}

@@ -411,12 +411,32 @@ function tick(now: number) {
 
 window.requestAnimationFrame(tick);
 
+const favicon: any = sel("#favicon");
+favicon.href = canvas.toDataURL();
+window.setInterval((e: any) => {
+  favicon.href = canvas.toDataURL();
+}, 5000);
+
+const rangeOver = (input: string, max: number, floor: number) => {
+  return expon(input) * max + floor;
+};
+
+const expon = (x: string): number => {
+  let value = parseFloat(x);
+  value = value < 0.0 ? 0.0 : value;
+  value = value > 1.0 ? 1.0 : value;
+  return -Math.sqrt(-value + 1) + 1;
+};
+
 canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
 sel("#delay").addEventListener(
   "input",
   (e: any) => {
-    gameOfLife.alpha = parseFloat(e.target.value as any);
+    const alpha = rangeOver(e.target.value, 1.0, 0);
+    console.log(alpha);
+    console.log(e.target.value);
+    gameOfLife.alpha = alpha;
   },
   false
 );
@@ -475,7 +495,6 @@ sel("#modal-capture-preview").addEventListener(
   "click",
   (e) => {
     sel("#modal-capture ").style.display = "none";
-    masterOnOff = masterCacheState;
   },
   false
 );
@@ -496,6 +515,8 @@ Left click to exit (all your captures are saved until refresh)
   a.download = `CanvasGOL-${Date.now()}.png`;
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a as any);
+  masterOnOff = false;
+  (sel("#masterOff") as any).checked = true;
 });
 sel("#showGallery").addEventListener("click", (e: any) => {
   sel("#modal-capture").style.display = "flex";
@@ -543,7 +564,6 @@ sel("#colorMode").addEventListener("change", (e: any) => {
       sel("#randCycle").style.display = "none";
       sel('label[for="randCycle"]').style.display = "none";
       sel('label[for="color"]').style.display = "none";
-      debugger;
       sel("#picker").style.display = "block";
       break;
     default:
@@ -610,17 +630,20 @@ sel("#clearFrame").addEventListener("change", (e) => {
 });
 
 sel("#setBlendMode").addEventListener("change", (e: any) => {
-  debugger;
   gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
 
-sel("#randCycle").addEventListener("input", (e) => {
-  gameOfLife.colorRateFps = parseInt((e.target as any).value as any);
+sel("#randCycle").addEventListener("input", (e: any) => {
+  const value = rangeOver(e.target.value, 1000, 1);
+  gameOfLife.colorRateFps = value;
+  console.log(value);
   gameOfLife.colorRateCounter = 0;
 });
 
-sel("#noiseRangeValue").addEventListener("input", (e) => {
-  gameOfLife.noiseRangeValue = parseInt((e.target as any).value as any);
+sel("#noiseRangeValue").addEventListener("input", (e: any) => {
+  const noiseRangeValue = rangeOver(e.target.value, 3, 12);
+  console.log(noiseRangeValue);
+  gameOfLife.noiseRangeValue = noiseRangeValue;
 });
 
 sel("#noiseOn").addEventListener("change", (e) => {

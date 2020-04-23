@@ -303,9 +303,26 @@ function tick(now) {
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
+var favicon = sel("#favicon");
+favicon.href = canvas.toDataURL();
+window.setInterval(function (e) {
+    favicon.href = canvas.toDataURL();
+}, 5000);
+var rangeOver = function (input, max, floor) {
+    return expon(input) * max + floor;
+};
+var expon = function (x) {
+    var value = parseFloat(x);
+    value = value < 0.0 ? 0.0 : value;
+    value = value > 1.0 ? 1.0 : value;
+    return -Math.sqrt(-value + 1) + 1;
+};
 canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
 sel("#delay").addEventListener("input", function (e) {
-    gameOfLife.alpha = parseFloat(e.target.value);
+    var alpha = rangeOver(e.target.value, 1.0, 0);
+    console.log(alpha);
+    console.log(e.target.value);
+    gameOfLife.alpha = alpha;
 }, false);
 sel(".input-hex").addEventListener("input", function (e) {
     gameOfLife.color = e.target.value;
@@ -334,7 +351,6 @@ sel("#masterOn").addEventListener("change", function (e) { return (masterOnOff =
 sel("#masterOff").addEventListener("change", function (e) { return (masterOnOff = false); }, false);
 sel("#modal-capture-preview").addEventListener("click", function (e) {
     sel("#modal-capture ").style.display = "none";
-    masterOnOff = masterCacheState;
 }, false);
 sel("#screencap").addEventListener("click", function (e) {
     var dataUrl = canvas.toDataURL("image/png");
@@ -348,6 +364,8 @@ sel("#screencap").addEventListener("click", function (e) {
     a.download = "CanvasGOL-" + Date.now() + ".png";
     sel("#modal-capture").style.display = "flex";
     sel("#modal-capture-preview").prepend(a);
+    masterOnOff = false;
+    sel("#masterOff").checked = true;
 });
 sel("#showGallery").addEventListener("click", function (e) {
     sel("#modal-capture").style.display = "flex";
@@ -384,7 +402,6 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#randCycle").style.display = "none";
             sel('label[for="randCycle"]').style.display = "none";
             sel('label[for="color"]').style.display = "none";
-            debugger;
             sel("#picker").style.display = "block";
             break;
         default:
@@ -444,15 +461,18 @@ sel("#clearFrame").addEventListener("change", function (e) {
     sel("#delay").disabled = true;
 });
 sel("#setBlendMode").addEventListener("change", function (e) {
-    debugger;
     gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
 sel("#randCycle").addEventListener("input", function (e) {
-    gameOfLife.colorRateFps = parseInt(e.target.value);
+    var value = rangeOver(e.target.value, 1000, 1);
+    gameOfLife.colorRateFps = value;
+    console.log(value);
     gameOfLife.colorRateCounter = 0;
 });
 sel("#noiseRangeValue").addEventListener("input", function (e) {
-    gameOfLife.noiseRangeValue = parseInt(e.target.value);
+    var noiseRangeValue = rangeOver(e.target.value, 3, 12);
+    console.log(noiseRangeValue);
+    gameOfLife.noiseRangeValue = noiseRangeValue;
 });
 sel("#noiseOn").addEventListener("change", function (e) {
     gameOfLife.spontaneousRegeneration = true;

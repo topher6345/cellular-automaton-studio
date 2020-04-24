@@ -1,4 +1,4 @@
-class GameOfLife {
+class CellularAutomaton {
   size: number;
   data: Uint8Array;
   canvas: HTMLCanvasElement;
@@ -25,7 +25,7 @@ class GameOfLife {
     this.size = size;
     this.pixelSize = 1;
     this.pixelScalar = 1;
-    this.data = GameOfLife.randBoard(this.size);
+    this.data = CellularAutomaton.randBoard(this.size);
     this.buffer = new Uint8Array(this.size * this.size);
     this.bufferLength = this.buffer.length;
 
@@ -57,7 +57,7 @@ class GameOfLife {
   }
 
   reset(): void {
-    this.data = GameOfLife.randBoard(this.size);
+    this.data = CellularAutomaton.randBoard(this.size);
   }
 
   clear(): void {
@@ -108,7 +108,7 @@ class GameOfLife {
             (this.get(row, col) && (liveNeighbors > 5)) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -120,7 +120,7 @@ class GameOfLife {
             (liveNeighbors === 4 || liveNeighbors === 6|| liveNeighbors === 7 || liveNeighbors === 8) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -132,7 +132,7 @@ class GameOfLife {
             (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 8) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -144,7 +144,7 @@ class GameOfLife {
             (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -156,7 +156,7 @@ class GameOfLife {
             (liveNeighbors === 3 || liveNeighbors === 6) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -168,7 +168,7 @@ class GameOfLife {
             (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -180,7 +180,7 @@ class GameOfLife {
             (liveNeighbors === 3 || liveNeighbors === 4) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -192,7 +192,7 @@ class GameOfLife {
             (liveNeighbors === 2 || liveNeighbors === 5) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -204,7 +204,7 @@ class GameOfLife {
             (liveNeighbors === 2) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -216,7 +216,7 @@ class GameOfLife {
             (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) ||
             // spontaneous generation
             (this.spontaneousRegeneration && (
-              GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
             )
           ) && (status = 1);
           break;
@@ -228,7 +228,7 @@ class GameOfLife {
           (liveNeighbors === 3 || liveNeighbors === 6) ||
           // spontaneous generation
           (this.spontaneousRegeneration && (
-            GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
           )
         ) && (status = 1);
           break;
@@ -240,7 +240,7 @@ class GameOfLife {
           liveNeighbors === 3 ||
           // spontaneous generation
           (this.spontaneousRegeneration && (
-            GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue))
+            CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
           )
         ) && (status = 1);
           break;
@@ -389,7 +389,7 @@ class GameOfLife {
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 
 const canvas = sel("canvas") as HTMLCanvasElement;
-const gameOfLife = new GameOfLife(750, canvas);
+const simulation = new CellularAutomaton(750, canvas);
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
 // Update the favicon with the current canvas
@@ -408,8 +408,8 @@ function tick(now: number) {
 
   if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
     msPast = now;
-    gameOfLife.draw(gameOfLife.blurEnabled);
-    gameOfLife.update();
+    simulation.draw(simulation.blurEnabled);
+    simulation.update();
   }
   window.requestAnimationFrame(tick);
 }
@@ -432,7 +432,7 @@ interface EventTarget {
 
 sel("#delay").addEventListener(
   "input",
-  (e) => (gameOfLife.alpha = rangeOver(e.target.value, 1.0, 0)),
+  (e) => (simulation.alpha = rangeOver(e.target.value, 1.0, 0)),
   false
 );
 
@@ -440,7 +440,7 @@ sel("#setBlendMode").addEventListener("input", (e) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
 
-  gameOfLife.ctx.globalCompositeOperation = e.target.value;
+  simulation.ctx.globalCompositeOperation = e.target.value;
 
   masterOnOff = currentState;
 });
@@ -455,11 +455,11 @@ sel("#hoverOn").addEventListener("input", () => (isHovering = true));
 sel("#hoverOff").addEventListener("input", () => (isHovering = false));
 canvas.addEventListener(
   "mousemove",
-  (e) => isHovering && gameOfLife.hover(e),
+  (e) => isHovering && simulation.hover(e),
   false
 );
 
-canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
+canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
 
 sel("#masterOn").addEventListener("change", () => (masterOnOff = true));
 sel("#masterOff").addEventListener("change", () => (masterOnOff = false));
@@ -496,21 +496,21 @@ sel("#showGallery").addEventListener(
   () => (sel("#modal-capture").style.display = "flex")
 );
 
-sel("#reset").addEventListener("click", () => gameOfLife.reset());
-sel("#clear").addEventListener("click", () => gameOfLife.clear());
+sel("#reset").addEventListener("click", () => simulation.reset());
+sel("#clear").addEventListener("click", () => simulation.clear());
 
 sel("#setShape").addEventListener(
   "change",
-  (e) => (gameOfLife.shape = e.target.value)
+  (e) => (simulation.shape = e.target.value)
 );
 
 sel("#color").addEventListener(
   "input",
   (e) => {
-    gameOfLife.color = e.target.value;
+    simulation.color = e.target.value;
 
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
+    masterOnOff || simulation.draw(false);
   },
   false
 );
@@ -519,16 +519,16 @@ sel("#color").addEventListener(
 sel(".input-hex").addEventListener(
   "input",
   (e) => {
-    gameOfLife.color = e.target.value;
+    simulation.color = e.target.value;
 
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
+    masterOnOff || simulation.draw(false);
   },
   false
 );
 
 sel("#colorMode").addEventListener("change", (e) => {
-  gameOfLife.colorMode = e.target.value;
+  simulation.colorMode = e.target.value;
   switch (e.target.value) {
     case "picker":
       sel("#colorRadix").style.display = "none";
@@ -561,7 +561,7 @@ sel("#colorMode").addEventListener("change", (e) => {
 
 sel("#colorRadix").addEventListener(
   "input",
-  (e) => (gameOfLife.colorRadix = parseInt(e.target.value))
+  (e) => (simulation.colorRadix = parseInt(e.target.value))
 );
 
 interface HTMLCanvasElement {
@@ -607,49 +607,49 @@ interface HTMLElement {
 }
 
 sel("#blurOn").addEventListener("input", () => {
-  gameOfLife.blurEnabled = true;
-  gameOfLife.clearEveryFrame = false;
+  simulation.blurEnabled = true;
+  simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
 });
 
 sel("#blurOff").addEventListener("input", () => {
-  gameOfLife.blurEnabled = false;
-  gameOfLife.clearEveryFrame = false;
+  simulation.blurEnabled = false;
+  simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
 });
 
 sel("#clearFrame").addEventListener("change", () => {
-  gameOfLife.clearEveryFrame = true;
-  gameOfLife.blurEnabled = false;
+  simulation.clearEveryFrame = true;
+  simulation.blurEnabled = false;
   sel("#delay").disabled = true;
 });
 
 sel("#setBlendMode").addEventListener(
   "change",
-  (e) => (gameOfLife.ctx.globalCompositeOperation = e.target.value)
+  (e) => (simulation.ctx.globalCompositeOperation = e.target.value)
 );
 
 sel("#randCycle").addEventListener("input", (e) => {
-  gameOfLife.colorRateFps = rangeOver(e.target.value, 1000, 1);
-  gameOfLife.colorRateCounter = 0;
+  simulation.colorRateFps = rangeOver(e.target.value, 1000, 1);
+  simulation.colorRateCounter = 0;
 });
 
 sel("#noiseRangeValue").addEventListener(
   "input",
-  (e) => (gameOfLife.noiseRangeValue = rangeOver(e.target.value, 3, 12))
+  (e) => (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12))
 );
 
 sel("#noiseOn").addEventListener(
   "change",
-  () => (gameOfLife.spontaneousRegeneration = true)
+  () => (simulation.spontaneousRegeneration = true)
 );
 
 sel("#noiseOff").addEventListener(
   "change",
-  () => (gameOfLife.spontaneousRegeneration = false)
+  () => (simulation.spontaneousRegeneration = false)
 );
 
 sel("#gameType").addEventListener(
   "change",
-  (e) => (gameOfLife.mode = e.target.value)
+  (e) => (simulation.mode = e.target.value)
 );

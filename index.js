@@ -1,9 +1,9 @@
-var GameOfLife = /** @class */ (function () {
-    function GameOfLife(size, canvas) {
+var CellularAutomaton = /** @class */ (function () {
+    function CellularAutomaton(size, canvas) {
         this.size = size;
         this.pixelSize = 1;
         this.pixelScalar = 1;
-        this.data = GameOfLife.randBoard(this.size);
+        this.data = CellularAutomaton.randBoard(this.size);
         this.buffer = new Uint8Array(this.size * this.size);
         this.bufferLength = this.buffer.length;
         this.canvas = canvas;
@@ -25,29 +25,29 @@ var GameOfLife = /** @class */ (function () {
         this.noiseRangeValue = 0;
         this.mode = "life";
     }
-    GameOfLife.prototype.reset = function () {
-        this.data = GameOfLife.randBoard(this.size);
+    CellularAutomaton.prototype.reset = function () {
+        this.data = CellularAutomaton.randBoard(this.size);
     };
-    GameOfLife.prototype.clear = function () {
+    CellularAutomaton.prototype.clear = function () {
         this.data = new Uint8Array(this.size * this.size);
     };
-    GameOfLife.rand = function (min, max) {
+    CellularAutomaton.rand = function (min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
-    GameOfLife.randBoard = function (size) {
+    CellularAutomaton.randBoard = function (size) {
         var _this = this;
         return new Uint8Array(size * size).map(function (_) { return _this.rand(0, 2); });
     };
-    GameOfLife.prototype.set = function (x, y, value) {
+    CellularAutomaton.prototype.set = function (x, y, value) {
         this.data[y * this.size + x] = value;
     };
-    GameOfLife.prototype.get = function (x, y) {
+    CellularAutomaton.prototype.get = function (x, y) {
         var size = this.size;
         var yy = y < 0 ? size + y : y % size;
         var xx = x < 0 ? size + x : x % size;
         return this.data[yy * size + xx];
     };
-    GameOfLife.prototype.update = function () {
+    CellularAutomaton.prototype.update = function () {
         for (var i = 0; i < this.buffer.length; i++) {
             var liveNeighbors = 0;
             var status_1 = 0;
@@ -69,7 +69,7 @@ var GameOfLife = /** @class */ (function () {
                     ( // S8
                     (this.get(row, col) && (liveNeighbors > 5)) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "anneal":
                     // prettier-ignore
@@ -78,7 +78,7 @@ var GameOfLife = /** @class */ (function () {
                         // B4678
                         (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "morley":
                     // prettier-ignore
@@ -87,7 +87,7 @@ var GameOfLife = /** @class */ (function () {
                         // B368
                         (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "day&night":
                     // prettier-ignore
@@ -96,7 +96,7 @@ var GameOfLife = /** @class */ (function () {
                         // B3678
                         (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "2x2":
                     // prettier-ignore
@@ -105,7 +105,7 @@ var GameOfLife = /** @class */ (function () {
                         // B36
                         (liveNeighbors === 3 || liveNeighbors === 6) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "diamoeba":
                     // prettier-ignore
@@ -114,7 +114,7 @@ var GameOfLife = /** @class */ (function () {
                         // B35678
                         (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "34life":
                     // prettier-ignore
@@ -123,7 +123,7 @@ var GameOfLife = /** @class */ (function () {
                         // B34
                         (liveNeighbors === 3 || liveNeighbors === 4) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "B25/S4":
                     // prettier-ignore
@@ -132,7 +132,7 @@ var GameOfLife = /** @class */ (function () {
                         // B25
                         (liveNeighbors === 2 || liveNeighbors === 5) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "seeds":
                     // prettier-ignore
@@ -141,7 +141,7 @@ var GameOfLife = /** @class */ (function () {
                         // B2
                         (liveNeighbors === 2) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "replicator":
                     // prettier-ignore
@@ -150,7 +150,7 @@ var GameOfLife = /** @class */ (function () {
                         // B1357
                         (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "highlife":
                     // prettier-ignore
@@ -159,7 +159,7 @@ var GameOfLife = /** @class */ (function () {
                         // Dead and 3 live neighbors
                         (liveNeighbors === 3 || liveNeighbors === 6) ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
                 case "life":
                     // prettier-ignore
@@ -168,7 +168,7 @@ var GameOfLife = /** @class */ (function () {
                         // Dead and 3 live neighbors
                         liveNeighbors === 3 ||
                         // spontaneous generation
-                        (this.spontaneousRegeneration && (GameOfLife.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -177,14 +177,14 @@ var GameOfLife = /** @class */ (function () {
         return 0;
         var _a;
     };
-    GameOfLife.prototype.getMousePos = function (evt) {
+    CellularAutomaton.prototype.getMousePos = function (evt) {
         var rect = this.canvas.getBoundingClientRect();
         return {
             y: Math.floor(((evt.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
             x: Math.floor(((evt.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
         };
     };
-    GameOfLife.prototype.hover = function (e) {
+    CellularAutomaton.prototype.hover = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         this.set(x - 1, y - 1, 1);
         this.set(x - 1, y, 1);
@@ -196,7 +196,7 @@ var GameOfLife = /** @class */ (function () {
         this.set(x - 1, y, 1);
         this.set(x - 1, y + 1, 1);
     };
-    GameOfLife.prototype.clickDown = function (e) {
+    CellularAutomaton.prototype.clickDown = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         // Glider SE
         switch (this.shape) {
@@ -241,7 +241,7 @@ var GameOfLife = /** @class */ (function () {
                 this.set(x - 1, y + 1, 1);
         }
     };
-    GameOfLife.prototype.randColor = function () {
+    CellularAutomaton.prototype.randColor = function () {
         if (this.colorRateCounter > this.colorRateFps) {
             this.colorCache = this.randColorString();
             this.colorRateCounter = 0;
@@ -249,10 +249,10 @@ var GameOfLife = /** @class */ (function () {
         this.colorRateCounter = this.colorRateCounter + 1;
         return this.colorCache;
     };
-    GameOfLife.prototype.randColorString = function () {
+    CellularAutomaton.prototype.randColorString = function () {
         return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
-    GameOfLife.prototype.draw = function (blur) {
+    CellularAutomaton.prototype.draw = function (blur) {
         if (blur === void 0) { blur = true; }
         if (blur) {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
@@ -280,11 +280,11 @@ var GameOfLife = /** @class */ (function () {
             }
         }
     };
-    return GameOfLife;
+    return CellularAutomaton;
 }());
 var sel = function (selector) { return document.querySelector(selector); };
 var canvas = sel("canvas");
-var gameOfLife = new GameOfLife(750, canvas);
+var simulation = new CellularAutomaton(750, canvas);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
@@ -300,8 +300,8 @@ function tick(now) {
         msPast = now;
     if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
         msPast = now;
-        gameOfLife.draw(gameOfLife.blurEnabled);
-        gameOfLife.update();
+        simulation.draw(simulation.blurEnabled);
+        simulation.update();
     }
     window.requestAnimationFrame(tick);
 }
@@ -315,20 +315,20 @@ var expon = function (x) {
     value = value > 1.0 ? 1.0 : value;
     return -Math.sqrt(-value + 1) + 1;
 };
-sel("#delay").addEventListener("input", function (e) { return (gameOfLife.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
+sel("#delay").addEventListener("input", function (e) { return (simulation.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
 sel("#setBlendMode").addEventListener("input", function (e) {
     var currentState = masterOnOff;
     if (currentState)
         masterOnOff = false;
-    gameOfLife.ctx.globalCompositeOperation = e.target.value;
+    simulation.ctx.globalCompositeOperation = e.target.value;
     masterOnOff = currentState;
 });
 sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
 var isHovering = false;
 sel("#hoverOn").addEventListener("input", function () { return (isHovering = true); });
 sel("#hoverOff").addEventListener("input", function () { return (isHovering = false); });
-canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
-canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
+canvas.addEventListener("mousemove", function (e) { return isHovering && simulation.hover(e); }, false);
+canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
 sel("#masterOn").addEventListener("change", function () { return (masterOnOff = true); });
 sel("#masterOff").addEventListener("change", function () { return (masterOnOff = false); });
 sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
@@ -348,22 +348,22 @@ sel("#screencap").addEventListener("click", function () {
     sel("#masterOff").checked = true;
 });
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
-sel("#reset").addEventListener("click", function () { return gameOfLife.reset(); });
-sel("#clear").addEventListener("click", function () { return gameOfLife.clear(); });
-sel("#setShape").addEventListener("change", function (e) { return (gameOfLife.shape = e.target.value); });
+sel("#reset").addEventListener("click", function () { return simulation.reset(); });
+sel("#clear").addEventListener("click", function () { return simulation.clear(); });
+sel("#setShape").addEventListener("change", function (e) { return (simulation.shape = e.target.value); });
 sel("#color").addEventListener("input", function (e) {
-    gameOfLife.color = e.target.value;
+    simulation.color = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
+    masterOnOff || simulation.draw(false);
 }, false);
 // HSLUV picker
 sel(".input-hex").addEventListener("input", function (e) {
-    gameOfLife.color = e.target.value;
+    simulation.color = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
+    masterOnOff || simulation.draw(false);
 }, false);
 sel("#colorMode").addEventListener("change", function (e) {
-    gameOfLife.colorMode = e.target.value;
+    simulation.colorMode = e.target.value;
     switch (e.target.value) {
         case "picker":
             sel("#colorRadix").style.display = "none";
@@ -392,7 +392,7 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="color"]').style.display = "none";
     }
 });
-sel("#colorRadix").addEventListener("input", function (e) { return (gameOfLife.colorRadix = parseInt(e.target.value)); });
+sel("#colorRadix").addEventListener("input", function (e) { return (simulation.colorRadix = parseInt(e.target.value)); });
 var recorders = null;
 sel("#recStart").addEventListener("change", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
@@ -421,26 +421,26 @@ sel("#recStop").addEventListener("change", function () {
     recorders = null;
 });
 sel("#blurOn").addEventListener("input", function () {
-    gameOfLife.blurEnabled = true;
-    gameOfLife.clearEveryFrame = false;
+    simulation.blurEnabled = true;
+    simulation.clearEveryFrame = false;
     sel("#delay").disabled = false;
 });
 sel("#blurOff").addEventListener("input", function () {
-    gameOfLife.blurEnabled = false;
-    gameOfLife.clearEveryFrame = false;
+    simulation.blurEnabled = false;
+    simulation.clearEveryFrame = false;
     sel("#delay").disabled = true;
 });
 sel("#clearFrame").addEventListener("change", function () {
-    gameOfLife.clearEveryFrame = true;
-    gameOfLife.blurEnabled = false;
+    simulation.clearEveryFrame = true;
+    simulation.blurEnabled = false;
     sel("#delay").disabled = true;
 });
-sel("#setBlendMode").addEventListener("change", function (e) { return (gameOfLife.ctx.globalCompositeOperation = e.target.value); });
+sel("#setBlendMode").addEventListener("change", function (e) { return (simulation.ctx.globalCompositeOperation = e.target.value); });
 sel("#randCycle").addEventListener("input", function (e) {
-    gameOfLife.colorRateFps = rangeOver(e.target.value, 1000, 1);
-    gameOfLife.colorRateCounter = 0;
+    simulation.colorRateFps = rangeOver(e.target.value, 1000, 1);
+    simulation.colorRateCounter = 0;
 });
-sel("#noiseRangeValue").addEventListener("input", function (e) { return (gameOfLife.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
-sel("#noiseOn").addEventListener("change", function () { return (gameOfLife.spontaneousRegeneration = true); });
-sel("#noiseOff").addEventListener("change", function () { return (gameOfLife.spontaneousRegeneration = false); });
-sel("#gameType").addEventListener("change", function (e) { return (gameOfLife.mode = e.target.value); });
+sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
+sel("#noiseOn").addEventListener("change", function () { return (simulation.spontaneousRegeneration = true); });
+sel("#noiseOff").addEventListener("change", function () { return (simulation.spontaneousRegeneration = false); });
+sel("#gameType").addEventListener("change", function (e) { return (simulation.mode = e.target.value); });

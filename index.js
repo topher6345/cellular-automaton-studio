@@ -315,15 +315,8 @@ var expon = function (x) {
     value = value > 1.0 ? 1.0 : value;
     return -Math.sqrt(-value + 1) + 1;
 };
-canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
-canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
 sel("#delay").addEventListener("input", function (e) { return (gameOfLife.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
-sel(".input-hex").addEventListener("input", function (e) {
-    gameOfLife.color = e.target.value;
-    // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
-}, false);
-sel("select").addEventListener("input", function (e) {
+sel("#setBlendMode").addEventListener("input", function (e) {
     var currentState = masterOnOff;
     if (currentState)
         masterOnOff = false;
@@ -334,14 +327,14 @@ sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parse
 var isHovering = false;
 sel("#hoverOn").addEventListener("input", function () { return (isHovering = true); });
 sel("#hoverOff").addEventListener("input", function () { return (isHovering = false); });
+canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
+canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
 sel("#masterOn").addEventListener("change", function () { return (masterOnOff = true); });
 sel("#masterOff").addEventListener("change", function () { return (masterOnOff = false); });
-sel("#modal-capture-preview").addEventListener("click", function () {
-    sel("#modal-capture ").style.display = "none";
-}, false);
+sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
 sel("#screencap").addEventListener("click", function () {
-    var dataUrl = canvas.toDataURL("image/png");
     var img = new Image();
+    var dataUrl = canvas.toDataURL("image/png");
     img.src = dataUrl;
     img.alt = "CanvasGOL-" + Date.now();
     img.title = "Right click and select \"Save Image As..\"\nLeft click to exit (all your captures are saved until refresh)\n";
@@ -354,19 +347,17 @@ sel("#screencap").addEventListener("click", function () {
     masterOnOff = false;
     sel("#masterOff").checked = true;
 });
-sel("#showGallery").addEventListener("click", function () {
-    sel("#modal-capture").style.display = "flex";
-});
-sel("#reset").addEventListener("click", function () {
-    gameOfLife.reset();
-});
-sel("#clear").addEventListener("click", function () {
-    gameOfLife.clear();
-});
-sel("#setShape").addEventListener("change", function (e) {
-    gameOfLife.shape = e.target.value;
-});
+sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
+sel("#reset").addEventListener("click", function () { return gameOfLife.reset(); });
+sel("#clear").addEventListener("click", function () { return gameOfLife.clear(); });
+sel("#setShape").addEventListener("change", function (e) { return (gameOfLife.shape = e.target.value); });
 sel("#color").addEventListener("input", function (e) {
+    gameOfLife.color = e.target.value;
+    // redraw if paused so the user can see what colors
+    masterOnOff || gameOfLife.draw(false);
+}, false);
+// HSLUV picker
+sel(".input-hex").addEventListener("input", function (e) {
     gameOfLife.color = e.target.value;
     // redraw if paused so the user can see what colors
     masterOnOff || gameOfLife.draw(false);
@@ -401,14 +392,12 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="color"]').style.display = "none";
     }
 });
-sel("#colorRadix").addEventListener("input", function (e) {
-    gameOfLife.colorRadix = parseInt(e.target.value);
-});
+sel("#colorRadix").addEventListener("input", function (e) { return (gameOfLife.colorRadix = parseInt(e.target.value)); });
 var recorders = null;
 sel("#recStart").addEventListener("change", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
-    var stream = canvas.captureStream(); // grab our canvas MediaStream
-    var rec = new MediaRecorder(stream); // init the recorder
+    var stream = canvas.captureStream();
+    var rec = new MediaRecorder(stream);
     // every time the recorder has new data, we will store it in our array
     recorders = rec;
     rec.ondataavailable = function (chunk) { return chunks.push(chunk.data); };
@@ -446,9 +435,7 @@ sel("#clearFrame").addEventListener("change", function () {
     gameOfLife.blurEnabled = false;
     sel("#delay").disabled = true;
 });
-sel("#setBlendMode").addEventListener("change", function (e) {
-    gameOfLife.ctx.globalCompositeOperation = e.target.value;
-});
+sel("#setBlendMode").addEventListener("change", function (e) { return (gameOfLife.ctx.globalCompositeOperation = e.target.value); });
 sel("#randCycle").addEventListener("input", function (e) {
     gameOfLife.colorRateFps = rangeOver(e.target.value, 1000, 1);
     gameOfLife.colorRateCounter = 0;

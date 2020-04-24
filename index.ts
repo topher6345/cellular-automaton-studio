@@ -426,12 +426,6 @@ const expon = (x: string): number => {
   return -Math.sqrt(-value + 1) + 1;
 };
 
-canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
-canvas.addEventListener(
-  "mousemove",
-  (e) => isHovering && gameOfLife.hover(e),
-  false
-);
 interface EventTarget {
   value: string;
 }
@@ -442,18 +436,7 @@ sel("#delay").addEventListener(
   false
 );
 
-sel(".input-hex").addEventListener(
-  "input",
-  (e) => {
-    gameOfLife.color = e.target.value;
-
-    // redraw if paused so the user can see what colors
-    masterOnOff || gameOfLife.draw(false);
-  },
-  false
-);
-
-sel("select").addEventListener("input", (e) => {
+sel("#setBlendMode").addEventListener("input", (e) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
 
@@ -470,22 +453,27 @@ sel("#rate").addEventListener(
 let isHovering = false;
 sel("#hoverOn").addEventListener("input", () => (isHovering = true));
 sel("#hoverOff").addEventListener("input", () => (isHovering = false));
+canvas.addEventListener(
+  "mousemove",
+  (e) => isHovering && gameOfLife.hover(e),
+  false
+);
+
+canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
 
 sel("#masterOn").addEventListener("change", () => (masterOnOff = true));
 sel("#masterOff").addEventListener("change", () => (masterOnOff = false));
 
 sel("#modal-capture-preview").addEventListener(
   "click",
-  () => {
-    sel("#modal-capture ").style.display = "none";
-  },
+  () => (sel("#modal-capture ").style.display = "none"),
   false
 );
 
 sel("#screencap").addEventListener("click", () => {
+  const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
 
-  const img = new Image();
   img.src = dataUrl;
   img.alt = `CanvasGOL-${Date.now()}`;
   img.title = `Right click and select "Save Image As.."
@@ -496,28 +484,39 @@ Left click to exit (all your captures are saved until refresh)
   a.href = dataUrl;
   a.append(img);
   a.download = `CanvasGOL-${Date.now()}.png`;
+
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a);
+
   masterOnOff = false;
   (sel("#masterOff") as HTMLInputElement).checked = true;
 });
-sel("#showGallery").addEventListener("click", () => {
-  sel("#modal-capture").style.display = "flex";
-});
+sel("#showGallery").addEventListener(
+  "click",
+  () => (sel("#modal-capture").style.display = "flex")
+);
 
-sel("#reset").addEventListener("click", () => {
-  gameOfLife.reset();
-});
+sel("#reset").addEventListener("click", () => gameOfLife.reset());
+sel("#clear").addEventListener("click", () => gameOfLife.clear());
 
-sel("#clear").addEventListener("click", () => {
-  gameOfLife.clear();
-});
-
-sel("#setShape").addEventListener("change", (e) => {
-  gameOfLife.shape = e.target.value;
-});
+sel("#setShape").addEventListener(
+  "change",
+  (e) => (gameOfLife.shape = e.target.value)
+);
 
 sel("#color").addEventListener(
+  "input",
+  (e) => {
+    gameOfLife.color = e.target.value;
+
+    // redraw if paused so the user can see what colors
+    masterOnOff || gameOfLife.draw(false);
+  },
+  false
+);
+
+// HSLUV picker
+sel(".input-hex").addEventListener(
   "input",
   (e) => {
     gameOfLife.color = e.target.value;
@@ -560,9 +559,10 @@ sel("#colorMode").addEventListener("change", (e) => {
   }
 });
 
-sel("#colorRadix").addEventListener("input", (e) => {
-  gameOfLife.colorRadix = parseInt(e.target.value);
-});
+sel("#colorRadix").addEventListener(
+  "input",
+  (e) => (gameOfLife.colorRadix = parseInt(e.target.value))
+);
 
 interface HTMLCanvasElement {
   captureStream(): MediaStream;
@@ -571,17 +571,21 @@ interface HTMLCanvasElement {
 let recorders: MediaRecorder = null;
 sel("#recStart").addEventListener("change", () => {
   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
-  const stream = canvas.captureStream(); // grab our canvas MediaStream
-  const rec = new MediaRecorder(stream); // init the recorder
+  const stream = canvas.captureStream();
+  const rec = new MediaRecorder(stream);
+
   // every time the recorder has new data, we will store it in our array
   recorders = rec;
   rec.ondataavailable = (chunk) => chunks.push(chunk.data);
+
   // only when the recorder stops, we construct a complete Blob from all the chunks
   rec.onstop = () => {
     const vid = document.createElement("video");
     vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
     vid.controls = true;
+
     sel("#modal-capture-preview").prepend(vid);
+
     masterCacheState = masterOnOff;
     masterOnOff = false;
   };
@@ -620,9 +624,10 @@ sel("#clearFrame").addEventListener("change", () => {
   sel("#delay").disabled = true;
 });
 
-sel("#setBlendMode").addEventListener("change", (e) => {
-  gameOfLife.ctx.globalCompositeOperation = e.target.value;
-});
+sel("#setBlendMode").addEventListener(
+  "change",
+  (e) => (gameOfLife.ctx.globalCompositeOperation = e.target.value)
+);
 
 sel("#randCycle").addEventListener("input", (e) => {
   gameOfLife.colorRateFps = rangeOver(e.target.value, 1000, 1);

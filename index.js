@@ -21,7 +21,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.colorRateFps = 120;
         this.colorRateCounter = 0;
         this.colorCache = this.randColorString();
-        this.spontaneousRegeneration = false;
+        this.noiseEnabled = false;
         this.noiseRangeValue = 0;
         this.mode = "life";
     }
@@ -49,14 +49,17 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     CellularAutomatonEngine.prototype.update = function () {
         for (var i = 0; i < this.buffer.length; i++) {
-            var liveNeighbors = 0;
-            var status_1 = 0;
+            // Noise
+            var spontaneousBirth = this.noiseEnabled &&
+                CellularAutomatonEngine.rand(0, 1000) > 985 + this.noiseRangeValue;
+            if (spontaneousBirth) {
+                this.buffer[i] = 1;
+                continue;
+            }
             var row = i % this.size;
             var col = Math.floor(i / this.size);
-            var spontaneousRegeneration = this.spontaneousRegeneration &&
-                CellularAutomatonEngine.rand(0, 1000) > 985 + this.noiseRangeValue;
-            // Optimization - check for live neighbors
-            // An array-based algorithm led to GC Pressure and low frame rate
+            // Optimization - array-based algorithm led to GC Pressure and low frame rate
+            var liveNeighbors = 0;
             this.get(row - 1, col - 1) && liveNeighbors++;
             this.get(row, col - 1) && liveNeighbors++;
             this.get(row + 1, col - 1) && liveNeighbors++;
@@ -65,89 +68,80 @@ var CellularAutomatonEngine = /** @class */ (function () {
             this.get(row - 1, col + 1) && liveNeighbors++;
             this.get(row, col + 1) && liveNeighbors++;
             this.get(row + 1, col + 1) && liveNeighbors++;
+            var status_1 = 0;
+            var alive = this.get(row, col);
             // prettier-ignore
             switch (this.mode) {
                 case "famine":
-                    ( // S8
-                    (this.get(row, col) && (liveNeighbors > 5)) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                    ( // S6789
+                    (alive && (liveNeighbors > 5)) || spontaneousBirth) && (status_1 = 1);
                     break;
                 case "anneal":
                     ( // S35678
-                    (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B4678
-                        (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
                     break;
                 case "morley":
                     ( // S245
-                    (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
                         // B368
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8)) && (status_1 = 1);
                     break;
                 case "day&night":
                     ( // S34678
-                    (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B3678
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
                     break;
                 case "2x2":
                     ( // S125
-                    (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+                    (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
                         // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
                     break;
                 case "diamoeba":
                     ( // S5678
-                    (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B35678
-                        (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
                     break;
                 case "34life":
                     ( // S34
-                    (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
                         (liveNeighbors === 3 || liveNeighbors === 4) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        spontaneousBirth) && (status_1 = 1);
                     break;
                 case "B25/S4":
                     ( // S4
-                    (this.get(row, col) && (liveNeighbors === 4)) ||
+                    (alive && (liveNeighbors === 4)) ||
                         // B25
-                        (liveNeighbors === 2 || liveNeighbors === 5) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 2 || liveNeighbors === 5)) && (status_1 = 1);
                     break;
                 case "seeds":
                     ( // S
-                    (this.get(row, col)) ||
+                    (alive) ||
                         // B2
-                        (liveNeighbors === 2) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 2)) && (status_1 = 1);
                     break;
                 case "replicator":
                     ( // S1357
-                    (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+                    (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
                         // B1357
-                        (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) && (status_1 = 1);
                     break;
                 case "highlife":
                     ( // S23
-                    (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6) ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
                     break;
                 case "life":
                     ( // A23
-                    (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // B3
-                        liveNeighbors === 3 ||
-                        spontaneousRegeneration) && (status_1 = 1);
+                        liveNeighbors === 3) && (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -418,6 +412,6 @@ sel("#randCycle").addEventListener("input", function (e) {
     simulation.colorRateCounter = 0;
 });
 sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
-sel("#noiseOn").addEventListener("change", function () { return (simulation.spontaneousRegeneration = true); });
-sel("#noiseOff").addEventListener("change", function () { return (simulation.spontaneousRegeneration = false); });
+sel("#noiseOn").addEventListener("change", function () { return (simulation.noiseEnabled = true); });
+sel("#noiseOff").addEventListener("change", function () { return (simulation.noiseEnabled = false); });
 sel("#gameType").addEventListener("change", function (e) { return (simulation.mode = e.target.value); });

@@ -338,7 +338,7 @@
       K && ((t = 70 < f ? "#1b1b1b" : "#ffffff"), (n = ca(f)), (m = 190 / n.o));
       c();
       var u = T(O(P(R(S([e, g, f])))));
-      gameOfLife.color = u;
+      simulation.color = u;
       ya.style.backgroundColor = u;
       6 !== h && (y.value = u);
       if (

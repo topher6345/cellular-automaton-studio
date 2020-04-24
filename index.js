@@ -18,7 +18,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.colorRadix = 16777215;
         this.ctx.fillStyle = "rgba(0,0,0,1)";
         this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
-        this.colorRateFps = 120;
+        this.colorRateFrames = 120;
         this.colorRateCounter = 0;
         this.colorCache = this.randColorString();
         this.noiseEnabled = false;
@@ -36,7 +36,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     CellularAutomatonEngine.randBoard = function (size) {
         var _this = this;
-        return new Uint8Array(size * size).map(function (_) { return _this.rand(0, 2); });
+        return new Uint8Array(size * size).map(function () { return _this.rand(0, 2); });
     };
     CellularAutomatonEngine.prototype.set = function (x, y, value) {
         this.data[y * this.size + x] = value;
@@ -150,11 +150,11 @@ var CellularAutomatonEngine = /** @class */ (function () {
         return 0;
         var _a;
     };
-    CellularAutomatonEngine.prototype.getMousePos = function (evt) {
+    CellularAutomatonEngine.prototype.getMousePos = function (event) {
         var rect = this.canvas.getBoundingClientRect();
         return {
-            y: Math.floor(((evt.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
-            x: Math.floor(((evt.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
+            y: Math.floor(((event.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
+            x: Math.floor(((event.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
         };
     };
     CellularAutomatonEngine.prototype.hover = function (e) {
@@ -171,7 +171,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     CellularAutomatonEngine.prototype.clickDown = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
-        // Glider SE
         switch (this.shape) {
             case "gliderse":
                 this.set(x - 1, y, 1);
@@ -215,7 +214,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         }
     };
     CellularAutomatonEngine.prototype.randColor = function () {
-        if (this.colorRateCounter > this.colorRateFps) {
+        if (this.colorRateCounter > this.colorRateFrames) {
             this.colorCache = this.randColorString();
             this.colorRateCounter = 0;
         }
@@ -408,7 +407,7 @@ sel("#clearFrame").addEventListener("change", function () {
 });
 sel("#setBlendMode").addEventListener("change", function (e) { return (simulation.ctx.globalCompositeOperation = e.target.value); });
 sel("#randCycle").addEventListener("input", function (e) {
-    simulation.colorRateFps = rangeOver(e.target.value, 1000, 1);
+    simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
     simulation.colorRateCounter = 0;
 });
 sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });

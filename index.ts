@@ -12,7 +12,7 @@ class CellularAutomatonEngine {
   buffer: Uint8Array;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
-  colorRateFps: number;
+  colorRateFrames: number;
   colorCache: string;
   colorRateCounter: number;
   noiseEnabled: boolean;
@@ -40,7 +40,7 @@ class CellularAutomatonEngine {
     this.shape = "gliderse";
     this.colorMode = "full";
     this.colorRadix = 16777215;
-    this.ctx.fillStyle = `rgba(0,0,0,1)`;
+    this.ctx.fillStyle = "rgba(0,0,0,1)";
     this.ctx.fillRect(
       0,
       0,
@@ -48,7 +48,7 @@ class CellularAutomatonEngine {
       this.size * this.pixelSize
     );
 
-    this.colorRateFps = 120;
+    this.colorRateFrames = 120;
     this.colorRateCounter = 0;
     this.colorCache = this.randColorString();
     this.noiseEnabled = false;
@@ -69,7 +69,7 @@ class CellularAutomatonEngine {
   }
 
   static randBoard(size: number): Uint8Array {
-    return new Uint8Array(size * size).map((_) => this.rand(0, 2));
+    return new Uint8Array(size * size).map(() => this.rand(0, 2));
   }
 
   set(x: number, y: number, value: number): void {
@@ -204,14 +204,14 @@ class CellularAutomatonEngine {
     return 0;
   }
 
-  getMousePos(evt: MouseEvent) {
+  getMousePos(event: MouseEvent) {
     const rect = this.canvas.getBoundingClientRect();
     return {
       y: Math.floor(
-        ((evt.clientX - rect.left) / this.pixelSize) * this.pixelScalar
+        ((event.clientX - rect.left) / this.pixelSize) * this.pixelScalar
       ),
       x: Math.floor(
-        ((evt.clientY - rect.top) / this.pixelSize) * this.pixelScalar
+        ((event.clientY - rect.top) / this.pixelSize) * this.pixelScalar
       ),
     };
   }
@@ -231,8 +231,6 @@ class CellularAutomatonEngine {
 
   clickDown(e: MouseEvent) {
     const { x, y } = this.getMousePos(e);
-
-    // Glider SE
 
     switch (this.shape) {
       case "gliderse":
@@ -278,7 +276,7 @@ class CellularAutomatonEngine {
   }
 
   randColor(): string {
-    if (this.colorRateCounter > this.colorRateFps) {
+    if (this.colorRateCounter > this.colorRateFrames) {
       this.colorCache = this.randColorString();
       this.colorRateCounter = 0;
     }
@@ -580,7 +578,7 @@ sel("#setBlendMode").addEventListener(
 );
 
 sel("#randCycle").addEventListener("input", (e) => {
-  simulation.colorRateFps = rangeOver(e.target.value, 1000, 1);
+  simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
   simulation.colorRateCounter = 0;
 });
 

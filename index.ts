@@ -6,7 +6,8 @@ class CellularAutomatonEngine {
   alpha: number;
   color: string;
   pixelSize: number;
-  shape: string;
+  clickShape: string;
+  hoverShape: string;
   colorMode: string;
   colorRadix: number;
   buffer: Uint8Array;
@@ -37,7 +38,8 @@ class CellularAutomatonEngine {
     this.clearEveryFrame = false;
     this.color = "orange";
 
-    this.shape = "gliderse";
+    this.clickShape = "gliderse";
+    this.hoverShape = "3x3";
     this.colorMode = "full";
     this.colorRadix = 16777215;
     this.ctx.fillStyle = "rgba(0,0,0,1)";
@@ -218,21 +220,11 @@ class CellularAutomatonEngine {
 
   hover(e: MouseEvent) {
     const { x, y } = this.getMousePos(e);
-    this.set(x - 1, y - 1, 1);
-    this.set(x - 1, y, 1);
-    this.set(x - 1, y + 1, 1);
-    this.set(x, y - 1, 1);
-    this.set(x, y, 1);
-    this.set(x, y + 1, 1);
-    this.set(x - 1, y - 1, 1);
-    this.set(x - 1, y, 1);
-    this.set(x - 1, y + 1, 1);
+    this.drawShape(x, y, this.hoverShape);
   }
 
-  clickDown(e: MouseEvent) {
-    const { x, y } = this.getMousePos(e);
-
-    switch (this.shape) {
+  drawShape(x: number, y: number, shape: string) {
+    switch (shape) {
       case "gliderse":
         this.set(x - 1, y, 1);
         this.set(x, y + 1, 1);
@@ -262,7 +254,6 @@ class CellularAutomatonEngine {
         this.set(x - 1, y + 1, 1);
         break;
       case "3x3":
-      default:
         this.set(x - 1, y - 1, 1);
         this.set(x - 1, y, 1);
         this.set(x - 1, y + 1, 1);
@@ -272,7 +263,17 @@ class CellularAutomatonEngine {
         this.set(x - 1, y - 1, 1);
         this.set(x - 1, y, 1);
         this.set(x - 1, y + 1, 1);
+        break;
+      case "1x1":
+        this.set(x, y, 1);
+        break;
+      default:
     }
+  }
+
+  clickDown(e: MouseEvent) {
+    const { x, y } = this.getMousePos(e);
+    this.drawShape(x, y, this.clickShape);
   }
 
   randColor(): string {
@@ -447,9 +448,14 @@ sel("#showGallery").addEventListener(
 sel("#reset").addEventListener("click", () => simulation.reset());
 sel("#clear").addEventListener("click", () => simulation.clear());
 
-sel("#setShape").addEventListener(
+sel("#setClickShape").addEventListener(
   "change",
-  (e) => (simulation.shape = e.target.value)
+  (e) => (simulation.clickShape = e.target.value)
+);
+
+sel("#setHoverShape").addEventListener(
+  "change",
+  (e) => (simulation.hoverShape = e.target.value)
 );
 
 sel("#color").addEventListener(

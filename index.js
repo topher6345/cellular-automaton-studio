@@ -13,7 +13,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.blurEnabled = false;
         this.clearEveryFrame = false;
         this.color = "orange";
-        this.shape = "gliderse";
+        this.clickShape = "gliderse";
+        this.hoverShape = "3x3";
         this.colorMode = "full";
         this.colorRadix = 16777215;
         this.ctx.fillStyle = "rgba(0,0,0,1)";
@@ -159,19 +160,10 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     CellularAutomatonEngine.prototype.hover = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
-        this.set(x - 1, y - 1, 1);
-        this.set(x - 1, y, 1);
-        this.set(x - 1, y + 1, 1);
-        this.set(x, y - 1, 1);
-        this.set(x, y, 1);
-        this.set(x, y + 1, 1);
-        this.set(x - 1, y - 1, 1);
-        this.set(x - 1, y, 1);
-        this.set(x - 1, y + 1, 1);
+        this.drawShape(x, y, this.hoverShape);
     };
-    CellularAutomatonEngine.prototype.clickDown = function (e) {
-        var _a = this.getMousePos(e), x = _a.x, y = _a.y;
-        switch (this.shape) {
+    CellularAutomatonEngine.prototype.drawShape = function (x, y, shape) {
+        switch (shape) {
             case "gliderse":
                 this.set(x - 1, y, 1);
                 this.set(x, y + 1, 1);
@@ -201,7 +193,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
                 this.set(x - 1, y + 1, 1);
                 break;
             case "3x3":
-            default:
                 this.set(x - 1, y - 1, 1);
                 this.set(x - 1, y, 1);
                 this.set(x - 1, y + 1, 1);
@@ -211,7 +202,16 @@ var CellularAutomatonEngine = /** @class */ (function () {
                 this.set(x - 1, y - 1, 1);
                 this.set(x - 1, y, 1);
                 this.set(x - 1, y + 1, 1);
+                break;
+            case "1x1":
+                this.set(x, y, 1);
+                break;
+            default:
         }
+    };
+    CellularAutomatonEngine.prototype.clickDown = function (e) {
+        var _a = this.getMousePos(e), x = _a.x, y = _a.y;
+        this.drawShape(x, y, this.clickShape);
     };
     CellularAutomatonEngine.prototype.randColor = function () {
         if (this.colorRateCounter > this.colorRateFrames) {
@@ -320,7 +320,8 @@ sel("#screencap").addEventListener("click", function () {
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
 sel("#reset").addEventListener("click", function () { return simulation.reset(); });
 sel("#clear").addEventListener("click", function () { return simulation.clear(); });
-sel("#setShape").addEventListener("change", function (e) { return (simulation.shape = e.target.value); });
+sel("#setClickShape").addEventListener("change", function (e) { return (simulation.clickShape = e.target.value); });
+sel("#setHoverShape").addEventListener("change", function (e) { return (simulation.hoverShape = e.target.value); });
 sel("#color").addEventListener("input", function (e) {
     simulation.color = e.target.value;
     // redraw if paused so the user can see what colors

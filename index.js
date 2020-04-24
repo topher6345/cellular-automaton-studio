@@ -282,12 +282,15 @@ var GameOfLife = /** @class */ (function () {
     };
     return GameOfLife;
 }());
-var sel = function (s) {
-    return document.querySelector(s);
-};
+var sel = function (selector) { return document.querySelector(selector); };
 var canvas = sel("canvas");
-canvas;
 var gameOfLife = new GameOfLife(750, canvas);
+var favicon = sel("#favicon");
+// Update the favicon with the current canvas
+favicon.href = canvas.toDataURL();
+window.setInterval(function () {
+    favicon.href = canvas.toDataURL();
+}, 5000);
 var msPast = null;
 var msPerFrame = 7;
 var masterOnOff = true;
@@ -303,11 +306,6 @@ function tick(now) {
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
-var favicon = sel("#favicon");
-favicon.href = canvas.toDataURL();
-window.setInterval(function (e) {
-    favicon.href = canvas.toDataURL();
-}, 5000);
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
@@ -318,12 +316,8 @@ var expon = function (x) {
     return -Math.sqrt(-value + 1) + 1;
 };
 canvas.addEventListener("click", function (e) { return gameOfLife.clickDown(e); }, false);
-sel("#delay").addEventListener("input", function (e) {
-    var alpha = rangeOver(e.target.value, 1.0, 0);
-    console.log(alpha);
-    console.log(e.target.value);
-    gameOfLife.alpha = alpha;
-}, false);
+canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
+sel("#delay").addEventListener("input", function (e) { return (gameOfLife.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
 sel(".input-hex").addEventListener("input", function (e) {
     gameOfLife.color = e.target.value;
     // redraw if paused so the user can see what colors
@@ -336,23 +330,16 @@ sel("select").addEventListener("input", function (e) {
     gameOfLife.ctx.globalCompositeOperation = e.target.value;
     masterOnOff = currentState;
 });
-sel("#rate").addEventListener("input", function (e) {
-    msPerFrame = parseInt(e.target.value);
-}, false);
+sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
 var isHovering = false;
-sel("#hoverOn").addEventListener("input", function (e) {
-    isHovering = true;
-});
-sel("#hoverOff").addEventListener("input", function (e) {
-    isHovering = false;
-});
-canvas.addEventListener("mousemove", function (e) { return isHovering && gameOfLife.hover(e); }, false);
-sel("#masterOn").addEventListener("change", function (e) { return (masterOnOff = true); }, false);
-sel("#masterOff").addEventListener("change", function (e) { return (masterOnOff = false); }, false);
-sel("#modal-capture-preview").addEventListener("click", function (e) {
+sel("#hoverOn").addEventListener("input", function () { return (isHovering = true); });
+sel("#hoverOff").addEventListener("input", function () { return (isHovering = false); });
+sel("#masterOn").addEventListener("change", function () { return (masterOnOff = true); });
+sel("#masterOff").addEventListener("change", function () { return (masterOnOff = false); });
+sel("#modal-capture-preview").addEventListener("click", function () {
     sel("#modal-capture ").style.display = "none";
 }, false);
-sel("#screencap").addEventListener("click", function (e) {
+sel("#screencap").addEventListener("click", function () {
     var dataUrl = canvas.toDataURL("image/png");
     var img = new Image();
     img.src = dataUrl;
@@ -367,13 +354,13 @@ sel("#screencap").addEventListener("click", function (e) {
     masterOnOff = false;
     sel("#masterOff").checked = true;
 });
-sel("#showGallery").addEventListener("click", function (e) {
+sel("#showGallery").addEventListener("click", function () {
     sel("#modal-capture").style.display = "flex";
 });
-sel("#reset").addEventListener("click", function (e) {
+sel("#reset").addEventListener("click", function () {
     gameOfLife.reset();
 });
-sel("#clear").addEventListener("click", function (e) {
+sel("#clear").addEventListener("click", function () {
     gameOfLife.clear();
 });
 sel("#setShape").addEventListener("change", function (e) {
@@ -415,10 +402,10 @@ sel("#colorMode").addEventListener("change", function (e) {
     }
 });
 sel("#colorRadix").addEventListener("input", function (e) {
-    gameOfLife.colorRadix = e.target.value;
+    gameOfLife.colorRadix = parseInt(e.target.value);
 });
 var recorders = null;
-sel("#recStart").addEventListener("change", function (e) {
+sel("#recStart").addEventListener("change", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
     var stream = canvas.captureStream(); // grab our canvas MediaStream
     var rec = new MediaRecorder(stream); // init the recorder
@@ -438,24 +425,23 @@ sel("#recStart").addEventListener("change", function (e) {
     setTimeout(function () {
         recorders && recorders.stop();
         sel("#recStop").checked = true;
-        sel("#recStop").checked = true;
-    }, 30000); // stop recording in 30s
+    }, 1000 * 30); // stop recording in 30s
 });
 sel("#recStop").addEventListener("change", function () {
     recorders.stop();
     recorders = null;
 });
-sel("#blurOn").addEventListener("input", function (e) {
+sel("#blurOn").addEventListener("input", function () {
     gameOfLife.blurEnabled = true;
     gameOfLife.clearEveryFrame = false;
     sel("#delay").disabled = false;
 });
-sel("#blurOff").addEventListener("input", function (e) {
+sel("#blurOff").addEventListener("input", function () {
     gameOfLife.blurEnabled = false;
     gameOfLife.clearEveryFrame = false;
     sel("#delay").disabled = true;
 });
-sel("#clearFrame").addEventListener("change", function (e) {
+sel("#clearFrame").addEventListener("change", function () {
     gameOfLife.clearEveryFrame = true;
     gameOfLife.blurEnabled = false;
     sel("#delay").disabled = true;
@@ -464,22 +450,10 @@ sel("#setBlendMode").addEventListener("change", function (e) {
     gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
 sel("#randCycle").addEventListener("input", function (e) {
-    var value = rangeOver(e.target.value, 1000, 1);
-    gameOfLife.colorRateFps = value;
-    console.log(value);
+    gameOfLife.colorRateFps = rangeOver(e.target.value, 1000, 1);
     gameOfLife.colorRateCounter = 0;
 });
-sel("#noiseRangeValue").addEventListener("input", function (e) {
-    var noiseRangeValue = rangeOver(e.target.value, 3, 12);
-    console.log(noiseRangeValue);
-    gameOfLife.noiseRangeValue = noiseRangeValue;
-});
-sel("#noiseOn").addEventListener("change", function (e) {
-    gameOfLife.spontaneousRegeneration = true;
-});
-sel("#noiseOff").addEventListener("change", function (e) {
-    gameOfLife.spontaneousRegeneration = false;
-});
-sel("#gameType").addEventListener("change", function (e) {
-    gameOfLife.mode = e.target.value;
-});
+sel("#noiseRangeValue").addEventListener("input", function (e) { return (gameOfLife.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
+sel("#noiseOn").addEventListener("change", function () { return (gameOfLife.spontaneousRegeneration = true); });
+sel("#noiseOff").addEventListener("change", function () { return (gameOfLife.spontaneousRegeneration = false); });
+sel("#gameType").addEventListener("change", function (e) { return (gameOfLife.mode = e.target.value); });

@@ -21,7 +21,7 @@ class GameOfLife {
   bufferLength: number;
   mode: string;
 
-  constructor(size: number, canvas?: HTMLCanvasElement) {
+  constructor(size: number, canvas: HTMLCanvasElement) {
     this.size = size;
     this.pixelSize = 1;
     this.pixelScalar = 1;
@@ -386,12 +386,17 @@ class GameOfLife {
   }
 }
 
-const sel = (s: string): HTMLElement => {
-  return document.querySelector(s);
-};
+const sel = (selector: string): HTMLElement => document.querySelector(selector);
+
 const canvas = sel("canvas") as HTMLCanvasElement;
-canvas;
 const gameOfLife = new GameOfLife(750, canvas);
+const favicon = sel("#favicon") as HTMLAnchorElement;
+
+// Update the favicon with the current canvas
+favicon.href = canvas.toDataURL();
+window.setInterval(() => {
+  favicon.href = canvas.toDataURL();
+}, 5000);
 
 let msPast: number = null;
 let msPerFrame: number = 7;
@@ -411,15 +416,8 @@ function tick(now: number) {
 
 window.requestAnimationFrame(tick);
 
-const favicon: any = sel("#favicon");
-favicon.href = canvas.toDataURL();
-window.setInterval((e: any) => {
-  favicon.href = canvas.toDataURL();
-}, 5000);
-
-const rangeOver = (input: string, max: number, floor: number) => {
-  return expon(input) * max + floor;
-};
+const rangeOver = (input: string, max: number, floor: number) =>
+  expon(input) * max + floor;
 
 const expon = (x: string): number => {
   let value = parseFloat(x);
@@ -429,22 +427,25 @@ const expon = (x: string): number => {
 };
 
 canvas.addEventListener("click", (e) => gameOfLife.clickDown(e), false);
+canvas.addEventListener(
+  "mousemove",
+  (e) => isHovering && gameOfLife.hover(e),
+  false
+);
+interface EventTarget {
+  value: string;
+}
 
 sel("#delay").addEventListener(
   "input",
-  (e: any) => {
-    const alpha = rangeOver(e.target.value, 1.0, 0);
-    console.log(alpha);
-    console.log(e.target.value);
-    gameOfLife.alpha = alpha;
-  },
+  (e) => (gameOfLife.alpha = rangeOver(e.target.value, 1.0, 0)),
   false
 );
 
 sel(".input-hex").addEventListener(
   "input",
-  (e: any) => {
-    gameOfLife.color = e.target.value as any;
+  (e) => {
+    gameOfLife.color = e.target.value;
 
     // redraw if paused so the user can see what colors
     masterOnOff || gameOfLife.draw(false);
@@ -452,54 +453,36 @@ sel(".input-hex").addEventListener(
   false
 );
 
-sel("select").addEventListener("input", (e: any) => {
+sel("select").addEventListener("input", (e) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
-  gameOfLife.ctx.globalCompositeOperation = e.target.value as any;
+
+  gameOfLife.ctx.globalCompositeOperation = e.target.value;
 
   masterOnOff = currentState;
 });
 
 sel("#rate").addEventListener(
   "input",
-  (e: any) => {
-    msPerFrame = parseInt(e.target.value as any);
-  },
-  false
+  (e) => (msPerFrame = parseInt(e.target.value))
 );
 
 let isHovering = false;
-sel("#hoverOn").addEventListener("input", (e) => {
-  isHovering = true;
-});
+sel("#hoverOn").addEventListener("input", () => (isHovering = true));
+sel("#hoverOff").addEventListener("input", () => (isHovering = false));
 
-sel("#hoverOff").addEventListener("input", (e) => {
-  isHovering = false;
-});
-
-canvas.addEventListener(
-  "mousemove",
-  (e) => isHovering && gameOfLife.hover(e),
-  false
-);
-
-sel("#masterOn").addEventListener("change", (e) => (masterOnOff = true), false);
-
-sel("#masterOff").addEventListener(
-  "change",
-  (e) => (masterOnOff = false),
-  false
-);
+sel("#masterOn").addEventListener("change", () => (masterOnOff = true));
+sel("#masterOff").addEventListener("change", () => (masterOnOff = false));
 
 sel("#modal-capture-preview").addEventListener(
   "click",
-  (e) => {
+  () => {
     sel("#modal-capture ").style.display = "none";
   },
   false
 );
 
-sel("#screencap").addEventListener("click", (e) => {
+sel("#screencap").addEventListener("click", () => {
   const dataUrl = canvas.toDataURL("image/png");
 
   const img = new Image();
@@ -509,35 +492,35 @@ sel("#screencap").addEventListener("click", (e) => {
 Left click to exit (all your captures are saved until refresh)
 `;
 
-  const a: any = document.createElement("a");
+  const a: HTMLAnchorElement = document.createElement("a");
   a.href = dataUrl;
-  a.append(img as any);
+  a.append(img);
   a.download = `CanvasGOL-${Date.now()}.png`;
   sel("#modal-capture").style.display = "flex";
-  sel("#modal-capture-preview").prepend(a as any);
+  sel("#modal-capture-preview").prepend(a);
   masterOnOff = false;
-  (sel("#masterOff") as any).checked = true;
+  (sel("#masterOff") as HTMLInputElement).checked = true;
 });
-sel("#showGallery").addEventListener("click", (e: any) => {
+sel("#showGallery").addEventListener("click", () => {
   sel("#modal-capture").style.display = "flex";
 });
 
-sel("#reset").addEventListener("click", (e) => {
+sel("#reset").addEventListener("click", () => {
   gameOfLife.reset();
 });
 
-sel("#clear").addEventListener("click", (e) => {
+sel("#clear").addEventListener("click", () => {
   gameOfLife.clear();
 });
 
-sel("#setShape").addEventListener("change", (e: any) => {
-  gameOfLife.shape = e.target.value as any;
+sel("#setShape").addEventListener("change", (e) => {
+  gameOfLife.shape = e.target.value;
 });
 
 sel("#color").addEventListener(
   "input",
-  (e: any) => {
-    gameOfLife.color = e.target.value as any;
+  (e) => {
+    gameOfLife.color = e.target.value;
 
     // redraw if paused so the user can see what colors
     masterOnOff || gameOfLife.draw(false);
@@ -545,9 +528,9 @@ sel("#color").addEventListener(
   false
 );
 
-sel("#colorMode").addEventListener("change", (e: any) => {
-  gameOfLife.colorMode = e.target.value as any;
-  switch (e.target.value as any) {
+sel("#colorMode").addEventListener("change", (e) => {
+  gameOfLife.colorMode = e.target.value;
+  switch (e.target.value) {
     case "picker":
       sel("#colorRadix").style.display = "none";
       sel('label[for="colorRadix"]').style.display = "none";
@@ -577,14 +560,18 @@ sel("#colorMode").addEventListener("change", (e: any) => {
   }
 });
 
-sel("#colorRadix").addEventListener("input", (e: any) => {
-  gameOfLife.colorRadix = e.target.value as any;
+sel("#colorRadix").addEventListener("input", (e) => {
+  gameOfLife.colorRadix = parseInt(e.target.value);
 });
 
+interface HTMLCanvasElement {
+  captureStream(): MediaStream;
+}
+
 let recorders: MediaRecorder = null;
-sel("#recStart").addEventListener("change", (e) => {
+sel("#recStart").addEventListener("change", () => {
   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
-  const stream = (canvas as any).captureStream(); // grab our canvas MediaStream
+  const stream = canvas.captureStream(); // grab our canvas MediaStream
   const rec = new MediaRecorder(stream); // init the recorder
   // every time the recorder has new data, we will store it in our array
   recorders = rec;
@@ -594,7 +581,7 @@ sel("#recStart").addEventListener("change", (e) => {
     const vid = document.createElement("video");
     vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
     vid.controls = true;
-    sel("#modal-capture-preview").prepend(vid as any);
+    sel("#modal-capture-preview").prepend(vid);
     masterCacheState = masterOnOff;
     masterOnOff = false;
   };
@@ -602,9 +589,8 @@ sel("#recStart").addEventListener("change", (e) => {
   rec.start();
   setTimeout(() => {
     recorders && recorders.stop();
-    (sel("#recStop") as any).checked = true;
-    (sel("#recStop") as any).checked = true;
-  }, 30000); // stop recording in 30s
+    (sel("#recStop") as HTMLInputElement).checked = true;
+  }, 1000 * 30); // stop recording in 30s
 });
 
 sel("#recStop").addEventListener("change", () => {
@@ -612,48 +598,53 @@ sel("#recStop").addEventListener("change", () => {
   recorders = null;
 });
 
-sel("#blurOn").addEventListener("input", (e) => {
+interface HTMLElement {
+  disabled: boolean;
+}
+
+sel("#blurOn").addEventListener("input", () => {
   gameOfLife.blurEnabled = true;
   gameOfLife.clearEveryFrame = false;
-  (sel("#delay") as any).disabled = false;
+  sel("#delay").disabled = false;
 });
 
-sel("#blurOff").addEventListener("input", (e) => {
+sel("#blurOff").addEventListener("input", () => {
   gameOfLife.blurEnabled = false;
   gameOfLife.clearEveryFrame = false;
-  (sel("#delay") as any).disabled = true;
-});
-sel("#clearFrame").addEventListener("change", (e) => {
-  gameOfLife.clearEveryFrame = true;
-  gameOfLife.blurEnabled = false;
-  (sel("#delay") as any).disabled = true;
+  sel("#delay").disabled = true;
 });
 
-sel("#setBlendMode").addEventListener("change", (e: any) => {
+sel("#clearFrame").addEventListener("change", () => {
+  gameOfLife.clearEveryFrame = true;
+  gameOfLife.blurEnabled = false;
+  sel("#delay").disabled = true;
+});
+
+sel("#setBlendMode").addEventListener("change", (e) => {
   gameOfLife.ctx.globalCompositeOperation = e.target.value;
 });
 
-sel("#randCycle").addEventListener("input", (e: any) => {
-  const value = rangeOver(e.target.value, 1000, 1);
-  gameOfLife.colorRateFps = value;
-  console.log(value);
+sel("#randCycle").addEventListener("input", (e) => {
+  gameOfLife.colorRateFps = rangeOver(e.target.value, 1000, 1);
   gameOfLife.colorRateCounter = 0;
 });
 
-sel("#noiseRangeValue").addEventListener("input", (e: any) => {
-  const noiseRangeValue = rangeOver(e.target.value, 3, 12);
-  console.log(noiseRangeValue);
-  gameOfLife.noiseRangeValue = noiseRangeValue;
-});
+sel("#noiseRangeValue").addEventListener(
+  "input",
+  (e) => (gameOfLife.noiseRangeValue = rangeOver(e.target.value, 3, 12))
+);
 
-sel("#noiseOn").addEventListener("change", (e) => {
-  gameOfLife.spontaneousRegeneration = true;
-});
+sel("#noiseOn").addEventListener(
+  "change",
+  () => (gameOfLife.spontaneousRegeneration = true)
+);
 
-sel("#noiseOff").addEventListener("change", (e) => {
-  gameOfLife.spontaneousRegeneration = false;
-});
+sel("#noiseOff").addEventListener(
+  "change",
+  () => (gameOfLife.spontaneousRegeneration = false)
+);
 
-sel("#gameType").addEventListener("change", (e: any) => {
-  gameOfLife.mode = e.target.value as any;
-});
+sel("#gameType").addEventListener(
+  "change",
+  (e) => (gameOfLife.mode = e.target.value)
+);

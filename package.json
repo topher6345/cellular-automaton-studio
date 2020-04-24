@@ -1,13 +1,13 @@
 {
-  "name": "js-game-of-life",
+  "name": "cellular-automaton-studio",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Christopher Saunders",
+  "license": "CC-BY-NC-ND-4.0",
   "devDependencies": {
     "@types/dom-mediacapture-record": "^1.0.4"
   }

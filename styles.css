@@ -62,10 +62,6 @@ a {
   flex-grow: 1;
 }
 
-.controls > div:last-child {
-  /* max-width: 8em; */
-}
-
 .controls input,
 .controls select,
 .controls button {

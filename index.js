@@ -252,9 +252,9 @@ var CellularAutomaton = /** @class */ (function () {
     CellularAutomaton.prototype.randColorString = function () {
         return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
-    CellularAutomaton.prototype.draw = function (blur) {
-        if (blur === void 0) { blur = true; }
-        if (blur) {
+    CellularAutomaton.prototype.draw = function (isAnimating) {
+        if (isAnimating === void 0) { isAnimating = true; }
+        if (isAnimating) {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
             this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
         }

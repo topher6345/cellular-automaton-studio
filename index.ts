@@ -338,8 +338,8 @@ class CellularAutomaton {
     return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
   }
 
-  draw(blur = true): void {
-    if (blur) {
+  draw(isAnimating = true): void {
+    if (isAnimating) {
       this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
       this.ctx.fillRect(
         0,

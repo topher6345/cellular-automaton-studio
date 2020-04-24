@@ -1,4 +1,4 @@
-class CellularAutomaton {
+class CellularAutomatonEngine {
   size: number;
   data: Uint8Array;
   canvas: HTMLCanvasElement;
@@ -25,7 +25,7 @@ class CellularAutomaton {
     this.size = size;
     this.pixelSize = 1;
     this.pixelScalar = 1;
-    this.data = CellularAutomaton.randBoard(this.size);
+    this.data = CellularAutomatonEngine.randBoard(this.size);
     this.buffer = new Uint8Array(this.size * this.size);
     this.bufferLength = this.buffer.length;
 
@@ -57,7 +57,7 @@ class CellularAutomaton {
   }
 
   reset(): void {
-    this.data = CellularAutomaton.randBoard(this.size);
+    this.data = CellularAutomatonEngine.randBoard(this.size);
   }
 
   clear(): void {
@@ -90,6 +90,10 @@ class CellularAutomaton {
       const row = i % this.size;
       const col = Math.floor(i / this.size);
 
+      const spontaneousRegeneration =
+        this.spontaneousRegeneration &&
+        CellularAutomatonEngine.rand(0, 1000) > 985 + this.noiseRangeValue;
+
       // Optimization - check for live neighbors
       // An array-based algorithm led to GC Pressure and low frame rate
       this.get(row - 1, col - 1) && liveNeighbors++;
@@ -106,10 +110,7 @@ class CellularAutomaton {
           // prettier-ignore
           ( // S8
             (this.get(row, col) && (liveNeighbors > 5)) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "anneal":
@@ -118,10 +119,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)) ||
             // B4678
             (liveNeighbors === 4 || liveNeighbors === 6|| liveNeighbors === 7 || liveNeighbors === 8) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "morley":
@@ -130,10 +128,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
             // B368
             (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 8) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "day&night":
@@ -142,10 +137,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6  || liveNeighbors === 7 || liveNeighbors === 8)) ||
             // B3678
             (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "2x2":
@@ -154,10 +146,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
             // B36
             (liveNeighbors === 3 || liveNeighbors === 6) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "diamoeba":
@@ -166,10 +155,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7|| liveNeighbors === 8)) ||
             // B35678
             (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "34life":
@@ -178,10 +164,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
             // B34
             (liveNeighbors === 3 || liveNeighbors === 4) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "B25/S4":
@@ -190,10 +173,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 4)) ||
             // B25
             (liveNeighbors === 2 || liveNeighbors === 5) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "seeds":
@@ -202,10 +182,7 @@ class CellularAutomaton {
             (this.get(row, col) ) ||
             // B2
             (liveNeighbors === 2) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "replicator":
@@ -214,10 +191,7 @@ class CellularAutomaton {
             (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
             // B1357
             (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) ||
-            // spontaneous generation
-            (this.spontaneousRegeneration && (
-              CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-            )
+            spontaneousRegeneration
           ) && (status = 1);
           break;
         case "highlife":
@@ -226,10 +200,7 @@ class CellularAutomaton {
           (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
           // Dead and 3 live neighbors
           (liveNeighbors === 3 || liveNeighbors === 6) ||
-          // spontaneous generation
-          (this.spontaneousRegeneration && (
-            CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-          )
+          spontaneousRegeneration
         ) && (status = 1);
           break;
         case "life":
@@ -238,10 +209,7 @@ class CellularAutomaton {
           (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
           // Dead and 3 live neighbors
           liveNeighbors === 3 ||
-          // spontaneous generation
-          (this.spontaneousRegeneration && (
-            CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue))
-          )
+          spontaneousRegeneration
         ) && (status = 1);
           break;
       }
@@ -389,14 +357,12 @@ class CellularAutomaton {
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 
 const canvas = sel("canvas") as HTMLCanvasElement;
-const simulation = new CellularAutomaton(750, canvas);
+const simulation = new CellularAutomatonEngine(750, canvas);
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
-window.setInterval(() => {
-  favicon.href = canvas.toDataURL();
-}, 5000);
+window.setInterval(() => (favicon.href = canvas.toDataURL()), 5000);
 
 let msPast: number = null;
 let msPerFrame: number = 7;

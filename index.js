@@ -1,9 +1,9 @@
-var CellularAutomaton = /** @class */ (function () {
-    function CellularAutomaton(size, canvas) {
+var CellularAutomatonEngine = /** @class */ (function () {
+    function CellularAutomatonEngine(size, canvas) {
         this.size = size;
         this.pixelSize = 1;
         this.pixelScalar = 1;
-        this.data = CellularAutomaton.randBoard(this.size);
+        this.data = CellularAutomatonEngine.randBoard(this.size);
         this.buffer = new Uint8Array(this.size * this.size);
         this.bufferLength = this.buffer.length;
         this.canvas = canvas;
@@ -25,34 +25,36 @@ var CellularAutomaton = /** @class */ (function () {
         this.noiseRangeValue = 0;
         this.mode = "life";
     }
-    CellularAutomaton.prototype.reset = function () {
-        this.data = CellularAutomaton.randBoard(this.size);
+    CellularAutomatonEngine.prototype.reset = function () {
+        this.data = CellularAutomatonEngine.randBoard(this.size);
     };
-    CellularAutomaton.prototype.clear = function () {
+    CellularAutomatonEngine.prototype.clear = function () {
         this.data = new Uint8Array(this.size * this.size);
     };
-    CellularAutomaton.rand = function (min, max) {
+    CellularAutomatonEngine.rand = function (min, max) {
         return Math.floor(Math.random() * (max - min)) + min;
     };
-    CellularAutomaton.randBoard = function (size) {
+    CellularAutomatonEngine.randBoard = function (size) {
         var _this = this;
         return new Uint8Array(size * size).map(function (_) { return _this.rand(0, 2); });
     };
-    CellularAutomaton.prototype.set = function (x, y, value) {
+    CellularAutomatonEngine.prototype.set = function (x, y, value) {
         this.data[y * this.size + x] = value;
     };
-    CellularAutomaton.prototype.get = function (x, y) {
+    CellularAutomatonEngine.prototype.get = function (x, y) {
         var size = this.size;
         var yy = y < 0 ? size + y : y % size;
         var xx = x < 0 ? size + x : x % size;
         return this.data[yy * size + xx];
     };
-    CellularAutomaton.prototype.update = function () {
+    CellularAutomatonEngine.prototype.update = function () {
         for (var i = 0; i < this.buffer.length; i++) {
             var liveNeighbors = 0;
             var status_1 = 0;
             var row = i % this.size;
             var col = Math.floor(i / this.size);
+            var spontaneousRegeneration = this.spontaneousRegeneration &&
+                CellularAutomatonEngine.rand(0, 1000) > 985 + this.noiseRangeValue;
             // Optimization - check for live neighbors
             // An array-based algorithm led to GC Pressure and low frame rate
             this.get(row - 1, col - 1) && liveNeighbors++;
@@ -68,8 +70,7 @@ var CellularAutomaton = /** @class */ (function () {
                     // prettier-ignore
                     ( // S8
                     (this.get(row, col) && (liveNeighbors > 5)) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "anneal":
                     // prettier-ignore
@@ -77,8 +78,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B4678
                         (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "morley":
                     // prettier-ignore
@@ -86,8 +86,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
                         // B368
                         (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "day&night":
                     // prettier-ignore
@@ -95,8 +94,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B3678
                         (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "2x2":
                     // prettier-ignore
@@ -104,8 +102,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
                         // B36
                         (liveNeighbors === 3 || liveNeighbors === 6) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "diamoeba":
                     // prettier-ignore
@@ -113,8 +110,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
                         // B35678
                         (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "34life":
                     // prettier-ignore
@@ -122,8 +118,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
                         (liveNeighbors === 3 || liveNeighbors === 4) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "B25/S4":
                     // prettier-ignore
@@ -131,8 +126,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 4)) ||
                         // B25
                         (liveNeighbors === 2 || liveNeighbors === 5) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "seeds":
                     // prettier-ignore
@@ -140,8 +134,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col)) ||
                         // B2
                         (liveNeighbors === 2) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "replicator":
                     // prettier-ignore
@@ -149,8 +142,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
                         // B1357
                         (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "highlife":
                     // prettier-ignore
@@ -158,8 +150,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // Dead and 3 live neighbors
                         (liveNeighbors === 3 || liveNeighbors === 6) ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
                 case "life":
                     // prettier-ignore
@@ -167,8 +158,7 @@ var CellularAutomaton = /** @class */ (function () {
                     (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // Dead and 3 live neighbors
                         liveNeighbors === 3 ||
-                        // spontaneous generation
-                        (this.spontaneousRegeneration && (CellularAutomaton.rand(0, 1000) > (985 + this.noiseRangeValue)))) && (status_1 = 1);
+                        spontaneousRegeneration) && (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -177,14 +167,14 @@ var CellularAutomaton = /** @class */ (function () {
         return 0;
         var _a;
     };
-    CellularAutomaton.prototype.getMousePos = function (evt) {
+    CellularAutomatonEngine.prototype.getMousePos = function (evt) {
         var rect = this.canvas.getBoundingClientRect();
         return {
             y: Math.floor(((evt.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
             x: Math.floor(((evt.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
         };
     };
-    CellularAutomaton.prototype.hover = function (e) {
+    CellularAutomatonEngine.prototype.hover = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         this.set(x - 1, y - 1, 1);
         this.set(x - 1, y, 1);
@@ -196,7 +186,7 @@ var CellularAutomaton = /** @class */ (function () {
         this.set(x - 1, y, 1);
         this.set(x - 1, y + 1, 1);
     };
-    CellularAutomaton.prototype.clickDown = function (e) {
+    CellularAutomatonEngine.prototype.clickDown = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         // Glider SE
         switch (this.shape) {
@@ -241,7 +231,7 @@ var CellularAutomaton = /** @class */ (function () {
                 this.set(x - 1, y + 1, 1);
         }
     };
-    CellularAutomaton.prototype.randColor = function () {
+    CellularAutomatonEngine.prototype.randColor = function () {
         if (this.colorRateCounter > this.colorRateFps) {
             this.colorCache = this.randColorString();
             this.colorRateCounter = 0;
@@ -249,10 +239,10 @@ var CellularAutomaton = /** @class */ (function () {
         this.colorRateCounter = this.colorRateCounter + 1;
         return this.colorCache;
     };
-    CellularAutomaton.prototype.randColorString = function () {
+    CellularAutomatonEngine.prototype.randColorString = function () {
         return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
-    CellularAutomaton.prototype.draw = function (isAnimating) {
+    CellularAutomatonEngine.prototype.draw = function (isAnimating) {
         if (isAnimating === void 0) { isAnimating = true; }
         if (isAnimating) {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
@@ -280,17 +270,15 @@ var CellularAutomaton = /** @class */ (function () {
             }
         }
     };
-    return CellularAutomaton;
+    return CellularAutomatonEngine;
 }());
 var sel = function (selector) { return document.querySelector(selector); };
 var canvas = sel("canvas");
-var simulation = new CellularAutomaton(750, canvas);
+var simulation = new CellularAutomatonEngine(750, canvas);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
-window.setInterval(function () {
-    favicon.href = canvas.toDataURL();
-}, 5000);
+window.setInterval(function () { return (favicon.href = canvas.toDataURL()); }, 5000);
 var msPast = null;
 var msPerFrame = 7;
 var masterOnOff = true;

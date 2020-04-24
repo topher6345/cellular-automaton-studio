@@ -105,16 +105,15 @@ class CellularAutomatonEngine {
       this.get(row, col + 1) && liveNeighbors++;
       this.get(row + 1, col + 1) && liveNeighbors++;
 
+      // prettier-ignore
       switch (this.mode) {
         case "famine":
-          // prettier-ignore
           ( // S8
             (this.get(row, col) && (liveNeighbors > 5)) ||
             spontaneousRegeneration
           ) && (status = 1);
           break;
         case "anneal":
-          // prettier-ignore
           ( // S35678
             (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)) ||
             // B4678
@@ -123,7 +122,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "morley":
-          // prettier-ignore
           ( // S245
             (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
             // B368
@@ -132,7 +130,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "day&night":
-          // prettier-ignore
           ( // S34678
             (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6  || liveNeighbors === 7 || liveNeighbors === 8)) ||
             // B3678
@@ -141,7 +138,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "2x2":
-          // prettier-ignore
           ( // S125
             (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
             // B36
@@ -150,7 +146,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "diamoeba":
-          // prettier-ignore
           ( // S5678
             (this.get(row, col) && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7|| liveNeighbors === 8)) ||
             // B35678
@@ -159,7 +154,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "34life":
-          // prettier-ignore
           ( // S34
             (this.get(row, col) && (liveNeighbors === 3 || liveNeighbors === 4)) ||
             // B34
@@ -168,7 +162,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "B25/S4":
-          // prettier-ignore
           ( // S4
             (this.get(row, col) && (liveNeighbors === 4)) ||
             // B25
@@ -177,7 +170,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "seeds":
-          // prettier-ignore
           ( // S
             (this.get(row, col) ) ||
             // B2
@@ -186,7 +178,6 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "replicator":
-          // prettier-ignore
           ( // S1357
             (this.get(row, col) && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
             // B1357
@@ -195,19 +186,17 @@ class CellularAutomatonEngine {
           ) && (status = 1);
           break;
         case "highlife":
-          // prettier-ignore
-          ( // Alive and 2-3 live neighbors
+          ( // S23
           (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-          // Dead and 3 live neighbors
+          // B36
           (liveNeighbors === 3 || liveNeighbors === 6) ||
           spontaneousRegeneration
         ) && (status = 1);
           break;
         case "life":
-          // prettier-ignore
-          (// Alive and 2-3 live neighbors
+          (// A23
           (this.get(row, col) && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-          // Dead and 3 live neighbors
+          // B3
           liveNeighbors === 3 ||
           spontaneousRegeneration
         ) && (status = 1);

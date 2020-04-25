@@ -515,10 +515,15 @@ sel("#setClickShape").addEventListener(
   (e) => (simulation.clickShape = e.target.value)
 );
 
-sel("#setHoverShape").addEventListener(
-  "change",
-  (e) => (simulation.hoverShape = e.target.value)
-);
+sel("#setHoverShape").addEventListener("change", (e) => {
+  simulation.hoverShape = e.target.value;
+
+  if (isHovering) {
+    log(`> Hover shape is now ${simulation.hoverShape}`);
+  } else {
+    log(`> Hover shape will be ${simulation.hoverShape} when hover is enabled`);
+  }
+});
 
 sel("#color").addEventListener(
   "input",

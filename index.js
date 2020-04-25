@@ -365,7 +365,15 @@ sel("#seedDensity").addEventListener("change", function (e) {
     return log("> Seed Density changed to " + e.target.value);
 });
 sel("#setClickShape").addEventListener("change", function (e) { return (simulation.clickShape = e.target.value); });
-sel("#setHoverShape").addEventListener("change", function (e) { return (simulation.hoverShape = e.target.value); });
+sel("#setHoverShape").addEventListener("change", function (e) {
+    simulation.hoverShape = e.target.value;
+    if (isHovering) {
+        log("> Hover shape is now " + simulation.hoverShape);
+    }
+    else {
+        log("> Hover shape will be " + simulation.hoverShape + " when hover is enabled");
+    }
+});
 sel("#color").addEventListener("input", function (e) {
     simulation.color = e.target.value;
     // redraw if paused so the user can see what colors

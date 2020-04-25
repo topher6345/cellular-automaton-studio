@@ -491,7 +491,12 @@ sel("#showGallery").addEventListener(
   () => (sel("#modal-capture").style.display = "flex")
 );
 
-sel("#seed").addEventListener("click", () => simulation.seed());
+sel("#seed").addEventListener("click", () => {
+  simulation.seed();
+  log(
+    `> Simulation seeded with a random chance of 1 in ${simulation.seedDensity}`
+  );
+});
 sel("#clear").addEventListener("click", () => {
   simulation.clear();
   log("> Screen cleared");
@@ -510,10 +515,10 @@ sel("#seedDensity").addEventListener("change", (e) =>
   log(`> Seed Density changed to ${e.target.value}`)
 );
 
-sel("#setClickShape").addEventListener(
-  "change",
-  (e) => (simulation.clickShape = e.target.value)
-);
+sel("#setClickShape").addEventListener("change", (e) => {
+  simulation.clickShape = e.target.value;
+  log(`> Click Shape changed to ${simulation.clickShape}`);
+});
 
 sel("#setHoverShape").addEventListener("change", (e) => {
   simulation.hoverShape = e.target.value;
@@ -665,15 +670,31 @@ sel("#noiseRangeValue").addEventListener(
   (e) => (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12))
 );
 
-sel("#noiseOn").addEventListener(
-  "change",
-  () => (simulation.noiseEnabled = true)
-);
+sel("#noiseRangeValue").addEventListener("change", () => {
+  if (simulation.noiseEnabled) {
+    log(
+      `> Noise Amount - cells have a 1 in ${simulation.noiseRangeValue.toFixed(
+        2
+      )} chance of being born`
+    );
+  } else {
+    log(
+      `> Noise Amount - cells will have a 1 in ${simulation.noiseRangeValue.toFixed(
+        2
+      )} chace of being born when noise is enabled`
+    );
+  }
+});
 
-sel("#noiseOff").addEventListener(
-  "change",
-  () => (simulation.noiseEnabled = false)
-);
+sel("#noiseOn").addEventListener("change", () => {
+  simulation.noiseEnabled = true;
+  log("> Noise On - cells will be born randomly");
+});
+
+sel("#noiseOff").addEventListener("change", () => {
+  simulation.noiseEnabled = false;
+  log("> Noise Off - cells will be born according to game rules only");
+});
 
 sel("#gameType").addEventListener("change", (e) => {
   simulation.mode = e.target.value;

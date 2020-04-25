@@ -351,7 +351,10 @@ sel("#screencap").addEventListener("click", function () {
     sel("#masterOff").checked = true;
 });
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
-sel("#seed").addEventListener("click", function () { return simulation.seed(); });
+sel("#seed").addEventListener("click", function () {
+    simulation.seed();
+    log("> Simulation seeded with a random chance of 1 in " + simulation.seedDensity);
+});
 sel("#clear").addEventListener("click", function () {
     simulation.clear();
     log("> Screen cleared");
@@ -364,7 +367,10 @@ sel("#seedDensity").addEventListener("input", function (e) { return (simulation.
 sel("#seedDensity").addEventListener("change", function (e) {
     return log("> Seed Density changed to " + e.target.value);
 });
-sel("#setClickShape").addEventListener("change", function (e) { return (simulation.clickShape = e.target.value); });
+sel("#setClickShape").addEventListener("change", function (e) {
+    simulation.clickShape = e.target.value;
+    log("> Click Shape changed to " + simulation.clickShape);
+});
 sel("#setHoverShape").addEventListener("change", function (e) {
     simulation.hoverShape = e.target.value;
     if (isHovering) {
@@ -472,8 +478,22 @@ sel("#randCycle").addEventListener("input", function (e) {
     simulation.colorRateCounter = 0;
 });
 sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
-sel("#noiseOn").addEventListener("change", function () { return (simulation.noiseEnabled = true); });
-sel("#noiseOff").addEventListener("change", function () { return (simulation.noiseEnabled = false); });
+sel("#noiseRangeValue").addEventListener("change", function () {
+    if (simulation.noiseEnabled) {
+        log("> Noise Amount - cells have a 1 in " + simulation.noiseRangeValue.toFixed(2) + " chance of being born");
+    }
+    else {
+        log("> Noise Amount - cells will have a 1 in " + simulation.noiseRangeValue.toFixed(2) + " chace of being born when noise is enabled");
+    }
+});
+sel("#noiseOn").addEventListener("change", function () {
+    simulation.noiseEnabled = true;
+    log("> Noise On - cells will be born randomly");
+});
+sel("#noiseOff").addEventListener("change", function () {
+    simulation.noiseEnabled = false;
+    log("> Noise Off - cells will be born according to game rules only");
+});
 sel("#gameType").addEventListener("change", function (e) {
     simulation.mode = e.target.value;
     log("> Game type has been changed to " + simulation.mode);

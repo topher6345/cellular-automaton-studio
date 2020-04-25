@@ -317,7 +317,7 @@ sel("#setBlendMode").addEventListener("input", function (e) {
 });
 sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
 sel("#rate").addEventListener("change", function () {
-    return log("Speed Updated: Each frame will last " + msPerFrame + " milliseconds");
+    return log("Speed Updated: Each generation will last " + msPerFrame + " milliseconds");
 });
 var isHovering = false;
 sel("#hoverOn").addEventListener("input", function () {
@@ -508,3 +508,8 @@ sel("#gameType").addEventListener("change", function (e) {
     log("Game type has been changed to " + simulation.mode);
 });
 sel("#prompt").scrollTop = 0;
+setInterval(function () {
+    sel("#currentCount").value = simulation.data
+        .reduce(function (previousValue, currentValue) { return previousValue + currentValue; }, 0)
+        .toLocaleString();
+}, 1000);

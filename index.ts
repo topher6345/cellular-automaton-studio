@@ -433,7 +433,7 @@ sel("#rate").addEventListener(
 );
 
 sel("#rate").addEventListener("change", () =>
-  log(`Speed Updated: Each frame will last ${msPerFrame} milliseconds`)
+  log(`Speed Updated: Each generation will last ${msPerFrame} milliseconds`)
 );
 
 let isHovering = false;
@@ -711,3 +711,9 @@ sel("#gameType").addEventListener("change", (e) => {
 });
 
 sel("#prompt").scrollTop = 0;
+
+setInterval(() => {
+  sel("#currentCount").value = simulation.data
+    .reduce((previousValue, currentValue) => previousValue + currentValue, 0)
+    .toLocaleString();
+}, 1000);

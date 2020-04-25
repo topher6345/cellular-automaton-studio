@@ -223,3 +223,12 @@ button {
   padding-left: 1em;
   padding-right: 1em;
 }
+
+#currentCount {
+  text-align: right;
+  max-width: 8em;
+}
+
+#currentCount:hover {
+  cursor: default;
+}

@@ -461,9 +461,9 @@ sel("#modal-capture-preview").addEventListener(
 sel("#screencap").addEventListener("click", () => {
   const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
-
+  const imgName = `CanvasGOL-${Date.now()}`;
   img.src = dataUrl;
-  img.alt = `CanvasGOL-${Date.now()}`;
+  img.alt = imgName;
   img.title = `Click to download
   
 Click grey border to exit (Simulation has been paused)
@@ -472,7 +472,9 @@ Click grey border to exit (Simulation has been paused)
   const a: HTMLAnchorElement = document.createElement("a");
   a.href = dataUrl;
   a.append(img);
-  a.download = `CanvasGOL-${Date.now()}.png`;
+  a.download = `${imgName}.png`;
+
+  log(`> Screenshot ${imgName}.png captured`);
 
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a);

@@ -333,13 +333,15 @@ sel("#modal-capture-preview").addEventListener("click", function () { return (se
 sel("#screencap").addEventListener("click", function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
+    var imgName = "CanvasGOL-" + Date.now();
     img.src = dataUrl;
-    img.alt = "CanvasGOL-" + Date.now();
+    img.alt = imgName;
     img.title = "Click to download\n  \nClick grey border to exit (Simulation has been paused)\n";
     var a = document.createElement("a");
     a.href = dataUrl;
     a.append(img);
-    a.download = "CanvasGOL-" + Date.now() + ".png";
+    a.download = imgName + ".png";
+    log("> Screenshot " + imgName + ".png captured");
     sel("#modal-capture").style.display = "flex";
     sel("#modal-capture-preview").prepend(a);
     masterOnOff = false;

@@ -210,3 +210,16 @@ button {
 #hoverOn:checked {
   animation: blink 1s infinite;
 }
+
+#prompt {
+  color: white;
+  font-family: monospace;
+  width: 100%;
+  max-height: 3em;
+  overflow: scroll;
+  scroll-behavior: smooth;
+}
+#prompt > p {
+  padding-left: 1em;
+  padding-right: 1em;
+}

@@ -18,361 +18,381 @@
         <div id="modal-capture-preview"></div>
       </div>
       <canvas id="game" width="750" height="750"></canvas>
-      <div class="controls">
-        <div>
-          <h1>Cellular Automaton Studio</h1>
-          <a href="https://github.com/topher6345">@topher6345</a>
+      <div class="foo">
+        <div id="prompt">
+          <p>
+            $ Welcome to Cellular Animation Studio!
+          </p>
         </div>
-        <div>
-          <label
-            for="masterOn"
-            title="When selected, the simulation is animating"
-            >On</label
-          >
-          <input type="radio" id="masterOn" name="master" value="on" checked />
-          <label
-            for="masterOff"
-            title="When selected, the simulation is not animating."
-            >Off</label
-          >
-          <input type="radio" id="masterOff" name="master" value="off" />
-        </div>
-
-        <div>
-          <label
-            for="gameType"
-            title="When selected, the simulation is not animating."
-            >Game</label
-          >
-          <select name="gameType" id="gameType">
-            <option value="life" selected>Life</option>
-            <option value="highlife">High Life</option>
-            <option value="replicator">Replicator</option>
-            <option value="seeds">Seeds</option>
-            <option value="B25/S4">B25/S4</option>
-            <option value="34life">34 Life</option>
-            <option value="diamoeba">Diamoeba</option>
-            <option value="2x2">2x2</option>
-            <option value="day&night">Day & Night</option>
-            <option value="morley">morley</option>
-            <option value="anneal">anneal</option>
-            <option value="famine">famine</option>
-          </select>
-        </div>
-        <div id="picker" style="display: none;">
-          <label>HSLUV</label>
-          <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
-          <div id="display">
-            <canvas
-              style="position: absolute; left: 0;"
-              height="400"
-              width="400"
-            ></canvas>
-            <svg
-              style="position: absolute; left: 0;"
-              height="400"
-              width="400"
-            ></svg>
+        <div class="controls">
+          <div>
+            <h1>Cellular Automaton Studio</h1>
+            <a href="https://github.com/topher6345">@topher6345</a>
           </div>
-          <table>
-            <tr id="control-h">
-              <td class="cell-input">
-                <input
-                  type="number"
-                  min="0"
-                  max="360"
-                  step="any"
-                  class="counter counter-hue"
-                  tabindex="0"
-                />
-              </td>
-              <td><div class="range-slider"></div></td>
-              <td class="picker-label">H</td>
-            </tr>
-            <tr id="control-s">
-              <td class="cell-input">
-                <input
-                  type="number"
-                  step="any"
-                  min="0"
-                  max="100"
-                  class="counter counter-saturation"
-                />
-              </td>
-              <td><div class="range-slider"></div></td>
-              <td class="picker-label">S</td>
-            </tr>
-            <tr id="control-l">
-              <td class="cell-input">
-                <input
-                  type="number"
-                  step="any"
-                  min="0"
-                  max="100"
-                  class="counter counter-lightness"
-                />
-              </td>
-              <td><div class="range-slider"></div></td>
-              <td class="picker-label">L</td>
-            </tr>
-            <tr>
-              <td class="cell-input cell-input-hex">
-                <input class="input-hex" pattern="#?[0-9a-fA-F]{6}" />
-              </td>
-              <td><div class="swatch"></div></td>
-              <td></td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <label
-            title="Color Mode: Different options for how new colors appear in the animation"
-            for="colorMode"
-            >Color Mode</label
-          >
-          <select name="colorMode" id="colorMode">
-            <option value="picker">Color Picker</option>
-            <option value="hsluv">HSLUV</option>
-            <option value="full" selected>Random Frame</option>
-            <option value="row">Random Row</option>
-            <option value="each">Random Pixel</option>
-          </select>
-          <label
-            title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
-            for="colorRadix"
-            >Color Range</label
-          >
-          <input
-            name="colorRadix"
-            id="colorRadix"
-            type="range"
-            min="1"
-            max="16777215"
-            value="16777215"
-          />
-          <label
-            title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
-            for="randCycle"
-            >Color Rate</label
-          >
-          <input
-            name="randCycle"
-            type="range"
-            min="0.0"
-            max="1.0"
-            step="0.0001"
-            id="randCycle"
-            value="0.01"
-          />
-          <label
-            style="display: none;"
-            title="The color of the new pixels."
-            for="color"
-            >Picker</label
-          >
-          <input
-            style="display: none;"
-            type="color"
-            id="color"
-            name="color"
-            value="#e66465"
-          />
-        </div>
-        <div>
-          <label
-            title="Blur only partially erases each frame, leaving visual trails"
-            for="blurOn"
-            >Blur</label
-          >
-          <input type="radio" id="blurOn" name="radio" value="on" />
+          <div>
+            <label
+              for="masterOn"
+              title="When selected, the simulation is animating"
+              >On</label
+            >
+            <input
+              type="radio"
+              id="masterOn"
+              name="master"
+              value="on"
+              checked
+            />
+            <label
+              for="masterOff"
+              title="When selected, the simulation is not animating."
+              >Off</label
+            >
+            <input type="radio" id="masterOff" name="master" value="off" />
+          </div>
 
-          <label
-            title="Each new frame is drawn over the last"
-            for="blurOff"
-            checked
-            >Overlay</label
-          >
-          <input type="radio" id="blurOff" name="radio" />
+          <div>
+            <label
+              for="gameType"
+              title="When selected, the simulation is not animating."
+              >Game</label
+            >
+            <select name="gameType" id="gameType">
+              <option value="life" selected>Life</option>
+              <option value="highlife">High Life</option>
+              <option value="replicator">Replicator</option>
+              <option value="seeds">Seeds</option>
+              <option value="B25/S4">B25/S4</option>
+              <option value="34life">34 Life</option>
+              <option value="diamoeba">Diamoeba</option>
+              <option value="2x2">2x2</option>
+              <option value="day&night">Day & Night</option>
+              <option value="morley">morley</option>
+              <option value="anneal">anneal</option>
+              <option value="famine">famine</option>
+            </select>
+          </div>
+          <div id="picker" style="display: none;">
+            <label>HSLUV</label>
+            <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
+            <div id="display">
+              <canvas
+                style="position: absolute; left: 0;"
+                height="400"
+                width="400"
+              ></canvas>
+              <svg
+                style="position: absolute; left: 0;"
+                height="400"
+                width="400"
+              ></svg>
+            </div>
+            <table>
+              <tr id="control-h">
+                <td class="cell-input">
+                  <input
+                    type="number"
+                    min="0"
+                    max="360"
+                    step="any"
+                    class="counter counter-hue"
+                    tabindex="0"
+                  />
+                </td>
+                <td><div class="range-slider"></div></td>
+                <td class="picker-label">H</td>
+              </tr>
+              <tr id="control-s">
+                <td class="cell-input">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    max="100"
+                    class="counter counter-saturation"
+                  />
+                </td>
+                <td><div class="range-slider"></div></td>
+                <td class="picker-label">S</td>
+              </tr>
+              <tr id="control-l">
+                <td class="cell-input">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    max="100"
+                    class="counter counter-lightness"
+                  />
+                </td>
+                <td><div class="range-slider"></div></td>
+                <td class="picker-label">L</td>
+              </tr>
+              <tr>
+                <td class="cell-input cell-input-hex">
+                  <input class="input-hex" pattern="#?[0-9a-fA-F]{6}" />
+                </td>
+                <td><div class="swatch"></div></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <div>
+            <label
+              title="Color Mode: Different options for how new colors appear in the animation"
+              for="colorMode"
+              >Color Mode</label
+            >
+            <select name="colorMode" id="colorMode">
+              <option value="picker">Color Picker</option>
+              <option value="hsluv">HSLUV</option>
+              <option value="full" selected>Random Frame</option>
+              <option value="row">Random Row</option>
+              <option value="each">Random Pixel</option>
+            </select>
+            <label
+              title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
+              for="colorRadix"
+              >Color Range</label
+            >
+            <input
+              name="colorRadix"
+              id="colorRadix"
+              type="range"
+              min="1"
+              max="16777215"
+              value="16777215"
+            />
+            <label
+              title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
+              for="randCycle"
+              >Color Rate</label
+            >
+            <input
+              name="randCycle"
+              type="range"
+              min="0.0"
+              max="1.0"
+              step="0.0001"
+              id="randCycle"
+              value="0.01"
+            />
+            <label
+              style="display: none;"
+              title="The color of the new pixels."
+              for="color"
+              >Picker</label
+            >
+            <input
+              style="display: none;"
+              type="color"
+              id="color"
+              name="color"
+              value="#e66465"
+            />
+          </div>
+          <div>
+            <label
+              title="Blur only partially erases each frame, leaving visual trails"
+              for="blurOn"
+              >Blur</label
+            >
+            <input type="radio" id="blurOn" name="radio" value="on" />
 
-          <label
-            title="Each frame is erased and redrawn from scratch"
-            for="blurEnabled"
-            >Clear Frame</label
-          >
-          <input title="clearFrame" name="radio" type="radio" id="clearFrame" />
-          <label
-            title="Blur Amount: left is more blur and longer trails, right is less blur and shorter trails."
-            for="motion-blur"
-            >Blur Amount
-          </label>
-          <input
-            name="motion-blur"
-            type="range"
-            id="delay"
-            min="0.0"
-            max="0.076"
-            step="0.0001"
-            value="0.0005"
-          />
-        </div>
-        <div>
-          <label
-            title="Blend Mode: the compositing or blending operation used in blending the new frame with the old."
-            for="setBlendMode"
-            >Blend Mode</label
-          >
-          <select id="setBlendMode" name="setBlendMode">
-            <option value="source-over">source-over</option>
-            <!-- <option value="source-in">source-in</option>
+            <label
+              title="Each new frame is drawn over the last"
+              for="blurOff"
+              checked
+              >Overlay</label
+            >
+            <input type="radio" id="blurOff" name="radio" />
+
+            <label
+              title="Each frame is erased and redrawn from scratch"
+              for="blurEnabled"
+              >Clear Frame</label
+            >
+            <input
+              title="clearFrame"
+              name="radio"
+              type="radio"
+              id="clearFrame"
+            />
+            <label
+              title="Blur Amount: left is more blur and longer trails, right is less blur and shorter trails."
+              for="motion-blur"
+              >Blur Amount
+            </label>
+            <input
+              name="motion-blur"
+              type="range"
+              id="delay"
+              min="0.0"
+              max="0.076"
+              step="0.0001"
+              value="0.0005"
+            />
+          </div>
+          <div>
+            <label
+              title="Blend Mode: the compositing or blending operation used in blending the new frame with the old."
+              for="setBlendMode"
+              >Blend Mode</label
+            >
+            <select id="setBlendMode" name="setBlendMode">
+              <option value="source-over">source-over</option>
+              <!-- <option value="source-in">source-in</option>
             <option value="source-out">source-out</option> -->
-            <option value="source-atop">source-atop</option>
-            <!-- <option value="destination-over">destination-over</option> -->
-            <!-- <option value="destination-in">destination-in</option> -->
-            <!-- <option value="destination-out">destination-out</option> -->
-            <!-- <option value="destination-atop">destination-atop</option> -->
-            <option value="lighter">lighter</option>
-            <!-- <option value="copy">copy</option> -->
-            <option value="xor">xor</option>
-            <option value="multiply">multiply</option>
-            <option value="screen">screen</option>
-            <option value="overlay">overlay</option>
-            <option value="darken">darken</option>
-            <option value="lighten">lighten</option>
-            <option value="color-dodge">color-dodge</option>
-            <option value="color-burn">color-burn</option>
-            <option value="hard-light">hard-light</option>
-            <option value="soft-light">soft-light</option>
-            <option value="difference">difference</option>
-            <option value="exclusion">exclusion</option>
-            <option value="hue">hue</option>
-            <option value="saturation">saturation</option>
-            <option value="luminosity">luminosity</option>
-          </select>
-        </div>
-        <div>
-          <label title="Speed - left is faster, right is slower" for="rate"
-            >Speed</label
-          >
-          <input type="range" name="rate" id="rate" min="1" max="1000" />
-        </div>
+              <option value="source-atop">source-atop</option>
+              <!-- <option value="destination-over">destination-over</option> -->
+              <!-- <option value="destination-in">destination-in</option> -->
+              <!-- <option value="destination-out">destination-out</option> -->
+              <!-- <option value="destination-atop">destination-atop</option> -->
+              <option value="lighter">lighter</option>
+              <!-- <option value="copy">copy</option> -->
+              <option value="xor">xor</option>
+              <option value="multiply">multiply</option>
+              <option value="screen">screen</option>
+              <option value="overlay">overlay</option>
+              <option value="darken">darken</option>
+              <option value="lighten">lighten</option>
+              <option value="color-dodge">color-dodge</option>
+              <option value="color-burn">color-burn</option>
+              <option value="hard-light">hard-light</option>
+              <option value="soft-light">soft-light</option>
+              <option value="difference">difference</option>
+              <option value="exclusion">exclusion</option>
+              <option value="hue">hue</option>
+              <option value="saturation">saturation</option>
+              <option value="luminosity">luminosity</option>
+            </select>
+          </div>
+          <div>
+            <label title="Speed - left is faster, right is slower" for="rate"
+              >Speed</label
+            >
+            <input type="range" name="rate" id="rate" min="1" max="1000" />
+          </div>
 
-        <div>
-          <label
-            title="Screenshot: Take as screenshot of the canvas for downloading as a .png file."
-            >Screenshot</label
-          >
-          <button id="screencap">📷</button>
-          <button id="showGallery">Gallery</button>
-        </div>
-        <div>
-          <label title="Redraw: Add or remove cells in the simluation"
-            >Redraw</label
-          >
+          <div>
+            <label
+              title="Screenshot: Take as screenshot of the canvas for downloading as a .png file."
+              >Screenshot</label
+            >
+            <button id="screencap">📷</button>
+            <button id="showGallery">Gallery</button>
+          </div>
+          <div>
+            <label title="Redraw: Add or remove cells in the simluation"
+              >Redraw</label
+            >
 
-          <button id="clear">Clear</button>
-          <button id="kill">Kill</button>
+            <button id="clear">Clear</button>
+            <button id="kill">Kill</button>
 
-          <button id="seed">Seed</button>
-          <label title="Density of seeding">Density</label>
-          <input
-            name="seedDensity"
-            type="range"
-            id="seedDensity"
-            min="0"
-            max="64"
-            step="1"
-            value="1"
-          />
-        </div>
-        <div>
-          <label
-            title="Click Shape: the shape of new live cells in the animation when you click"
-            for="setShape"
-            >Click Shape</label
-          >
-          <select name="setShape" id="setClickShape">
-            <option value="gliderse">Glider SE</option>
-            <option value="glidersw">Glider SW</option>
-            <option value="gliderne">Glider NE</option>
-            <option value="glidernw">Glider NW</option>
-            <option value="3x3">3x3</option>
-            <option value="1x1">1x1</option>
-          </select>
-        </div>
-        <div>
-          <label
-            title="When checked, hovering the mouse over the canvas will draw a pixel"
-            for="hover"
-            >Hover On</label
-          >
-          <input title="Hover" name="hover" type="radio" id="hoverOn" />
-          <label
-            title="When checked, hovering the mouse over the canvas will draw a pixel"
-            for="hover"
-            >Hover Off</label
-          >
-          <input
-            title="Hover"
-            name="hover"
-            type="radio"
-            id="hoverOff"
-            checked
-          />
-          <label
-            title="Hover Shape: the shape of new live cells in the animation when you hover the mouse"
-            for="setHoverShape"
-            >Hover Shape</label
-          >
-          <select name="setHoverShape" id="setHoverShape">
-            <option value="gliderse">Glider SE</option>
-            <option value="glidersw">Glider SW</option>
-            <option value="gliderne">Glider NE</option>
-            <option value="glidernw">Glider NW</option>
-            <option value="3x3" selected>3x3</option>
-            <option value="1x1">1x1</option>
-          </select>
-        </div>
+            <button id="seed">Seed</button>
+            <label title="Density of seeding">Density</label>
+            <input
+              name="seedDensity"
+              type="range"
+              id="seedDensity"
+              min="0"
+              max="64"
+              step="1"
+              value="1"
+            />
+          </div>
+          <div>
+            <label
+              title="Click Shape: the shape of new live cells in the animation when you click"
+              for="setShape"
+              >Click Shape</label
+            >
+            <select name="setShape" id="setClickShape">
+              <option value="gliderse">Glider SE</option>
+              <option value="glidersw">Glider SW</option>
+              <option value="gliderne">Glider NE</option>
+              <option value="glidernw">Glider NW</option>
+              <option value="3x3">3x3</option>
+              <option value="1x1">1x1</option>
+            </select>
+          </div>
+          <div>
+            <label
+              title="When checked, hovering the mouse over the canvas will draw a pixel"
+              for="hover"
+              >Hover On</label
+            >
+            <input title="Hover" name="hover" type="radio" id="hoverOn" />
+            <label
+              title="When checked, hovering the mouse over the canvas will draw a pixel"
+              for="hover"
+              >Hover Off</label
+            >
+            <input
+              title="Hover"
+              name="hover"
+              type="radio"
+              id="hoverOff"
+              checked
+            />
+            <label
+              title="Hover Shape: the shape of new live cells in the animation when you hover the mouse"
+              for="setHoverShape"
+              >Hover Shape</label
+            >
+            <select name="setHoverShape" id="setHoverShape">
+              <option value="gliderse">Glider SE</option>
+              <option value="glidersw">Glider SW</option>
+              <option value="gliderne">Glider NE</option>
+              <option value="glidernw">Glider NW</option>
+              <option value="3x3" selected>3x3</option>
+              <option value="1x1">1x1</option>
+            </select>
+          </div>
 
-        <div id="record">
-          <label
-            title="Recording: This will start recording video, automatically stops after 30 seconds"
-            for="record-video"
-            >Recording</label
-          >
-          <input type="radio" id="recStart" name="record-video" />
-          <label
-            title="Stop the currently recording video and open the gallery"
-            for="record-video"
-            >Stopped</label
-          >
-          <input type="radio" id="recStop" name="record-video" checked />
-        </div>
-        <div id="noise">
-          <label title="Adds random live cells to the simulation" for="noiseOn"
-            >Noise On</label
-          >
-          <input type="radio" id="noiseOn" name="noise" />
+          <div id="record">
+            <label
+              title="Recording: This will start recording video, automatically stops after 30 seconds"
+              for="record-video"
+              >Recording</label
+            >
+            <input type="radio" id="recStart" name="record-video" />
+            <label
+              title="Stop the currently recording video and open the gallery"
+              for="record-video"
+              >Stopped</label
+            >
+            <input type="radio" id="recStop" name="record-video" checked />
+          </div>
+          <div id="noise">
+            <label
+              title="Adds random live cells to the simulation"
+              for="noiseOn"
+              >Noise On</label
+            >
+            <input type="radio" id="noiseOn" name="noise" />
 
-          <label
-            title="Disables random live cells in the simulation"
-            for="noiseOff"
-            >Noise Off</label
-          >
-          <input type="radio" id="noiseOff" name="noise" checked />
-          <label
-            title="How likely live cells spontaneously appear"
-            for="noiseRangeValue"
-            >Amount</label
-          >
-          <input
-            name="noiseRangeValue"
-            type="range"
-            min="0.0"
-            max="1.0"
-            step="0.001"
-            id="noiseRangeValue"
-            value="0.0"
-          />
+            <label
+              title="Disables random live cells in the simulation"
+              for="noiseOff"
+              >Noise Off</label
+            >
+            <input type="radio" id="noiseOff" name="noise" checked />
+            <label
+              title="How likely live cells spontaneously appear"
+              for="noiseRangeValue"
+              >Amount</label
+            >
+            <input
+              name="noiseRangeValue"
+              type="range"
+              min="0.0"
+              max="1.0"
+              step="0.001"
+              id="noiseRangeValue"
+              value="0.0"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -388,6 +388,16 @@ function tick(now: number) {
 
 window.requestAnimationFrame(tick);
 
+const log = (message: string) => {
+  const prompt = sel("#prompt");
+  const p = document.createElement("p");
+  p.innerText = message;
+  prompt.append(p);
+  prompt.scrollTop = prompt.scrollTop + 60;
+};
+
+setTimeout(() => log("$ Hover over controls for help"), 3000);
+
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
 
@@ -433,8 +443,14 @@ canvas.addEventListener(
 
 canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
 
-sel("#masterOn").addEventListener("change", () => (masterOnOff = true));
-sel("#masterOff").addEventListener("change", () => (masterOnOff = false));
+sel("#masterOn").addEventListener("change", () => {
+  masterOnOff = true;
+  log("$ The simulation has been started.");
+});
+sel("#masterOff").addEventListener("change", () => {
+  masterOnOff = false;
+  log("$ The simulation has been paused.");
+});
 
 sel("#modal-capture-preview").addEventListener(
   "click",
@@ -609,7 +625,7 @@ sel("#clearFrame").addEventListener("change", () => {
 });
 
 sel("#setBlendMode").addEventListener(
-  "change",
+  "input",
   (e) => (simulation.ctx.globalCompositeOperation = e.target.value)
 );
 
@@ -633,7 +649,9 @@ sel("#noiseOff").addEventListener(
   () => (simulation.noiseEnabled = false)
 );
 
-sel("#gameType").addEventListener(
-  "change",
-  (e) => (simulation.mode = e.target.value)
-);
+sel("#gameType").addEventListener("change", (e) => {
+  simulation.mode = e.target.value;
+  log(`$ Game type has been changed to ${simulation.mode}`);
+});
+
+sel("#prompt").scrollTop = 0;

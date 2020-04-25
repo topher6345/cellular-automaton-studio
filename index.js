@@ -63,6 +63,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         return this.data[yy * size + xx];
     };
     CellularAutomatonEngine.prototype.update = function () {
+        var _a;
         for (var i = 0; i < this.buffer.length; i++) {
             // Noise
             var spontaneousBirth = this.noiseEnabled &&
@@ -163,7 +164,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
         }
         _a = [this.buffer, this.data], this.data = _a[0], this.buffer = _a[1];
         return 0;
-        var _a;
     };
     CellularAutomatonEngine.prototype.getMousePos = function (event) {
         var rect = this.canvas.getBoundingClientRect();
@@ -290,6 +290,14 @@ function tick(now) {
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
+var log = function (message) {
+    var prompt = sel("#prompt");
+    var p = document.createElement("p");
+    p.innerText = message;
+    prompt.append(p);
+    prompt.scrollTop = prompt.scrollTop + 60;
+};
+setTimeout(function () { return log("$ Hover over controls for help"); }, 3000);
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
@@ -313,8 +321,14 @@ sel("#hoverOn").addEventListener("input", function () { return (isHovering = tru
 sel("#hoverOff").addEventListener("input", function () { return (isHovering = false); });
 canvas.addEventListener("mousemove", function (e) { return isHovering && simulation.hover(e); }, false);
 canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
-sel("#masterOn").addEventListener("change", function () { return (masterOnOff = true); });
-sel("#masterOff").addEventListener("change", function () { return (masterOnOff = false); });
+sel("#masterOn").addEventListener("change", function () {
+    masterOnOff = true;
+    log("$ The simulation has been started.");
+});
+sel("#masterOff").addEventListener("change", function () {
+    masterOnOff = false;
+    log("$ The simulation has been paused.");
+});
 sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
 sel("#screencap").addEventListener("click", function () {
     var img = new Image();
@@ -422,7 +436,7 @@ sel("#clearFrame").addEventListener("change", function () {
     simulation.blurEnabled = false;
     sel("#delay").disabled = true;
 });
-sel("#setBlendMode").addEventListener("change", function (e) { return (simulation.ctx.globalCompositeOperation = e.target.value); });
+sel("#setBlendMode").addEventListener("input", function (e) { return (simulation.ctx.globalCompositeOperation = e.target.value); });
 sel("#randCycle").addEventListener("input", function (e) {
     simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
     simulation.colorRateCounter = 0;
@@ -430,4 +444,8 @@ sel("#randCycle").addEventListener("input", function (e) {
 sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
 sel("#noiseOn").addEventListener("change", function () { return (simulation.noiseEnabled = true); });
 sel("#noiseOff").addEventListener("change", function () { return (simulation.noiseEnabled = false); });
-sel("#gameType").addEventListener("change", function (e) { return (simulation.mode = e.target.value); });
+sel("#gameType").addEventListener("change", function (e) {
+    simulation.mode = e.target.value;
+    log("$ Game type has been changed to " + simulation.mode);
+});
+sel("#prompt").scrollTop = 0;

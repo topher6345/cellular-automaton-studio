@@ -483,8 +483,7 @@ Click grey border to exit (Simulation has been paused)
   a.href = dataUrl;
   a.append(img);
   a.download = `${imgName}.png`;
-
-  log(`Screenshot ${imgName}.png captured`);
+  log(`Screenshot captured, the simulation has been paused.`);
 
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a);

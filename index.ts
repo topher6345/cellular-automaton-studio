@@ -628,8 +628,9 @@ sel("#recStart").addEventListener("change", () => {
   log(`Recording started at ${new Date()}..`);
   setTimeout(() => {
     recorders && recorders.stop();
+    recorders && log("Recording Stopped after 30 seconds");
     (sel("#recStop") as HTMLInputElement).checked = true;
-  }, 1000 * 30); // stop recording in 30s
+  }, 1000 * 30);
 });
 
 sel("#recStop").addEventListener("change", () => {
@@ -646,21 +647,21 @@ sel("#blurOn").addEventListener("input", () => {
   simulation.blurEnabled = true;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
-  log("Draw Mode:Blur - older generations will fade out.");
+  log("Draw Mode Blur - older generations will fade out.");
 });
 
 sel("#blurOff").addEventListener("input", () => {
   simulation.blurEnabled = false;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
-  log("Draw Mode:Overlay - new generations will paint on top of old ones.");
+  log("Draw Mode Overlay - new generations will paint on top of old ones.");
 });
 
 sel("#clearFrame").addEventListener("change", () => {
   simulation.clearEveryFrame = true;
   simulation.blurEnabled = false;
   sel("#delay").disabled = true;
-  log("Draw Mode:Clear Frame - only current generation shown.");
+  log("Draw Mode Clear Frame - only current generation shown.");
 });
 
 sel("#setBlendMode").addEventListener("input", (e) => {

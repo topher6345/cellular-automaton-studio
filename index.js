@@ -451,8 +451,9 @@ sel("#recStart").addEventListener("change", function () {
     log("Recording started at " + new Date() + "..");
     setTimeout(function () {
         recorders && recorders.stop();
+        recorders && log("Recording Stopped after 30 seconds");
         sel("#recStop").checked = true;
-    }, 1000 * 30); // stop recording in 30s
+    }, 1000 * 30);
 });
 sel("#recStop").addEventListener("change", function () {
     recorders.stop();
@@ -463,19 +464,19 @@ sel("#blurOn").addEventListener("input", function () {
     simulation.blurEnabled = true;
     simulation.clearEveryFrame = false;
     sel("#delay").disabled = false;
-    log("Draw Mode:Blur - older generations will fade out.");
+    log("Draw Mode Blur - older generations will fade out.");
 });
 sel("#blurOff").addEventListener("input", function () {
     simulation.blurEnabled = false;
     simulation.clearEveryFrame = false;
     sel("#delay").disabled = true;
-    log("Draw Mode:Overlay - new generations will paint on top of old ones.");
+    log("Draw Mode Overlay - new generations will paint on top of old ones.");
 });
 sel("#clearFrame").addEventListener("change", function () {
     simulation.clearEveryFrame = true;
     simulation.blurEnabled = false;
     sel("#delay").disabled = true;
-    log("Draw Mode:Clear Frame - only current generation shown.");
+    log("Draw Mode Clear Frame - only current generation shown.");
 });
 sel("#setBlendMode").addEventListener("input", function (e) {
     simulation.ctx.globalCompositeOperation = e.target.value;

@@ -316,6 +316,9 @@ sel("#setBlendMode").addEventListener("input", function (e) {
     masterOnOff = currentState;
 });
 sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
+sel("#rate").addEventListener("change", function () {
+    return log("> Speed Updated: Each frame will last " + msPerFrame + " milliseconds");
+});
 var isHovering = false;
 sel("#hoverOn").addEventListener("input", function () { return (isHovering = true); });
 sel("#hoverOff").addEventListener("input", function () { return (isHovering = false); });
@@ -349,9 +352,18 @@ sel("#screencap").addEventListener("click", function () {
 });
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
 sel("#seed").addEventListener("click", function () { return simulation.seed(); });
-sel("#clear").addEventListener("click", function () { return simulation.clear(); });
-sel("#kill").addEventListener("click", function () { return simulation.kill(); });
+sel("#clear").addEventListener("click", function () {
+    simulation.clear();
+    log("> Screen cleared");
+});
+sel("#kill").addEventListener("click", function () {
+    simulation.kill();
+    log("> Cells Killed - click Seed or the canvas to add live cells");
+});
 sel("#seedDensity").addEventListener("input", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
+sel("#seedDensity").addEventListener("change", function (e) {
+    return log("> Seed Density changed to " + e.target.value);
+});
 sel("#setClickShape").addEventListener("change", function (e) { return (simulation.clickShape = e.target.value); });
 sel("#setHoverShape").addEventListener("change", function (e) { return (simulation.hoverShape = e.target.value); });
 sel("#color").addEventListener("input", function (e) {
@@ -414,6 +426,7 @@ sel("#recStart").addEventListener("change", function () {
         masterOnOff = false;
     };
     rec.start();
+    log("> Recording started at " + new Date() + "..");
     setTimeout(function () {
         recorders && recorders.stop();
         sel("#recStop").checked = true;
@@ -422,6 +435,7 @@ sel("#recStart").addEventListener("change", function () {
 sel("#recStop").addEventListener("change", function () {
     recorders.stop();
     recorders = null;
+    log("> Recording Stopped");
 });
 sel("#blurOn").addEventListener("input", function () {
     simulation.blurEnabled = true;
@@ -441,7 +455,10 @@ sel("#clearFrame").addEventListener("change", function () {
     sel("#delay").disabled = true;
     log("> Draw Mode:Clear Frame - only newest generation shown.");
 });
-sel("#setBlendMode").addEventListener("input", function (e) { return (simulation.ctx.globalCompositeOperation = e.target.value); });
+sel("#setBlendMode").addEventListener("input", function (e) {
+    simulation.ctx.globalCompositeOperation = e.target.value;
+    log("> Blend Mode changed to " + simulation.ctx.globalCompositeOperation);
+});
 sel("#randCycle").addEventListener("input", function (e) {
     simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
     simulation.colorRateCounter = 0;

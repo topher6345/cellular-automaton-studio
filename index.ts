@@ -432,6 +432,10 @@ sel("#rate").addEventListener(
   (e) => (msPerFrame = parseInt(e.target.value))
 );
 
+sel("#rate").addEventListener("change", () =>
+  log(`> Speed Updated: Each frame will last ${msPerFrame} milliseconds`)
+);
+
 let isHovering = false;
 sel("#hoverOn").addEventListener("input", () => (isHovering = true));
 sel("#hoverOff").addEventListener("input", () => (isHovering = false));
@@ -488,12 +492,22 @@ sel("#showGallery").addEventListener(
 );
 
 sel("#seed").addEventListener("click", () => simulation.seed());
-sel("#clear").addEventListener("click", () => simulation.clear());
-sel("#kill").addEventListener("click", () => simulation.kill());
+sel("#clear").addEventListener("click", () => {
+  simulation.clear();
+  log("> Screen cleared");
+});
+sel("#kill").addEventListener("click", () => {
+  simulation.kill();
+  log("> Cells Killed - click Seed or the canvas to add live cells");
+});
 
 sel("#seedDensity").addEventListener(
   "input",
   (e) => (simulation.seedDensity = parseInt(e.target.value))
+);
+
+sel("#seedDensity").addEventListener("change", (e) =>
+  log(`> Seed Density changed to ${e.target.value}`)
 );
 
 sel("#setClickShape").addEventListener(
@@ -593,6 +607,7 @@ sel("#recStart").addEventListener("change", () => {
   };
 
   rec.start();
+  log(`> Recording started at ${new Date()}..`);
   setTimeout(() => {
     recorders && recorders.stop();
     (sel("#recStop") as HTMLInputElement).checked = true;
@@ -602,6 +617,7 @@ sel("#recStart").addEventListener("change", () => {
 sel("#recStop").addEventListener("change", () => {
   recorders.stop();
   recorders = null;
+  log("> Recording Stopped");
 });
 
 interface HTMLElement {
@@ -629,10 +645,10 @@ sel("#clearFrame").addEventListener("change", () => {
   log("> Draw Mode:Clear Frame - only newest generation shown.");
 });
 
-sel("#setBlendMode").addEventListener(
-  "input",
-  (e) => (simulation.ctx.globalCompositeOperation = e.target.value)
-);
+sel("#setBlendMode").addEventListener("input", (e) => {
+  simulation.ctx.globalCompositeOperation = e.target.value;
+  log(`> Blend Mode changed to ${simulation.ctx.globalCompositeOperation}`);
+});
 
 sel("#randCycle").addEventListener("input", (e) => {
   simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);

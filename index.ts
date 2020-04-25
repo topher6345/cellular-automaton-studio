@@ -391,12 +391,12 @@ window.requestAnimationFrame(tick);
 const log = (message: string) => {
   const prompt = sel("#prompt");
   const p = document.createElement("p");
-  p.innerText = message;
+  p.innerText = `> ${message}`;
   prompt.append(p);
   prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 
-setTimeout(() => log("> Hover over controls for help"), 3000);
+setTimeout(() => log("Hover over controls for help"), 3000);
 
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
@@ -433,12 +433,18 @@ sel("#rate").addEventListener(
 );
 
 sel("#rate").addEventListener("change", () =>
-  log(`> Speed Updated: Each frame will last ${msPerFrame} milliseconds`)
+  log(`Speed Updated: Each frame will last ${msPerFrame} milliseconds`)
 );
 
 let isHovering = false;
-sel("#hoverOn").addEventListener("input", () => (isHovering = true));
-sel("#hoverOff").addEventListener("input", () => (isHovering = false));
+sel("#hoverOn").addEventListener("input", () => {
+  isHovering = true;
+  log("Hovering the mouse over the canvas will now draw a shape");
+});
+sel("#hoverOff").addEventListener("input", () => {
+  isHovering = false;
+  log("Hovering the mouse over the canvas will have no effect");
+});
 canvas.addEventListener(
   "mousemove",
   (e) => isHovering && simulation.hover(e),
@@ -449,11 +455,11 @@ canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
 
 sel("#masterOn").addEventListener("change", () => {
   masterOnOff = true;
-  log("$ The simulation has been started.");
+  log("The simulation has been started.");
 });
 sel("#masterOff").addEventListener("change", () => {
   masterOnOff = false;
-  log("$ The simulation has been paused.");
+  log("The simulation has been paused.");
 });
 
 sel("#modal-capture-preview").addEventListener(
@@ -478,7 +484,7 @@ Click grey border to exit (Simulation has been paused)
   a.append(img);
   a.download = `${imgName}.png`;
 
-  log(`> Screenshot ${imgName}.png captured`);
+  log(`Screenshot ${imgName}.png captured`);
 
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a);
@@ -494,16 +500,16 @@ sel("#showGallery").addEventListener(
 sel("#seed").addEventListener("click", () => {
   simulation.seed();
   log(
-    `> Simulation seeded with a random chance of 1 in ${simulation.seedDensity}`
+    `Simulation seeded with a random chance of 1 in ${simulation.seedDensity}`
   );
 });
 sel("#clear").addEventListener("click", () => {
   simulation.clear();
-  log("> Screen cleared");
+  log("Screen cleared");
 });
 sel("#kill").addEventListener("click", () => {
   simulation.kill();
-  log("> Cells Killed - click Seed or the canvas to add live cells");
+  log("Cells Killed - click Seed or the canvas to add live cells");
 });
 
 sel("#seedDensity").addEventListener(
@@ -512,21 +518,21 @@ sel("#seedDensity").addEventListener(
 );
 
 sel("#seedDensity").addEventListener("change", (e) =>
-  log(`> Seed Density changed to ${e.target.value}`)
+  log(`Seed Density changed to ${e.target.value}`)
 );
 
 sel("#setClickShape").addEventListener("change", (e) => {
   simulation.clickShape = e.target.value;
-  log(`> Click Shape changed to ${simulation.clickShape}`);
+  log(`Click Shape changed to ${simulation.clickShape}`);
 });
 
 sel("#setHoverShape").addEventListener("change", (e) => {
   simulation.hoverShape = e.target.value;
 
   if (isHovering) {
-    log(`> Hover shape is now ${simulation.hoverShape}`);
+    log(`Hover shape is now ${simulation.hoverShape}`);
   } else {
-    log(`> Hover shape will be ${simulation.hoverShape} when hover is enabled`);
+    log(`Hover shape will be ${simulation.hoverShape} when hover is enabled`);
   }
 });
 
@@ -573,6 +579,8 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel('label[for="randCycle"]').style.display = "none";
       sel('label[for="color"]').style.display = "none";
       sel("#picker").style.display = "block";
+      sel("#color").style.display = "none";
+      log("Color mode is now HSLUV picker https://hsluv.org");
       break;
     default:
       sel("#colorRadix").style.display = "block";
@@ -617,7 +625,7 @@ sel("#recStart").addEventListener("change", () => {
   };
 
   rec.start();
-  log(`> Recording started at ${new Date()}..`);
+  log(`Recording started at ${new Date()}..`);
   setTimeout(() => {
     recorders && recorders.stop();
     (sel("#recStop") as HTMLInputElement).checked = true;
@@ -627,7 +635,7 @@ sel("#recStart").addEventListener("change", () => {
 sel("#recStop").addEventListener("change", () => {
   recorders.stop();
   recorders = null;
-  log("> Recording Stopped");
+  log("Recording Stopped");
 });
 
 interface HTMLElement {
@@ -638,26 +646,26 @@ sel("#blurOn").addEventListener("input", () => {
   simulation.blurEnabled = true;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
-  log("> Draw Mode:Blur - older generations will fade out.");
+  log("Draw Mode:Blur - older generations will fade out.");
 });
 
 sel("#blurOff").addEventListener("input", () => {
   simulation.blurEnabled = false;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
-  log("> Draw Mode:Overlay - new generations will paint on top of old ones.");
+  log("Draw Mode:Overlay - new generations will paint on top of old ones.");
 });
 
 sel("#clearFrame").addEventListener("change", () => {
   simulation.clearEveryFrame = true;
   simulation.blurEnabled = false;
   sel("#delay").disabled = true;
-  log("> Draw Mode:Clear Frame - only newest generation shown.");
+  log("Draw Mode:Clear Frame - only current generation shown.");
 });
 
 sel("#setBlendMode").addEventListener("input", (e) => {
   simulation.ctx.globalCompositeOperation = e.target.value;
-  log(`> Blend Mode changed to ${simulation.ctx.globalCompositeOperation}`);
+  log(`Blend Mode changed to ${simulation.ctx.globalCompositeOperation}`);
 });
 
 sel("#randCycle").addEventListener("input", (e) => {
@@ -673,13 +681,13 @@ sel("#noiseRangeValue").addEventListener(
 sel("#noiseRangeValue").addEventListener("change", () => {
   if (simulation.noiseEnabled) {
     log(
-      `> Noise Amount - cells have a 1 in ${simulation.noiseRangeValue.toFixed(
+      `Noise Amount - cells have a 1 in ${simulation.noiseRangeValue.toFixed(
         2
       )} chance of being born`
     );
   } else {
     log(
-      `> Noise Amount - cells will have a 1 in ${simulation.noiseRangeValue.toFixed(
+      `Noise Amount - cells will have a 1 in ${simulation.noiseRangeValue.toFixed(
         2
       )} chace of being born when noise is enabled`
     );
@@ -688,17 +696,17 @@ sel("#noiseRangeValue").addEventListener("change", () => {
 
 sel("#noiseOn").addEventListener("change", () => {
   simulation.noiseEnabled = true;
-  log("> Noise On - cells will be born randomly");
+  log("Noise On - cells will be born randomly");
 });
 
 sel("#noiseOff").addEventListener("change", () => {
   simulation.noiseEnabled = false;
-  log("> Noise Off - cells will be born according to game rules only");
+  log("Noise Off - cells will be born according to game rules only");
 });
 
 sel("#gameType").addEventListener("change", (e) => {
   simulation.mode = e.target.value;
-  log(`> Game type has been changed to ${simulation.mode}`);
+  log(`Game type has been changed to ${simulation.mode}`);
 });
 
 sel("#prompt").scrollTop = 0;

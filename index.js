@@ -293,11 +293,11 @@ window.requestAnimationFrame(tick);
 var log = function (message) {
     var prompt = sel("#prompt");
     var p = document.createElement("p");
-    p.innerText = message;
+    p.innerText = "> " + message;
     prompt.append(p);
     prompt.scrollTop = sel("#prompt").scrollHeight;
 };
-setTimeout(function () { return log("> Hover over controls for help"); }, 3000);
+setTimeout(function () { return log("Hover over controls for help"); }, 3000);
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
@@ -317,20 +317,26 @@ sel("#setBlendMode").addEventListener("input", function (e) {
 });
 sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
 sel("#rate").addEventListener("change", function () {
-    return log("> Speed Updated: Each frame will last " + msPerFrame + " milliseconds");
+    return log("Speed Updated: Each frame will last " + msPerFrame + " milliseconds");
 });
 var isHovering = false;
-sel("#hoverOn").addEventListener("input", function () { return (isHovering = true); });
-sel("#hoverOff").addEventListener("input", function () { return (isHovering = false); });
+sel("#hoverOn").addEventListener("input", function () {
+    isHovering = true;
+    log("Hovering the mouse over the canvas will now draw a shape");
+});
+sel("#hoverOff").addEventListener("input", function () {
+    isHovering = false;
+    log("Hovering the mouse over the canvas will have no effect");
+});
 canvas.addEventListener("mousemove", function (e) { return isHovering && simulation.hover(e); }, false);
 canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
 sel("#masterOn").addEventListener("change", function () {
     masterOnOff = true;
-    log("$ The simulation has been started.");
+    log("The simulation has been started.");
 });
 sel("#masterOff").addEventListener("change", function () {
     masterOnOff = false;
-    log("$ The simulation has been paused.");
+    log("The simulation has been paused.");
 });
 sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
 sel("#screencap").addEventListener("click", function () {
@@ -344,7 +350,7 @@ sel("#screencap").addEventListener("click", function () {
     a.href = dataUrl;
     a.append(img);
     a.download = imgName + ".png";
-    log("> Screenshot " + imgName + ".png captured");
+    log("Screenshot " + imgName + ".png captured");
     sel("#modal-capture").style.display = "flex";
     sel("#modal-capture-preview").prepend(a);
     masterOnOff = false;
@@ -353,31 +359,31 @@ sel("#screencap").addEventListener("click", function () {
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
 sel("#seed").addEventListener("click", function () {
     simulation.seed();
-    log("> Simulation seeded with a random chance of 1 in " + simulation.seedDensity);
+    log("Simulation seeded with a random chance of 1 in " + simulation.seedDensity);
 });
 sel("#clear").addEventListener("click", function () {
     simulation.clear();
-    log("> Screen cleared");
+    log("Screen cleared");
 });
 sel("#kill").addEventListener("click", function () {
     simulation.kill();
-    log("> Cells Killed - click Seed or the canvas to add live cells");
+    log("Cells Killed - click Seed or the canvas to add live cells");
 });
 sel("#seedDensity").addEventListener("input", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
 sel("#seedDensity").addEventListener("change", function (e) {
-    return log("> Seed Density changed to " + e.target.value);
+    return log("Seed Density changed to " + e.target.value);
 });
 sel("#setClickShape").addEventListener("change", function (e) {
     simulation.clickShape = e.target.value;
-    log("> Click Shape changed to " + simulation.clickShape);
+    log("Click Shape changed to " + simulation.clickShape);
 });
 sel("#setHoverShape").addEventListener("change", function (e) {
     simulation.hoverShape = e.target.value;
     if (isHovering) {
-        log("> Hover shape is now " + simulation.hoverShape);
+        log("Hover shape is now " + simulation.hoverShape);
     }
     else {
-        log("> Hover shape will be " + simulation.hoverShape + " when hover is enabled");
+        log("Hover shape will be " + simulation.hoverShape + " when hover is enabled");
     }
 });
 sel("#color").addEventListener("input", function (e) {
@@ -410,6 +416,8 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="randCycle"]').style.display = "none";
             sel('label[for="color"]').style.display = "none";
             sel("#picker").style.display = "block";
+            sel("#color").style.display = "none";
+            log("Color mode is now HSLUV picker https://hsluv.org");
             break;
         default:
             sel("#colorRadix").style.display = "block";
@@ -440,7 +448,7 @@ sel("#recStart").addEventListener("change", function () {
         masterOnOff = false;
     };
     rec.start();
-    log("> Recording started at " + new Date() + "..");
+    log("Recording started at " + new Date() + "..");
     setTimeout(function () {
         recorders && recorders.stop();
         sel("#recStop").checked = true;
@@ -449,29 +457,29 @@ sel("#recStart").addEventListener("change", function () {
 sel("#recStop").addEventListener("change", function () {
     recorders.stop();
     recorders = null;
-    log("> Recording Stopped");
+    log("Recording Stopped");
 });
 sel("#blurOn").addEventListener("input", function () {
     simulation.blurEnabled = true;
     simulation.clearEveryFrame = false;
     sel("#delay").disabled = false;
-    log("> Draw Mode:Blur - older generations will fade out.");
+    log("Draw Mode:Blur - older generations will fade out.");
 });
 sel("#blurOff").addEventListener("input", function () {
     simulation.blurEnabled = false;
     simulation.clearEveryFrame = false;
     sel("#delay").disabled = true;
-    log("> Draw Mode:Overlay - new generations will paint on top of old ones.");
+    log("Draw Mode:Overlay - new generations will paint on top of old ones.");
 });
 sel("#clearFrame").addEventListener("change", function () {
     simulation.clearEveryFrame = true;
     simulation.blurEnabled = false;
     sel("#delay").disabled = true;
-    log("> Draw Mode:Clear Frame - only newest generation shown.");
+    log("Draw Mode:Clear Frame - only current generation shown.");
 });
 sel("#setBlendMode").addEventListener("input", function (e) {
     simulation.ctx.globalCompositeOperation = e.target.value;
-    log("> Blend Mode changed to " + simulation.ctx.globalCompositeOperation);
+    log("Blend Mode changed to " + simulation.ctx.globalCompositeOperation);
 });
 sel("#randCycle").addEventListener("input", function (e) {
     simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
@@ -480,22 +488,22 @@ sel("#randCycle").addEventListener("input", function (e) {
 sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
 sel("#noiseRangeValue").addEventListener("change", function () {
     if (simulation.noiseEnabled) {
-        log("> Noise Amount - cells have a 1 in " + simulation.noiseRangeValue.toFixed(2) + " chance of being born");
+        log("Noise Amount - cells have a 1 in " + simulation.noiseRangeValue.toFixed(2) + " chance of being born");
     }
     else {
-        log("> Noise Amount - cells will have a 1 in " + simulation.noiseRangeValue.toFixed(2) + " chace of being born when noise is enabled");
+        log("Noise Amount - cells will have a 1 in " + simulation.noiseRangeValue.toFixed(2) + " chace of being born when noise is enabled");
     }
 });
 sel("#noiseOn").addEventListener("change", function () {
     simulation.noiseEnabled = true;
-    log("> Noise On - cells will be born randomly");
+    log("Noise On - cells will be born randomly");
 });
 sel("#noiseOff").addEventListener("change", function () {
     simulation.noiseEnabled = false;
-    log("> Noise Off - cells will be born according to game rules only");
+    log("Noise Off - cells will be born according to game rules only");
 });
 sel("#gameType").addEventListener("change", function (e) {
     simulation.mode = e.target.value;
-    log("> Game type has been changed to " + simulation.mode);
+    log("Game type has been changed to " + simulation.mode);
 });
 sel("#prompt").scrollTop = 0;

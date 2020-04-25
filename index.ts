@@ -396,7 +396,7 @@ const log = (message: string) => {
   prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 
-setTimeout(() => log("$ Hover over controls for help"), 3000);
+setTimeout(() => log("> Hover over controls for help"), 3000);
 
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
@@ -610,25 +610,21 @@ sel("#blurOn").addEventListener("input", () => {
   simulation.blurEnabled = true;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
-  log(
-    "$ Draw mode has been changed to Blur - older generations will fade out."
-  );
+  log("> Draw Mode:Blur - older generations will fade out.");
 });
 
 sel("#blurOff").addEventListener("input", () => {
   simulation.blurEnabled = false;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
-  log(
-    "$ Draw mode has been changed to Overlay - new generations will paint on top of old ones."
-  );
+  log("> Draw Mode:Overlay - new generations will paint on top of old ones.");
 });
 
 sel("#clearFrame").addEventListener("change", () => {
   simulation.clearEveryFrame = true;
   simulation.blurEnabled = false;
   sel("#delay").disabled = true;
-  log("Clear Frame enabled.");
+  log("> Draw Mode:Clear Frame - only newest generation shown.");
 });
 
 sel("#setBlendMode").addEventListener(
@@ -658,7 +654,7 @@ sel("#noiseOff").addEventListener(
 
 sel("#gameType").addEventListener("change", (e) => {
   simulation.mode = e.target.value;
-  log(`$ Game type has been changed to ${simulation.mode}`);
+  log(`> Game type has been changed to ${simulation.mode}`);
 });
 
 sel("#prompt").scrollTop = 0;

@@ -471,7 +471,7 @@ sel("#modal-capture-preview").addEventListener(
 sel("#screencap").addEventListener("click", () => {
   const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
-  const imgName = `CanvasGOL-${Date.now()}`;
+  const imgName = `CellularAnimationStudio-${Date.now()}`;
   img.src = dataUrl;
   img.alt = imgName;
   img.title = `Click to download

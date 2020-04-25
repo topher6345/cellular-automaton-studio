@@ -342,7 +342,7 @@ sel("#modal-capture-preview").addEventListener("click", function () { return (se
 sel("#screencap").addEventListener("click", function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
-    var imgName = "CanvasGOL-" + Date.now();
+    var imgName = "CellularAnimationStudio-" + Date.now();
     img.src = dataUrl;
     img.alt = imgName;
     img.title = "Click to download\n  \nClick grey border to exit (Simulation has been paused)\n";

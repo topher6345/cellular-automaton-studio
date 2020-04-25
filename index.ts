@@ -393,7 +393,7 @@ const log = (message: string) => {
   const p = document.createElement("p");
   p.innerText = message;
   prompt.append(p);
-  prompt.scrollTop = prompt.scrollTop + 60;
+  prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 
 setTimeout(() => log("$ Hover over controls for help"), 3000);
@@ -610,18 +610,25 @@ sel("#blurOn").addEventListener("input", () => {
   simulation.blurEnabled = true;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
+  log(
+    "$ Draw mode has been changed to Blur - older generations will fade out."
+  );
 });
 
 sel("#blurOff").addEventListener("input", () => {
   simulation.blurEnabled = false;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
+  log(
+    "$ Draw mode has been changed to Overlay - new generations will paint on top of old ones."
+  );
 });
 
 sel("#clearFrame").addEventListener("change", () => {
   simulation.clearEveryFrame = true;
   simulation.blurEnabled = false;
   sel("#delay").disabled = true;
+  log("Clear Frame enabled.");
 });
 
 sel("#setBlendMode").addEventListener(

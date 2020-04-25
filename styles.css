@@ -47,13 +47,12 @@ a {
   padding: 0.5em;
   border: 1px solid black;
   color: white;
-  background: rgba(30, 30, 30, 0.9);
+  background: rgba(40, 40, 40, 0.9);
   flex-grow: 2;
 }
 
 .controls > div:hover {
-  background: rgba(130, 130, 130, 0.9);
-  color: black;
+  background: rgba(50, 50, 50, 0.9);
 }
 
 .controls > div:first-child {
@@ -154,7 +153,7 @@ button {
 }
 
 #picker table .swatch {
-  height: 100px;
+  height: 40px;
 }
 
 #picker .explanation-text {

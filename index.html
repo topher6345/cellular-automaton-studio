@@ -60,6 +60,7 @@
           </select>
         </div>
         <div id="picker" style="display: none;">
+          <label>HSLUV</label>
           <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
           <div id="display">
             <canvas
@@ -267,8 +268,21 @@
           <label title="Redraw: Add or remove cells in the simluation"
             >Redraw</label
           >
-          <button id="reset">Random</button>
+
           <button id="clear">Clear</button>
+          <button id="kill">Kill</button>
+
+          <button id="seed">Seed</button>
+          <label title="Density of seeding">Density</label>
+          <input
+            name="seedDensity"
+            type="range"
+            id="seedDensity"
+            min="0"
+            max="64"
+            step="1"
+            value="1"
+          />
         </div>
         <div>
           <label

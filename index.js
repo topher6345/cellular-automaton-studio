@@ -25,19 +25,33 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.noiseEnabled = false;
         this.noiseRangeValue = 0;
         this.mode = "life";
+        this.seedDensity = 1;
     }
-    CellularAutomatonEngine.prototype.reset = function () {
-        this.data = CellularAutomatonEngine.randBoard(this.size);
+    CellularAutomatonEngine.prototype.seed = function () {
+        var data = CellularAutomatonEngine.randBoard(this.size, this.seedDensity);
+        for (var i = 0; i < data.length; i++) {
+            if (this.data[i])
+                data[i] = 1;
+        }
+        this.data = data;
     };
     CellularAutomatonEngine.prototype.clear = function () {
+        this.ctx.clearRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
+    };
+    CellularAutomatonEngine.prototype.kill = function () {
         this.data = new Uint8Array(this.size * this.size);
     };
-    CellularAutomatonEngine.rand = function (min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
+    CellularAutomatonEngine.rand = function (min, max, density) {
+        var pass = Math.floor(Math.random() * density);
+        if (pass === 0) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+        return 0;
     };
-    CellularAutomatonEngine.randBoard = function (size) {
+    CellularAutomatonEngine.randBoard = function (size, density) {
         var _this = this;
-        return new Uint8Array(size * size).map(function () { return _this.rand(0, 2); });
+        if (density === void 0) { density = 0; }
+        return new Uint8Array(size * size).map(function () { return _this.rand(0, 2, density); });
     };
     CellularAutomatonEngine.prototype.set = function (x, y, value) {
         this.data[y * this.size + x] = value;
@@ -52,7 +66,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         for (var i = 0; i < this.buffer.length; i++) {
             // Noise
             var spontaneousBirth = this.noiseEnabled &&
-                CellularAutomatonEngine.rand(0, 1000) > 985 + this.noiseRangeValue;
+                CellularAutomatonEngine.rand(0, 1000, 0) > 985 + this.noiseRangeValue;
             if (spontaneousBirth) {
                 this.buffer[i] = 1;
                 continue;
@@ -307,7 +321,7 @@ sel("#screencap").addEventListener("click", function () {
     var dataUrl = canvas.toDataURL("image/png");
     img.src = dataUrl;
     img.alt = "CanvasGOL-" + Date.now();
-    img.title = "Right click and select \"Save Image As..\"\nLeft click to exit (all your captures are saved until refresh)\n";
+    img.title = "Click to download\n  \nClick grey border to exit (Simulation has been paused)\n";
     var a = document.createElement("a");
     a.href = dataUrl;
     a.append(img);
@@ -318,8 +332,10 @@ sel("#screencap").addEventListener("click", function () {
     sel("#masterOff").checked = true;
 });
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
-sel("#reset").addEventListener("click", function () { return simulation.reset(); });
+sel("#seed").addEventListener("click", function () { return simulation.seed(); });
 sel("#clear").addEventListener("click", function () { return simulation.clear(); });
+sel("#kill").addEventListener("click", function () { return simulation.kill(); });
+sel("#seedDensity").addEventListener("input", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
 sel("#setClickShape").addEventListener("change", function (e) { return (simulation.clickShape = e.target.value); });
 sel("#setHoverShape").addEventListener("change", function (e) { return (simulation.hoverShape = e.target.value); });
 sel("#color").addEventListener("input", function (e) {

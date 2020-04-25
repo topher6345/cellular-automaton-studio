@@ -21,6 +21,7 @@ class CellularAutomatonEngine {
   pixelScalar: number;
   bufferLength: number;
   mode: string;
+  seedDensity: number;
 
   constructor(size: number, canvas: HTMLCanvasElement) {
     this.size = size;
@@ -56,22 +57,44 @@ class CellularAutomatonEngine {
     this.noiseEnabled = false;
     this.noiseRangeValue = 0;
     this.mode = "life";
+
+    this.seedDensity = 1;
   }
 
-  reset(): void {
-    this.data = CellularAutomatonEngine.randBoard(this.size);
+  seed(): void {
+    const data = CellularAutomatonEngine.randBoard(this.size, this.seedDensity);
+
+    for (let i = 0; i < data.length; i++) {
+      if (this.data[i]) data[i] = 1;
+    }
+    this.data = data;
   }
 
   clear(): void {
+    this.ctx.clearRect(
+      0,
+      0,
+      this.size * this.pixelSize,
+      this.size * this.pixelSize
+    );
+  }
+
+  kill(): void {
     this.data = new Uint8Array(this.size * this.size);
   }
 
-  static rand(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min)) + min;
+  static rand(min: number, max: number, density: number) {
+    const pass = Math.floor(Math.random() * density);
+
+    if (pass === 0) {
+      return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    return 0;
   }
 
-  static randBoard(size: number): Uint8Array {
-    return new Uint8Array(size * size).map(() => this.rand(0, 2));
+  static randBoard(size: number, density = 0): Uint8Array {
+    return new Uint8Array(size * size).map(() => this.rand(0, 2, density));
   }
 
   set(x: number, y: number, value: number): void {
@@ -90,7 +113,7 @@ class CellularAutomatonEngine {
       // Noise
       const spontaneousBirth =
         this.noiseEnabled &&
-        CellularAutomatonEngine.rand(0, 1000) > 985 + this.noiseRangeValue;
+        CellularAutomatonEngine.rand(0, 1000, 0) > 985 + this.noiseRangeValue;
 
       if (spontaneousBirth) {
         this.buffer[i] = 1;
@@ -425,8 +448,9 @@ sel("#screencap").addEventListener("click", () => {
 
   img.src = dataUrl;
   img.alt = `CanvasGOL-${Date.now()}`;
-  img.title = `Right click and select "Save Image As.."
-Left click to exit (all your captures are saved until refresh)
+  img.title = `Click to download
+  
+Click grey border to exit (Simulation has been paused)
 `;
 
   const a: HTMLAnchorElement = document.createElement("a");
@@ -445,8 +469,14 @@ sel("#showGallery").addEventListener(
   () => (sel("#modal-capture").style.display = "flex")
 );
 
-sel("#reset").addEventListener("click", () => simulation.reset());
+sel("#seed").addEventListener("click", () => simulation.seed());
 sel("#clear").addEventListener("click", () => simulation.clear());
+sel("#kill").addEventListener("click", () => simulation.kill());
+
+sel("#seedDensity").addEventListener(
+  "input",
+  (e) => (simulation.seedDensity = parseInt(e.target.value))
+);
 
 sel("#setClickShape").addEventListener(
   "change",

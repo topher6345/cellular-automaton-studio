@@ -1,3 +1,76 @@
+type ControlValues = {
+  alpha: number;
+  color: string;
+  clickShape: string;
+  hoverShape: string;
+  colorMode: string;
+  colorRadix: number;
+  blurEnabled: boolean;
+  clearEveryFrame: boolean;
+  colorRateFrames: number;
+  noiseEnabled: boolean;
+  noiseRangeValue: number;
+  game: string;
+  seedDensity: number;
+};
+
+const INIT_CONTROL_VALUES: ControlValues = {
+  alpha: 0.006,
+  color: "orange",
+  clickShape: "gliderse",
+  hoverShape: "gliderse",
+  colorMode: "picker",
+  colorRadix: 16777215,
+  blurEnabled: true,
+  clearEveryFrame: false,
+  colorRateFrames: 120,
+  noiseEnabled: false,
+  noiseRangeValue: 0,
+  game: "life",
+  seedDensity: 1,
+};
+
+class HashStorage {
+  constructor() {
+    try {
+      if (this.isEmpty(this.decode(window.location.hash))) {
+        window.location.hash = this.encode(INIT_CONTROL_VALUES);
+      }
+    } catch (e) {
+      window.location.hash = this.encode(INIT_CONTROL_VALUES);
+    }
+  }
+
+  isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
+  isEmpty = (a: any) => a.length === 0;
+  state(): ControlValues {
+    return this.decode(window.location.hash);
+  }
+
+  encode(state: ControlValues) {
+    return btoa(JSON.stringify(state));
+  }
+  decode(hash: any): any {
+    return JSON.parse(atob(hash.substring(1)));
+  }
+
+  update(data: any) {
+    const _state = this.state();
+    const updated = { ..._state, ...data };
+    if (this.isEqual(updated, _state)) {
+      return false;
+    } else {
+      window.location.hash = this.encode(updated);
+      console.log(_state);
+      return updated;
+    }
+  }
+
+  setMasterGain(e: string) {
+    this.update({ masterGain: e });
+  }
+}
+
 class CellularAutomatonEngine {
   size: number;
   data: Uint8Array;
@@ -20,10 +93,14 @@ class CellularAutomatonEngine {
   noiseRangeValue: number;
   pixelScalar: number;
   bufferLength: number;
-  mode: string;
+  game: string;
   seedDensity: number;
 
-  constructor(size: number, canvas: HTMLCanvasElement) {
+  constructor(
+    size: number,
+    canvas: HTMLCanvasElement,
+    controlValues: ControlValues
+  ) {
     this.size = size;
     this.pixelSize = 1;
     this.pixelScalar = 1;
@@ -34,15 +111,6 @@ class CellularAutomatonEngine {
     this.canvas = canvas;
     this.ctx = this.canvas.getContext("2d", { alpha: false });
     this.ctx.imageSmoothingEnabled = true;
-    this.alpha = 0.006;
-    this.blurEnabled = false;
-    this.clearEveryFrame = false;
-    this.color = "orange";
-
-    this.clickShape = "gliderse";
-    this.hoverShape = "3x3";
-    this.colorMode = "full";
-    this.colorRadix = 16777215;
     this.ctx.fillStyle = "rgba(0,0,0,1)";
     this.ctx.fillRect(
       0,
@@ -51,14 +119,21 @@ class CellularAutomatonEngine {
       this.size * this.pixelSize
     );
 
-    this.colorRateFrames = 120;
+    this.alpha = controlValues.alpha;
+    this.blurEnabled = controlValues.blurEnabled;
+    this.clearEveryFrame = controlValues.clearEveryFrame;
+    this.color = controlValues.color;
+    this.clickShape = controlValues.clickShape;
+    this.hoverShape = controlValues.hoverShape;
+    this.colorMode = controlValues.colorMode;
+    this.colorRadix = controlValues.colorRadix;
+    this.colorRateFrames = controlValues.colorRateFrames;
     this.colorRateCounter = 0;
     this.colorCache = this.randColorString();
-    this.noiseEnabled = false;
-    this.noiseRangeValue = 0;
-    this.mode = "life";
-
-    this.seedDensity = 1;
+    this.noiseEnabled = controlValues.noiseEnabled;
+    this.noiseRangeValue = controlValues.noiseRangeValue;
+    this.game = controlValues.game;
+    this.seedDensity = controlValues.seedDensity;
   }
 
   seed(): void {
@@ -137,7 +212,7 @@ class CellularAutomatonEngine {
       let status = 0;
       const alive = this.get(row, col);
       // prettier-ignore
-      switch (this.mode) {
+      switch (this.game) {
         case "famine":
           ( // S6789
             (alive && (liveNeighbors > 5)) || spontaneousBirth
@@ -390,8 +465,15 @@ class CellularAutomatonEngine {
 
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 
+const hashStorage = new HashStorage();
+console.log(hashStorage.state());
+
 const canvas = sel("canvas") as HTMLCanvasElement;
-const simulation = new CellularAutomatonEngine(750, canvas);
+const simulation = new CellularAutomatonEngine(
+  750,
+  canvas,
+  hashStorage.state()
+);
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
 // Update the favicon with the current canvas
@@ -733,8 +815,8 @@ sel("#noiseOff").addEventListener("change", () => {
 });
 
 sel("#gameType").addEventListener("change", (e) => {
-  simulation.mode = e.target.value;
-  log(`Game type has been changed to ${simulation.mode}`);
+  simulation.game = e.target.value;
+  log(`Game type has been changed to ${simulation.game}`);
 });
 
 sel("#prompt").scrollTop = 0;

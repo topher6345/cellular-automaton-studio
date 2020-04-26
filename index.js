@@ -1,5 +1,67 @@
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
+var INIT_CONTROL_VALUES = {
+    alpha: 0.006,
+    color: "orange",
+    clickShape: "gliderse",
+    hoverShape: "gliderse",
+    colorMode: "picker",
+    colorRadix: 16777215,
+    blurEnabled: true,
+    clearEveryFrame: false,
+    colorRateFrames: 120,
+    noiseEnabled: false,
+    noiseRangeValue: 0,
+    game: "life",
+    seedDensity: 1
+};
+var HashStorage = /** @class */ (function () {
+    function HashStorage() {
+        this.isEqual = function (a, b) { return JSON.stringify(a) === JSON.stringify(b); };
+        this.isEmpty = function (a) { return a.length === 0; };
+        try {
+            if (this.isEmpty(this.decode(window.location.hash))) {
+                window.location.hash = this.encode(INIT_CONTROL_VALUES);
+            }
+        }
+        catch (e) {
+            window.location.hash = this.encode(INIT_CONTROL_VALUES);
+        }
+    }
+    HashStorage.prototype.state = function () {
+        return this.decode(window.location.hash);
+    };
+    HashStorage.prototype.encode = function (state) {
+        return btoa(JSON.stringify(state));
+    };
+    HashStorage.prototype.decode = function (hash) {
+        return JSON.parse(atob(hash.substring(1)));
+    };
+    HashStorage.prototype.update = function (data) {
+        var _state = this.state();
+        var updated = __assign({}, _state, data);
+        if (this.isEqual(updated, _state)) {
+            return false;
+        }
+        else {
+            window.location.hash = this.encode(updated);
+            console.log(_state);
+            return updated;
+        }
+    };
+    HashStorage.prototype.setMasterGain = function (e) {
+        this.update({ masterGain: e });
+    };
+    return HashStorage;
+}());
 var CellularAutomatonEngine = /** @class */ (function () {
-    function CellularAutomatonEngine(size, canvas) {
+    function CellularAutomatonEngine(size, canvas, controlValues) {
         this.size = size;
         this.pixelSize = 1;
         this.pixelScalar = 1;
@@ -9,23 +71,23 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d", { alpha: false });
         this.ctx.imageSmoothingEnabled = true;
-        this.alpha = 0.006;
-        this.blurEnabled = false;
-        this.clearEveryFrame = false;
-        this.color = "orange";
-        this.clickShape = "gliderse";
-        this.hoverShape = "3x3";
-        this.colorMode = "full";
-        this.colorRadix = 16777215;
         this.ctx.fillStyle = "rgba(0,0,0,1)";
         this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
-        this.colorRateFrames = 120;
+        this.alpha = controlValues.alpha;
+        this.blurEnabled = controlValues.blurEnabled;
+        this.clearEveryFrame = controlValues.clearEveryFrame;
+        this.color = controlValues.color;
+        this.clickShape = controlValues.clickShape;
+        this.hoverShape = controlValues.hoverShape;
+        this.colorMode = controlValues.colorMode;
+        this.colorRadix = controlValues.colorRadix;
+        this.colorRateFrames = controlValues.colorRateFrames;
         this.colorRateCounter = 0;
         this.colorCache = this.randColorString();
-        this.noiseEnabled = false;
-        this.noiseRangeValue = 0;
-        this.mode = "life";
-        this.seedDensity = 1;
+        this.noiseEnabled = controlValues.noiseEnabled;
+        this.noiseRangeValue = controlValues.noiseRangeValue;
+        this.game = controlValues.game;
+        this.seedDensity = controlValues.seedDensity;
     }
     CellularAutomatonEngine.prototype.seed = function () {
         var data = CellularAutomatonEngine.randBoard(this.size, this.seedDensity);
@@ -87,7 +149,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
             var status_1 = 0;
             var alive = this.get(row, col);
             // prettier-ignore
-            switch (this.mode) {
+            switch (this.game) {
                 case "famine":
                     ( // S6789
                     (alive && (liveNeighbors > 5)) || spontaneousBirth) && (status_1 = 1);
@@ -295,8 +357,10 @@ var CellularAutomatonEngine = /** @class */ (function () {
     return CellularAutomatonEngine;
 }());
 var sel = function (selector) { return document.querySelector(selector); };
+var hashStorage = new HashStorage();
+console.log(hashStorage.state());
 var canvas = sel("canvas");
-var simulation = new CellularAutomatonEngine(750, canvas);
+var simulation = new CellularAutomatonEngine(750, canvas, hashStorage.state());
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
@@ -530,8 +594,8 @@ sel("#noiseOff").addEventListener("change", function () {
     log("Noise Off - cells will be born according to game rules only");
 });
 sel("#gameType").addEventListener("change", function (e) {
-    simulation.mode = e.target.value;
-    log("Game type has been changed to " + simulation.mode);
+    simulation.game = e.target.value;
+    log("Game type has been changed to " + simulation.game);
 });
 sel("#prompt").scrollTop = 0;
 setInterval(function () {

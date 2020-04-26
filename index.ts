@@ -305,6 +305,16 @@ class CellularAutomatonEngine {
         this.set(x - 1, y - 1, 1);
         this.set(x - 1, y + 1, 1);
         break;
+      case "c-heptomino":
+        this.set(x - 2, y, 1);
+
+        this.set(x - 1, y - 1, 1);
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        this.set(x, y - 1, 1);
+        this.set(x, y, 1);
+        this.set(x + 1, y - 1, 1);
+        break;
       case "1x1":
         this.set(x, y, 1);
         break;

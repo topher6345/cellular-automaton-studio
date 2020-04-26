@@ -247,6 +247,8 @@ class CellularAutomatonEngine {
   }
 
   drawShape(x: number, y: number, shape: string) {
+    debugger;
+
     switch (shape) {
       case "gliderse":
         this.set(x - 1, y, 1);
@@ -277,14 +279,30 @@ class CellularAutomatonEngine {
         this.set(x - 1, y + 1, 1);
         break;
       case "3x3":
-        this.set(x - 1, y - 1, 1);
-        this.set(x - 1, y, 1);
-        this.set(x - 1, y + 1, 1);
+        this.set(x + 1, y - 1, 1);
+        this.set(x + 1, y, 1);
+        this.set(x + 1, y + 1, 1);
         this.set(x, y - 1, 1);
         this.set(x, y, 1);
         this.set(x, y + 1, 1);
         this.set(x - 1, y - 1, 1);
         this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        break;
+      case "r-pentomino":
+        this.set(x - 1, y, 1);
+        this.set(x - 1, y + 1, 1);
+        this.set(x, y - 1, 1);
+        this.set(x, y, 1);
+        this.set(x + 1, y, 1);
+        break;
+      case "pi-heptomino":
+        this.set(x + 1, y - 1, 1);
+        this.set(x + 1, y, 1);
+        this.set(x + 1, y + 1, 1);
+        this.set(x, y - 1, 1);
+        this.set(x, y + 1, 1);
+        this.set(x - 1, y - 1, 1);
         this.set(x - 1, y + 1, 1);
         break;
       case "1x1":

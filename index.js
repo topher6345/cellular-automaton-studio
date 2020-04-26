@@ -177,6 +177,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.drawShape(x, y, this.hoverShape);
     };
     CellularAutomatonEngine.prototype.drawShape = function (x, y, shape) {
+        debugger;
         switch (shape) {
             case "gliderse":
                 this.set(x - 1, y, 1);
@@ -207,14 +208,30 @@ var CellularAutomatonEngine = /** @class */ (function () {
                 this.set(x - 1, y + 1, 1);
                 break;
             case "3x3":
-                this.set(x - 1, y - 1, 1);
-                this.set(x - 1, y, 1);
-                this.set(x - 1, y + 1, 1);
+                this.set(x + 1, y - 1, 1);
+                this.set(x + 1, y, 1);
+                this.set(x + 1, y + 1, 1);
                 this.set(x, y - 1, 1);
                 this.set(x, y, 1);
                 this.set(x, y + 1, 1);
                 this.set(x - 1, y - 1, 1);
                 this.set(x - 1, y, 1);
+                this.set(x - 1, y + 1, 1);
+                break;
+            case "r-pentomino":
+                this.set(x - 1, y, 1);
+                this.set(x - 1, y + 1, 1);
+                this.set(x, y - 1, 1);
+                this.set(x, y, 1);
+                this.set(x + 1, y, 1);
+                break;
+            case "pi-heptomino":
+                this.set(x + 1, y - 1, 1);
+                this.set(x + 1, y, 1);
+                this.set(x + 1, y + 1, 1);
+                this.set(x, y - 1, 1);
+                this.set(x, y + 1, 1);
+                this.set(x - 1, y - 1, 1);
                 this.set(x - 1, y + 1, 1);
                 break;
             case "1x1":

@@ -1,6 +1,6 @@
 # Cellular Automaton Studio
 
-The goal of Cellular Automaton Studio is to draw trippy pictures.
+Cellular Automaton Studio is a tool to draw trippy pictures.
 
 To save pictures use the screenshot button 📷 or right click on the canvas and select 'Save as..'
 
@@ -9,9 +9,9 @@ To save pictures use the screenshot button 📷 or right click on the canvas and
 - 11 different Cellular Automaton Games
 - Screenshots with Gallery
 - Video Recording
-- Multiple color modes
+- Multiple color blend modes
 - Blur
-- Suuport for HSLUV color picker - https://hsluv.org
+- Suport for HSLUV color picker - https://hsluv.org
 - Adjustable blend modes
 - Adjustable speed
 - Draw with mouse

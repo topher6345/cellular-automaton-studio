@@ -223,6 +223,14 @@ button {
   padding-right: 1em;
 }
 
+#prompt > p > a {
+  text-decoration: none;
+  color: #00dbff;
+}
+#prompt > p > a:visited {
+  color: #d300ff;
+}
+
 #currentCount {
   text-align: right;
   max-width: 8em;

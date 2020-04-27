@@ -499,7 +499,7 @@ function tick(now: number) {
 
 window.requestAnimationFrame(tick);
 
-const log = (message: string, link?: string) => {
+const log = (message: string, link?: string, linkText?: string) => {
   const prompt = sel("#prompt");
   const p = document.createElement("p");
   p.innerText = `> ${message}`;
@@ -508,7 +508,7 @@ const log = (message: string, link?: string) => {
   if (link) {
     const a = document.createElement("a");
     a.href = link;
-    a.innerText = link;
+    a.innerText = linkText || link;
     a.target = "_blank";
     p.append(a);
   }
@@ -545,13 +545,38 @@ sel("#delay").addEventListener(
   false
 );
 
+const blendModeLink: any = {
+  "source-over":
+    "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcover",
+  "source-atop":
+    "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcatop",
+  lighten: "https://drafts.fxtf.org/compositing-1/#blendinglighten",
+  xor:
+    "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
+  multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
+  screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
+  overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
+  darken: "https://drafts.fxtf.org/compositing-1/#blendingdarken",
+  "color-dodge": "https://drafts.fxtf.org/compositing-1/#blendingcolordodge",
+  "color-burn": "https://drafts.fxtf.org/compositing-1/#blendingcolorburn",
+  "hard-light": "https://drafts.fxtf.org/compositing-1/#blendinghardlight",
+  "soft-light": "https://drafts.fxtf.org/compositing-1/#blendingsoftlight",
+  difference: "https://drafts.fxtf.org/compositing-1/#blendingdifference",
+  exclusion: "https://drafts.fxtf.org/compositing-1/#blendingexclusion",
+  hue: "https://drafts.fxtf.org/compositing-1/#blendinghue",
+  saturation: "https://drafts.fxtf.org/compositing-1/#blendingsaturation",
+  luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity",
+};
+
 sel("#setBlendMode").addEventListener("input", (e) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
 
-  simulation.ctx.globalCompositeOperation = e.target.value;
+  const blendMode = e.target.value;
+  simulation.ctx.globalCompositeOperation = blendMode;
 
   masterOnOff = currentState;
+  log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
 
 sel("#rate").addEventListener(
@@ -560,18 +585,18 @@ sel("#rate").addEventListener(
 );
 
 sel("#rate").addEventListener("change", () =>
-  log(`Speed Updated: Each generation will last ${msPerFrame} milliseconds`)
+  log(`Speed is now ${msPerFrame} milliseconds per generation`)
 );
 
 let isHovering = false;
 sel("#hoverOn").addEventListener("input", () => {
   isHovering = true;
-  log("Hovering the mouse over the canvas will now draw a shape");
+  log("Hover ON - the mouse over the canvas will now draw a shape");
 });
 
 sel("#hoverOff").addEventListener("input", () => {
   isHovering = false;
-  log("Hovering the mouse over the canvas will have no effect");
+  log("Hover OFF - the mouse over the canvas will not draw");
 });
 
 canvas.addEventListener(
@@ -584,12 +609,12 @@ canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
 
 sel("#masterOn").addEventListener("change", () => {
   masterOnOff = true;
-  log("The simulation has been started.");
+  log("Simulation ON");
 });
 
 sel("#masterOff").addEventListener("change", () => {
   masterOnOff = false;
-  log("The simulation has been paused.");
+  log("Simulation OFF");
 });
 
 sel("#modal-capture-preview").addEventListener(
@@ -629,9 +654,7 @@ sel("#showGallery").addEventListener(
 
 sel("#seed").addEventListener("click", () => {
   simulation.seed();
-  log(
-    `Simulation seeded with a random chance of 1 in ${simulation.seedDensity}`
-  );
+  log(`Simulation seeded - 1 in ${simulation.seedDensity} odds`);
 });
 
 sel("#clear").addEventListener("click", () => {
@@ -660,7 +683,6 @@ const shapeLink = (shape: string): string => {
     case "gliderne":
     case "glidernw":
       return "https://www.conwaylife.com/wiki/Glider";
-
     case "r-pentomino":
       return "https://www.conwaylife.com/wiki/R-pentomino";
     case "pi-heptomino":
@@ -676,8 +698,9 @@ const shapeLink = (shape: string): string => {
 sel("#setClickShape").addEventListener("change", (e) => {
   simulation.clickShape = e.target.value;
   log(
-    `Click Shape changed to ${simulation.clickShape} `,
-    shapeLink(simulation.clickShape)
+    "Click Shape is now ",
+    shapeLink(simulation.clickShape),
+    simulation.clickShape
   );
 });
 
@@ -686,12 +709,12 @@ sel("#setHoverShape").addEventListener("change", (e) => {
 
   if (isHovering) {
     log(
-      `Hover shape is now ${simulation.hoverShape}`,
+      `Hover Shape (ON) is now ${simulation.hoverShape}`,
       shapeLink(simulation.hoverShape)
     );
   } else {
     log(
-      `Hover shape will be ${simulation.hoverShape} when hover is enabled`,
+      `Hover Shape (OFF) is now ${simulation.hoverShape} `,
       shapeLink(simulation.hoverShape)
     );
   }
@@ -807,26 +830,23 @@ sel("#blurOn").addEventListener("input", () => {
   simulation.blurEnabled = true;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
-  log("Draw Mode Blur - older generations will fade out.");
+  log("Blur ON - previous generations will fade out based on Blur Amount");
 });
 
 sel("#blurOff").addEventListener("input", () => {
   simulation.blurEnabled = false;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
-  log("Draw Mode Overlay - new generations will paint on top of old ones.");
+  log("Overlay ON - new generation will paint on top of previous one");
 });
 
 sel("#clearFrame").addEventListener("change", () => {
   simulation.clearEveryFrame = true;
   simulation.blurEnabled = false;
   sel("#delay").disabled = true;
-  log("Draw Mode Clear Frame - only current generation shown.");
-});
-
-sel("#setBlendMode").addEventListener("input", (e) => {
-  simulation.ctx.globalCompositeOperation = e.target.value;
-  log(`Blend Mode changed to ${simulation.ctx.globalCompositeOperation}`);
+  log(
+    "Clear Frame ON - draw only current generation, erase previous generations"
+  );
 });
 
 sel("#randCycle").addEventListener("input", (e) => {
@@ -842,15 +862,15 @@ sel("#noiseRangeValue").addEventListener(
 sel("#noiseRangeValue").addEventListener("change", () => {
   if (simulation.noiseEnabled) {
     log(
-      `Noise Amount - cells have a 1 in ${simulation.noiseRangeValue.toFixed(
+      `Noise (ON) Amount is now 1 in ${simulation.noiseRangeValue.toFixed(
         2
       )} chance of being born`
     );
   } else {
     log(
-      `Noise Amount - cells will have a 1 in ${simulation.noiseRangeValue.toFixed(
+      `Noise (OFF) Amount is now 1 in ${simulation.noiseRangeValue.toFixed(
         2
-      )} chace of being born when noise is enabled`
+      )} chace of being born`
     );
   }
 });
@@ -891,10 +911,7 @@ const gameLink = (game: string): string => {
 sel("#gameType").addEventListener("change", (e) => {
   simulation.game = e.target.value;
   hashStorage.update({ game: e.target.value });
-  log(
-    `Game type has been changed to ${simulation.game}`,
-    gameLink(simulation.game)
-  );
+  log("Game changed to ", gameLink(simulation.game), simulation.game);
 });
 
 sel("#prompt").scrollTop = 0;

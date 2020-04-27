@@ -388,6 +388,7 @@ var log = function (message, link) {
         var a = document.createElement("a");
         a.href = link;
         a.innerText = link;
+        a.target = "_blank";
         p.append(a);
     }
     prompt.scrollTop = sel("#prompt").scrollHeight;
@@ -471,17 +472,35 @@ sel("#seedDensity").addEventListener("input", function (e) { return (simulation.
 sel("#seedDensity").addEventListener("change", function (e) {
     return log("Seed Density changed to " + e.target.value);
 });
+var shapeLink = function (shape) {
+    switch (shape) {
+        case "gliderse":
+        case "glidersw":
+        case "gliderne":
+        case "glidernw":
+            return "https://www.conwaylife.com/wiki/Glider";
+        case "r-pentomino":
+            return "https://www.conwaylife.com/wiki/R-pentomino";
+        case "pi-heptomino":
+            return "https://www.conwaylife.com/wiki/Pi-heptomino";
+        case "c-heptomino":
+            return "https://www.conwaylife.com/wiki/C-heptomino";
+        case "1x1":
+        case "3x3":
+            return null;
+    }
+};
 sel("#setClickShape").addEventListener("change", function (e) {
     simulation.clickShape = e.target.value;
-    log("Click Shape changed to " + simulation.clickShape);
+    log("Click Shape changed to " + simulation.clickShape + " ", shapeLink(simulation.clickShape));
 });
 sel("#setHoverShape").addEventListener("change", function (e) {
     simulation.hoverShape = e.target.value;
     if (isHovering) {
-        log("Hover shape is now " + simulation.hoverShape);
+        log("Hover shape is now " + simulation.hoverShape, shapeLink(simulation.hoverShape));
     }
     else {
-        log("Hover shape will be " + simulation.hoverShape + " when hover is enabled");
+        log("Hover shape will be " + simulation.hoverShape + " when hover is enabled", shapeLink(simulation.hoverShape));
     }
 });
 sel("#color").addEventListener("input", function (e) {
@@ -515,7 +534,7 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="color"]').style.display = "none";
             sel("#picker").style.display = "block";
             sel("#color").style.display = "none";
-            log("Color mode is now HSLUV picker ", "https://hsluv.org");
+            log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
             break;
         default:
             sel("#colorRadix").style.display = "block";
@@ -600,10 +619,32 @@ sel("#noiseOff").addEventListener("change", function () {
     simulation.noiseEnabled = false;
     log("Noise Off - cells will be born according to game rules only");
 });
+var gameLink = function (game) {
+    switch (game) {
+        case "life":
+            return "https://conwaylife.com/wiki/Life";
+        case "highlife":
+            return "https://en.wikipedia.org/wiki/Highlife_(cellular_automaton)";
+        case "replicator":
+            return "https://conwaylife.com/wiki/Replicator";
+        case "seeds":
+            return "https://conwaylife.com/wiki/OCA:Seeds";
+        case "B25/S4":
+        case "34life":
+        case "diamoeba":
+        case "2x2":
+        case "day&night":
+        case "morley":
+        case "anneal":
+            return "https://en.wikipedia.org/wiki/Life-like_cellular_automaton#A_selection_of_Life-like_rules";
+        case "famine":
+            return null;
+    }
+};
 sel("#gameType").addEventListener("change", function (e) {
     simulation.game = e.target.value;
     hashStorage.update({ game: e.target.value });
-    log("Game type has been changed to " + simulation.game);
+    log("Game type has been changed to " + simulation.game, gameLink(simulation.game));
 });
 sel("#prompt").scrollTop = 0;
 setInterval(function () {

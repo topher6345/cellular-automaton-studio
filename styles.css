@@ -22,12 +22,6 @@ h1 {
   font-size: 1em;
 }
 
-a {
-  font-size: 0.5em;
-  text-decoration: none;
-  color: white;
-}
-
 #root {
   display: flex;
   max-width: 100%;
@@ -40,6 +34,11 @@ a {
   display: flex;
   align-content: flex-start;
   flex-wrap: wrap;
+}
+.controls a {
+  font-size: 0.5em;
+  text-decoration: none;
+  color: white;
 }
 
 .controls > div {

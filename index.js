@@ -379,11 +379,17 @@ function tick(now) {
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
-var log = function (message) {
+var log = function (message, link) {
     var prompt = sel("#prompt");
     var p = document.createElement("p");
     p.innerText = "> " + message;
     prompt.append(p);
+    if (link) {
+        var a = document.createElement("a");
+        a.href = link;
+        a.innerText = link;
+        p.append(a);
+    }
     prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 setTimeout(function () { return log("Hover over controls for help"); }, 3000);
@@ -509,7 +515,7 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="color"]').style.display = "none";
             sel("#picker").style.display = "block";
             sel("#color").style.display = "none";
-            log("Color mode is now HSLUV picker https://hsluv.org");
+            log("Color mode is now HSLUV picker ", "https://hsluv.org");
             break;
         default:
             sel("#colorRadix").style.display = "block";

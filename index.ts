@@ -499,11 +499,18 @@ function tick(now: number) {
 
 window.requestAnimationFrame(tick);
 
-const log = (message: string) => {
+const log = (message: string, link?: string) => {
   const prompt = sel("#prompt");
   const p = document.createElement("p");
   p.innerText = `> ${message}`;
   prompt.append(p);
+
+  if (link) {
+    const a = document.createElement("a");
+    a.href = link;
+    a.innerText = link;
+    p.append(a);
+  }
   prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 
@@ -704,7 +711,7 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel('label[for="color"]').style.display = "none";
       sel("#picker").style.display = "block";
       sel("#color").style.display = "none";
-      log("Color mode is now HSLUV picker https://hsluv.org");
+      log("Color mode is now HSLUV picker ", "https://hsluv.org");
       break;
     default:
       sel("#colorRadix").style.display = "block";

@@ -368,7 +368,6 @@ window.setInterval(function () { return (favicon.href = canvas.toDataURL()); }, 
 var msPast = null;
 var msPerFrame = 7;
 var masterOnOff = true;
-var masterCacheState = masterOnOff;
 function tick(now) {
     if (!msPast)
         msPast = now;
@@ -398,6 +397,9 @@ var expon = function (x) {
     return -Math.sqrt(-value + 1) + 1;
 };
 sel("#delay").addEventListener("input", function (e) { return (simulation.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
+sel("#delay").addEventListener("change", function () {
+    hashStorage.update({ alpha: simulation.alpha });
+}, false);
 sel("#setBlendMode").addEventListener("input", function (e) {
     var currentState = masterOnOff;
     if (currentState)
@@ -534,7 +536,6 @@ sel("#recStart").addEventListener("change", function () {
         vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
         vid.controls = true;
         sel("#modal-capture-preview").prepend(vid);
-        masterCacheState = masterOnOff;
         masterOnOff = false;
     };
     rec.start();
@@ -595,11 +596,32 @@ sel("#noiseOff").addEventListener("change", function () {
 });
 sel("#gameType").addEventListener("change", function (e) {
     simulation.game = e.target.value;
+    hashStorage.update({ game: e.target.value });
     log("Game type has been changed to " + simulation.game);
 });
 sel("#prompt").scrollTop = 0;
 setInterval(function () {
-    sel("#currentCount").value = simulation.data
-        .reduce(function (previousValue, currentValue) { return previousValue + currentValue; }, 0)
-        .toLocaleString();
+    var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
+    sel("#currentCount").value = sum.toLocaleString();
 }, 1000);
+var route = function (state) {
+    sel("#gameType").value = state.game;
+    // TODO: exponential to linear
+    // sel("#delay").value = state.alpha.toString();
+    // Don't set color in UI
+    // sel("").value = state.color;
+    sel("#setClickShape").value = state.clickShape;
+    sel("#setHoverShape").value = state.hoverShape;
+    sel("#colorMode").value = state.colorMode;
+    sel("#colorRadix").value = state.colorRadix.toString();
+    sel("#clearFrame").checked = state.blurEnabled;
+    sel("#clearFrame").checked = state.clearEveryFrame;
+    // TODO: exponential to linear
+    // sel("#randCycle").value = state.colorRateFrames;
+    sel("#noiseOn").checked = state.noiseEnabled;
+    sel("#noiseRangeValue").value = state.noiseRangeValue.toString();
+    // TODO: exponential to linear
+    // sel("#seedDensity").value = state.seedDensity;
+};
+route(hashStorage.state());
+window.addEventListener("hashchange", function () { return route(hashStorage.state()); }, false);

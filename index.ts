@@ -42,7 +42,9 @@ class HashStorage {
   }
 
   isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
+
   isEmpty = (a: any) => a.length === 0;
+
   state(): ControlValues {
     return this.decode(window.location.hash);
   }
@@ -483,7 +485,6 @@ window.setInterval(() => (favicon.href = canvas.toDataURL()), 5000);
 let msPast: number = null;
 let msPerFrame: number = 7;
 let masterOnOff: boolean = true;
-let masterCacheState: boolean = masterOnOff;
 
 function tick(now: number) {
   if (!msPast) msPast = now;
@@ -528,6 +529,14 @@ sel("#delay").addEventListener(
   false
 );
 
+sel("#delay").addEventListener(
+  "change",
+  () => {
+    hashStorage.update({ alpha: simulation.alpha });
+  },
+  false
+);
+
 sel("#setBlendMode").addEventListener("input", (e) => {
   const currentState = masterOnOff;
   if (currentState) masterOnOff = false;
@@ -551,10 +560,12 @@ sel("#hoverOn").addEventListener("input", () => {
   isHovering = true;
   log("Hovering the mouse over the canvas will now draw a shape");
 });
+
 sel("#hoverOff").addEventListener("input", () => {
   isHovering = false;
   log("Hovering the mouse over the canvas will have no effect");
 });
+
 canvas.addEventListener(
   "mousemove",
   (e) => isHovering && simulation.hover(e),
@@ -567,6 +578,7 @@ sel("#masterOn").addEventListener("change", () => {
   masterOnOff = true;
   log("The simulation has been started.");
 });
+
 sel("#masterOff").addEventListener("change", () => {
   masterOnOff = false;
   log("The simulation has been paused.");
@@ -601,6 +613,7 @@ Click grey border to exit (Simulation has been paused)
   masterOnOff = false;
   (sel("#masterOff") as HTMLInputElement).checked = true;
 });
+
 sel("#showGallery").addEventListener(
   "click",
   () => (sel("#modal-capture").style.display = "flex")
@@ -612,10 +625,12 @@ sel("#seed").addEventListener("click", () => {
     `Simulation seeded with a random chance of 1 in ${simulation.seedDensity}`
   );
 });
+
 sel("#clear").addEventListener("click", () => {
   simulation.clear();
   log("Screen cleared");
 });
+
 sel("#kill").addEventListener("click", () => {
   simulation.kill();
   log("Cells Killed - click Seed or the canvas to add live cells");
@@ -729,7 +744,6 @@ sel("#recStart").addEventListener("change", () => {
 
     sel("#modal-capture-preview").prepend(vid);
 
-    masterCacheState = masterOnOff;
     masterOnOff = false;
   };
 
@@ -816,13 +830,43 @@ sel("#noiseOff").addEventListener("change", () => {
 
 sel("#gameType").addEventListener("change", (e) => {
   simulation.game = e.target.value;
+  hashStorage.update({ game: e.target.value });
   log(`Game type has been changed to ${simulation.game}`);
 });
 
 sel("#prompt").scrollTop = 0;
 
 setInterval(() => {
-  sel("#currentCount").value = simulation.data
-    .reduce((previousValue, currentValue) => previousValue + currentValue, 0)
-    .toLocaleString();
+  const sum = simulation.data.reduce((a, b) => a + b, 0);
+
+  sel("#currentCount").value = sum.toLocaleString();
 }, 1000);
+
+const route = (state: ControlValues) => {
+  sel("#gameType").value = state.game;
+
+  // TODO: exponential to linear
+  // sel("#delay").value = state.alpha.toString();
+
+  // Don't set color in UI
+  // sel("").value = state.color;
+
+  sel("#setClickShape").value = state.clickShape;
+  sel("#setHoverShape").value = state.hoverShape;
+  sel("#colorMode").value = state.colorMode;
+  sel("#colorRadix").value = state.colorRadix.toString();
+  (sel("#clearFrame") as HTMLInputElement).checked = state.blurEnabled;
+  (sel("#clearFrame") as HTMLInputElement).checked = state.clearEveryFrame;
+
+  // TODO: exponential to linear
+  // sel("#randCycle").value = state.colorRateFrames;
+
+  (sel("#noiseOn") as HTMLInputElement).checked = state.noiseEnabled;
+  sel("#noiseRangeValue").value = state.noiseRangeValue.toString();
+
+  // TODO: exponential to linear
+  // sel("#seedDensity").value = state.seedDensity;
+};
+
+route(hashStorage.state());
+window.addEventListener("hashchange", () => route(hashStorage.state()), false);

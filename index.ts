@@ -19,7 +19,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
   color: "orange",
   clickShape: "gliderse",
   hoverShape: "gliderse",
-  colorMode: "full ",
+  colorMode: "full",
   colorRadix: 16777215,
   blurEnabled: true,
   clearEveryFrame: false,

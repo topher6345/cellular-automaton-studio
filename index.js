@@ -11,7 +11,7 @@ var INIT_CONTROL_VALUES = {
     color: "orange",
     clickShape: "gliderse",
     hoverShape: "gliderse",
-    colorMode: "picker",
+    colorMode: "full",
     colorRadix: 16777215,
     blurEnabled: true,
     clearEveryFrame: false,

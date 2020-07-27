@@ -73,6 +73,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.ctx.imageSmoothingEnabled = true;
         this.ctx.fillStyle = "rgba(0,0,0,1)";
         this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
+        this.rotations = 6;
+        this.rotationsEnabled = false;
         this.alpha = controlValues.alpha;
         this.blurEnabled = controlValues.blurEnabled;
         this.clearEveryFrame = controlValues.clearEveryFrame;
@@ -340,6 +342,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
         else if (this.colorMode === "picker" || this.colorMode === "hsluv") {
             this.ctx.fillStyle = this.color;
         }
+        var da = (2 * Math.PI) / this.rotations;
+        var translate = this.size / 2;
         for (var row = 0; row < this.size; row++) {
             if (this.colorMode === "row") {
                 this.ctx.fillStyle = this.randColor();
@@ -349,7 +353,18 @@ var CellularAutomatonEngine = /** @class */ (function () {
                     if (this.colorMode === "each") {
                         this.ctx.fillStyle = this.randColor();
                     }
-                    this.ctx.fillRect(col * this.pixelSize, row * this.pixelSize, this.pixelSize, this.pixelSize);
+                    if (this.rotationsEnabled) {
+                        for (var v = 0; v < this.rotations; v++) {
+                            this.ctx.translate(translate, translate);
+                            this.ctx.rotate(da);
+                            this.ctx.fillRect(col * this.pixelSize, row * this.pixelSize, this.pixelSize, this.pixelSize);
+                            this.ctx.translate(-translate, -translate);
+                            this.ctx.rotate(0);
+                        }
+                    }
+                    else {
+                        this.ctx.fillRect(col * this.pixelSize, row * this.pixelSize, this.pixelSize, this.pixelSize);
+                    }
                 }
             }
         }

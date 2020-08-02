@@ -9,6 +9,8 @@ type ControlValues = {
   clearEveryFrame: boolean;
   colorRateFrames: number;
   noiseEnabled: boolean;
+  rotations: number;
+  rotationsEnabled: boolean;
   noiseRangeValue: number;
   game: string;
   seedDensity: number;
@@ -24,6 +26,8 @@ const INIT_CONTROL_VALUES: ControlValues = {
   blurEnabled: true,
   clearEveryFrame: false,
   colorRateFrames: 120,
+  rotations: 3,
+  rotationsEnabled: false,
   noiseEnabled: false,
   noiseRangeValue: 0,
   game: "life",

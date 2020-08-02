@@ -6,6 +6,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
+//@ts-ignore
+var gpu = new GPU();
 var INIT_CONTROL_VALUES = {
     alpha: 0.006,
     color: "orange",
@@ -239,7 +241,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.drawShape(x, y, this.hoverShape);
     };
     CellularAutomatonEngine.prototype.drawShape = function (x, y, shape) {
-        debugger;
         switch (shape) {
             case "gliderse":
                 this.set(x - 1, y, 1);

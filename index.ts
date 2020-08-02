@@ -14,6 +14,9 @@ type ControlValues = {
   seedDensity: number;
 };
 
+//@ts-ignore
+const gpu = new GPU();
+
 const INIT_CONTROL_VALUES: ControlValues = {
   alpha: 0.006,
   color: "orange",
@@ -324,8 +327,6 @@ class CellularAutomatonEngine {
   }
 
   drawShape(x: number, y: number, shape: string) {
-    debugger;
-
     switch (shape) {
       case "gliderse":
         this.set(x - 1, y, 1);

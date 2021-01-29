@@ -755,6 +755,7 @@ sel("#colorMode").addEventListener("change", (e) => {
 
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
+      log("Color mode is now the native color picker in your browser");
       break;
     case "hsluv":
       sel("#colorRadix").style.display = "none";
@@ -766,6 +767,18 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#color").style.display = "none";
       log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
       break;
+    case "full":
+      log(
+        "Color mode is now Random Frame - all pixels of each frame will be the same random color"
+      );
+    case "row":
+      log(
+        "Color mode is now Random Row - all pixels of each row will be the same random color"
+      );
+    case "each":
+      log(
+        "Color mode is now Random Pixel- every pixel is a new random color"
+      );
     default:
       sel("#colorRadix").style.display = "block";
       sel('label[for="colorRadix"]').style.display = "block";

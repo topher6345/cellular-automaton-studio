@@ -674,8 +674,8 @@ sel("#gameType").addEventListener("change", function (e) {
 sel("#prompt").scrollTop = 0;
 setInterval(function () {
     var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
-    sel("#currentCount").value = sum.toLocaleString();
-}, 1000);
+    sel("#currentCount").value = sum;
+}, 2000);
 var route = function (state) {
     sel("#gameType").value = state.game;
     // TODO: exponential to linear

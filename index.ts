@@ -931,8 +931,8 @@ sel("#prompt").scrollTop = 0;
 setInterval(() => {
   const sum = simulation.data.reduce((a, b) => a + b, 0);
 
-  sel("#currentCount").value = sum.toLocaleString();
-}, 1000);
+  sel("#currentCount").value = sum;
+}, 2000);
 
 const route = (state: ControlValues) => {
   sel("#gameType").value = state.game;

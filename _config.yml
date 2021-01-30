@@ -1,0 +1,1 @@
+exclude: ["README.md", "_config.yml", "index.ts", "node_modules", "package-lock.json", "package.json", "static.json", "tsconfig.json"]

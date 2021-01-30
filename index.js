@@ -560,10 +560,13 @@ sel("#colorMode").addEventListener("change", function (e) {
             break;
         case "full":
             log("Color mode is now Random Frame - all pixels of each frame will be the same random color");
+            break;
         case "row":
             log("Color mode is now Random Row - all pixels of each row will be the same random color");
+            break;
         case "each":
             log("Color mode is now Random Pixel- every pixel is a new random color");
+            break;
         default:
             sel("#colorRadix").style.display = "block";
             sel('label[for="colorRadix"]').style.display = "block";

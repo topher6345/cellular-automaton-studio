@@ -707,17 +707,12 @@ sel("#setClickShape").addEventListener("change", (e) => {
 sel("#setHoverShape").addEventListener("change", (e) => {
   simulation.hoverShape = e.target.value;
 
-  if (isHovering) {
-    log(
-      `Hover Shape (ON) is now ${simulation.hoverShape}`,
-      shapeLink(simulation.hoverShape)
-    );
-  } else {
-    log(
-      `Hover Shape (OFF) is now ${simulation.hoverShape} `,
-      shapeLink(simulation.hoverShape)
-    );
-  }
+  log(
+    `Hover Shape (${isHovering ? "ON" : "OFF"}) is now ${
+      simulation.hoverShape
+    }`,
+    shapeLink(simulation.hoverShape)
+  );
 });
 
 sel("#color").addEventListener(

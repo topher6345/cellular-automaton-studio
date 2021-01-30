@@ -602,7 +602,7 @@ sel("#recStart").addEventListener("change", function () {
 sel("#recStop").addEventListener("change", function () {
     recorders.stop();
     recorders = null;
-    log("Recording Stopped");
+    log("Recording Stopped, click Gallery to view and download the recording");
 });
 sel("#blurOn").addEventListener("input", function () {
     simulation.blurEnabled = true;

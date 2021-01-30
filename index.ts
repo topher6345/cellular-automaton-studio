@@ -776,9 +776,7 @@ sel("#colorMode").addEventListener("change", (e) => {
         "Color mode is now Random Row - all pixels of each row will be the same random color"
       );
     case "each":
-      log(
-        "Color mode is now Random Pixel- every pixel is a new random color"
-      );
+      log("Color mode is now Random Pixel- every pixel is a new random color");
     default:
       sel("#colorRadix").style.display = "block";
       sel('label[for="colorRadix"]').style.display = "block";
@@ -832,7 +830,7 @@ sel("#recStart").addEventListener("change", () => {
 sel("#recStop").addEventListener("change", () => {
   recorders.stop();
   recorders = null;
-  log("Recording Stopped");
+  log("Recording Stopped, click Gallery to view and download the recording");
 });
 
 interface HTMLElement {

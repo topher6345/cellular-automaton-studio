@@ -413,7 +413,7 @@ var blendModeLink = {
     lighten: "https://drafts.fxtf.org/compositing-1/#blendinglighten",
     xor: "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
     multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
-    screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
+    n: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
     overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
     darken: "https://drafts.fxtf.org/compositing-1/#blendingdarken",
     "color-dodge": "https://drafts.fxtf.org/compositing-1/#blendingcolordodge",
@@ -517,12 +517,7 @@ sel("#setClickShape").addEventListener("change", function (e) {
 });
 sel("#setHoverShape").addEventListener("change", function (e) {
     simulation.hoverShape = e.target.value;
-    if (isHovering) {
-        log("Hover Shape (ON) is now " + simulation.hoverShape, shapeLink(simulation.hoverShape));
-    }
-    else {
-        log("Hover Shape (OFF) is now " + simulation.hoverShape + " ", shapeLink(simulation.hoverShape));
-    }
+    log("Hover Shape (" + (isHovering ? "ON" : "OFF") + ") is now " + simulation.hoverShape, shapeLink(simulation.hoverShape));
 });
 sel("#color").addEventListener("input", function (e) {
     simulation.color = e.target.value;
@@ -590,9 +585,12 @@ sel("#recStart").addEventListener("change", function () {
     rec.onstop = function () {
         var vid = document.createElement("video");
         vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
+        var vidName = "CellularAnimationStudio-" + Date.now();
+        vid.download = vidName + ".webm";
         vid.controls = true;
         sel("#modal-capture-preview").prepend(vid);
         masterOnOff = false;
+        sel("#masterOff").checked = true;
     };
     rec.start();
     log("Recording started at " + new Date() + "..");

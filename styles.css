@@ -221,6 +221,7 @@ button {
 #prompt > p {
   padding-left: 1em;
   padding-right: 1em;
+  line-height: 1em;
 }
 
 #prompt > p > a {

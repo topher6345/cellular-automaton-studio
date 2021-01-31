@@ -521,6 +521,7 @@ sel("#setHoverShape").addEventListener("change", function (e) {
 });
 sel("#color").addEventListener("input", function (e) {
     simulation.color = e.target.value;
+    sel("#colorDisplay").value = e.target.value;
     // redraw if paused so the user can see what colors
     masterOnOff || simulation.draw(false);
 }, false);
@@ -542,6 +543,8 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
             log("Color mode is now the native color picker in your browser");
+            sel("#colorDisplay").style.display = "none";
+            sel('label[for="colorDisplay"]').style.display = "none";
             break;
         case "hsluv":
             sel("#colorRadix").style.display = "none";
@@ -552,15 +555,24 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#picker").style.display = "block";
             sel("#color").style.display = "none";
             log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
+            sel("#colorDisplay").style.display = "none";
+            sel('label[for="colorDisplay"]').style.display = "none";
             break;
         case "full":
+            sel("#colorDisplay").style.display = "block";
+            sel('label[for="colorDisplay"]').style.display = "block";
+            sel("#picker").style.display = "none";
             log("Color mode is now Random Frame - all pixels of each frame will be the same random color");
             break;
         case "row":
+            sel("#colorDisplay").style.display = "none";
+            sel('label[for="colorDisplay"]').style.display = "none";
             log("Color mode is now Random Row - all pixels of each row will be the same random color");
             break;
         case "each":
             log("Color mode is now Random Pixel- every pixel is a new random color");
+            sel("#colorDisplay").style.display = "none";
+            sel('label[for="colorDisplay"]').style.display = "none";
             break;
         default:
             sel("#colorRadix").style.display = "block";
@@ -570,8 +582,14 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#color").style.display = "none";
             sel("#picker").style.display = "none";
             sel('label[for="color"]').style.display = "none";
+            sel("#colorDisplay").style.display = "none";
     }
 });
+setInterval(function () {
+    if (simulation.colorMode == "full") {
+        sel("#colorDisplay").value = simulation.ctx.fillStyle.toString();
+    }
+}, 250);
 sel("#colorRadix").addEventListener("input", function (e) { return (simulation.colorRadix = parseInt(e.target.value)); });
 var recorders = null;
 sel("#recStart").addEventListener("change", function () {
@@ -674,8 +692,8 @@ sel("#gameType").addEventListener("change", function (e) {
 sel("#prompt").scrollTop = 0;
 setInterval(function () {
     var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
-    sel("#currentCount").value = sum.toLocaleString();
-}, 1000);
+    sel("#currentCount").value = sum;
+}, 2000);
 var route = function (state) {
     sel("#gameType").value = state.game;
     // TODO: exponential to linear

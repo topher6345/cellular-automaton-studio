@@ -71,7 +71,7 @@
               <option value="famine">famine</option>
             </select>
             <label for="currentCount">Live Cells:</label>
-            <input id="currentCount" readonly="readonly" type="text" />
+            <meter id="currentCount" low="10" high="281250" optimum="5000" min="0" max="562500"></meter>
           </div>
           <div id="picker" style="display: none;">
             <label>HSLUV</label>
@@ -190,6 +190,19 @@
               id="color"
               name="color"
               value="#e66465"
+            />
+
+            <label
+              title="The color of the current pixels."
+              for="colorDisplay"
+              >Current color</label
+            >
+            <input
+              disabled="disabled"
+              type="color"
+              id="colorDisplay"
+              name="color"
+              value=""
             />
           </div>
           <div>

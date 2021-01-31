@@ -692,8 +692,8 @@ sel("#gameType").addEventListener("change", function (e) {
 sel("#prompt").scrollTop = 0;
 setInterval(function () {
     var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
-    sel("#currentCount").value = sum;
-}, 2000);
+    sel("#currentCount").value = sum.toString();
+}, 250);
 var route = function (state) {
     sel("#gameType").value = state.game;
     // TODO: exponential to linear
@@ -715,3 +715,13 @@ var route = function (state) {
 };
 route(hashStorage.state());
 window.addEventListener("hashchange", function () { return route(hashStorage.state()); }, false);
+document.addEventListener("visibilitychange", function (event) {
+    if (document.visibilityState == "visible") {
+        if (sel("#masterOn").checked) {
+            masterOnOff = true;
+        }
+    }
+    else {
+        masterOnOff = false;
+    }
+});

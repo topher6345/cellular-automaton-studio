@@ -952,8 +952,8 @@ sel("#prompt").scrollTop = 0;
 setInterval(() => {
   const sum = simulation.data.reduce((a, b) => a + b, 0);
 
-  sel("#currentCount").value = sum;
-}, 2000);
+  sel("#currentCount").value = sum.toString();
+}, 250);
 
 const route = (state: ControlValues) => {
   sel("#gameType").value = state.game;
@@ -983,3 +983,12 @@ const route = (state: ControlValues) => {
 
 route(hashStorage.state());
 window.addEventListener("hashchange", () => route(hashStorage.state()), false);
+document.addEventListener("visibilitychange", (event) => {
+  if (document.visibilityState == "visible") {
+    if ((sel("#masterOn") as HTMLInputElement).checked) {
+      masterOnOff = true;
+    }
+  } else {
+    masterOnOff = false;
+  }
+});

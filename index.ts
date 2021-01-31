@@ -719,7 +719,7 @@ sel("#color").addEventListener(
   "input",
   (e) => {
     simulation.color = e.target.value;
-
+    sel("#colorDisplay").value = e.target.value;
     // redraw if paused so the user can see what colors
     masterOnOff || simulation.draw(false);
   },
@@ -740,6 +740,7 @@ sel(".input-hex").addEventListener(
 
 sel("#colorMode").addEventListener("change", (e) => {
   simulation.colorMode = e.target.value;
+
   switch (e.target.value) {
     case "picker":
       sel("#colorRadix").style.display = "none";
@@ -751,6 +752,8 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
       log("Color mode is now the native color picker in your browser");
+      sel("#colorDisplay").style.display = "none";
+      sel('label[for="colorDisplay"]').style.display = "none";
       break;
     case "hsluv":
       sel("#colorRadix").style.display = "none";
@@ -761,19 +764,30 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#picker").style.display = "block";
       sel("#color").style.display = "none";
       log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
+      sel("#colorDisplay").style.display = "none";
+      sel('label[for="colorDisplay"]').style.display = "none";
       break;
     case "full":
+      sel("#colorDisplay").style.display = "block";
+      sel('label[for="colorDisplay"]').style.display = "block";
+      sel("#picker").style.display = "none";
+
       log(
         "Color mode is now Random Frame - all pixels of each frame will be the same random color"
       );
+
       break;
     case "row":
+      sel("#colorDisplay").style.display = "none";
+      sel('label[for="colorDisplay"]').style.display = "none";
       log(
         "Color mode is now Random Row - all pixels of each row will be the same random color"
       );
       break;
     case "each":
       log("Color mode is now Random Pixel- every pixel is a new random color");
+      sel("#colorDisplay").style.display = "none";
+      sel('label[for="colorDisplay"]').style.display = "none";
       break;
     default:
       sel("#colorRadix").style.display = "block";
@@ -783,8 +797,15 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#color").style.display = "none";
       sel("#picker").style.display = "none";
       sel('label[for="color"]').style.display = "none";
+      sel("#colorDisplay").style.display = "none";
   }
 });
+
+setInterval(() => {
+  if (simulation.colorMode == "full") {
+    sel("#colorDisplay").value = simulation.ctx.fillStyle.toString();
+  }
+}, 250);
 
 sel("#colorRadix").addEventListener(
   "input",

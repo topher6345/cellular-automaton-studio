@@ -554,7 +554,7 @@ const blendModeLink: any = {
   xor:
     "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
   multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
-  n: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
+  screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
   overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
   darken: "https://drafts.fxtf.org/compositing-1/#blendingdarken",
   "color-dodge": "https://drafts.fxtf.org/compositing-1/#blendingcolordodge",

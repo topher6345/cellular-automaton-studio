@@ -459,7 +459,7 @@ sel("#masterOff").addEventListener("change", function () {
     log("Simulation OFF");
 });
 sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
-sel("#screencap").addEventListener("click", function () {
+var takeSnapshot = function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
     var imgName = "CellularAnimationStudio-" + Date.now();
@@ -475,6 +475,14 @@ sel("#screencap").addEventListener("click", function () {
     sel("#modal-capture-preview").prepend(a);
     masterOnOff = false;
     sel("#masterOff").checked = true;
+};
+sel("#screencap").addEventListener("click", takeSnapshot);
+window.addEventListener("keydown", function (event) {
+    if (event.defaultPrevented) {
+        return; // Do nothing if event already handled
+    }
+    if (event.code == "Space")
+        takeSnapshot();
 });
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
 sel("#seed").addEventListener("click", function () {

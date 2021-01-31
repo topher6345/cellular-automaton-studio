@@ -623,7 +623,7 @@ sel("#modal-capture-preview").addEventListener(
   false
 );
 
-sel("#screencap").addEventListener("click", () => {
+const takeSnapshot = () => {
   const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
   const imgName = `CellularAnimationStudio-${Date.now()}`;
@@ -645,6 +645,15 @@ Click grey border to exit (Simulation has been paused)
 
   masterOnOff = false;
   (sel("#masterOff") as HTMLInputElement).checked = true;
+};
+
+sel("#screencap").addEventListener("click", takeSnapshot);
+window.addEventListener("keydown", function (event) {
+  if (event.defaultPrevented) {
+    return; // Do nothing if event already handled
+  }
+
+  if (event.code == "Space") takeSnapshot();
 });
 
 sel("#showGallery").addEventListener(

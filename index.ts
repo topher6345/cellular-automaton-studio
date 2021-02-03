@@ -324,8 +324,6 @@ class CellularAutomatonEngine {
   }
 
   drawShape(x: number, y: number, shape: string) {
-    debugger;
-
     switch (shape) {
       case "gliderse":
         this.set(x - 1, y, 1);

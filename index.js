@@ -239,7 +239,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.drawShape(x, y, this.hoverShape);
     };
     CellularAutomatonEngine.prototype.drawShape = function (x, y, shape) {
-        debugger;
         switch (shape) {
             case "gliderse":
                 this.set(x - 1, y, 1);

@@ -554,7 +554,7 @@ const blendModeLink: any = {
   xor:
     "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
   multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
-  n: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
+  screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
   overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
   darken: "https://drafts.fxtf.org/compositing-1/#blendingdarken",
   "color-dodge": "https://drafts.fxtf.org/compositing-1/#blendingcolordodge",
@@ -623,7 +623,7 @@ sel("#modal-capture-preview").addEventListener(
   false
 );
 
-sel("#screencap").addEventListener("click", () => {
+const takeSnapshot = () => {
   const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
   const imgName = `CellularAnimationStudio-${Date.now()}`;
@@ -645,6 +645,15 @@ Click grey border to exit (Simulation has been paused)
 
   masterOnOff = false;
   (sel("#masterOff") as HTMLInputElement).checked = true;
+};
+
+sel("#screencap").addEventListener("click", takeSnapshot);
+window.addEventListener("keydown", function (event) {
+  if (event.defaultPrevented) {
+    return; // Do nothing if event already handled
+  }
+
+  if (event.code == "Space") takeSnapshot();
 });
 
 sel("#showGallery").addEventListener(
@@ -952,8 +961,8 @@ sel("#prompt").scrollTop = 0;
 setInterval(() => {
   const sum = simulation.data.reduce((a, b) => a + b, 0);
 
-  sel("#currentCount").value = sum;
-}, 2000);
+  sel("#currentCount").value = sum.toString();
+}, 250);
 
 const route = (state: ControlValues) => {
   sel("#gameType").value = state.game;
@@ -983,3 +992,12 @@ const route = (state: ControlValues) => {
 
 route(hashStorage.state());
 window.addEventListener("hashchange", () => route(hashStorage.state()), false);
+document.addEventListener("visibilitychange", (event) => {
+  if (document.visibilityState == "visible") {
+    if ((sel("#masterOn") as HTMLInputElement).checked) {
+      masterOnOff = true;
+    }
+  } else {
+    masterOnOff = false;
+  }
+});

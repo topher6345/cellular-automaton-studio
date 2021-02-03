@@ -413,7 +413,7 @@ var blendModeLink = {
     lighten: "https://drafts.fxtf.org/compositing-1/#blendinglighten",
     xor: "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
     multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
-    n: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
+    screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
     overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
     darken: "https://drafts.fxtf.org/compositing-1/#blendingdarken",
     "color-dodge": "https://drafts.fxtf.org/compositing-1/#blendingcolordodge",
@@ -459,7 +459,7 @@ sel("#masterOff").addEventListener("change", function () {
     log("Simulation OFF");
 });
 sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
-sel("#screencap").addEventListener("click", function () {
+var takeSnapshot = function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
     var imgName = "CellularAnimationStudio-" + Date.now();
@@ -475,6 +475,14 @@ sel("#screencap").addEventListener("click", function () {
     sel("#modal-capture-preview").prepend(a);
     masterOnOff = false;
     sel("#masterOff").checked = true;
+};
+sel("#screencap").addEventListener("click", takeSnapshot);
+window.addEventListener("keydown", function (event) {
+    if (event.defaultPrevented) {
+        return; // Do nothing if event already handled
+    }
+    if (event.code == "Space")
+        takeSnapshot();
 });
 sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
 sel("#seed").addEventListener("click", function () {
@@ -692,8 +700,8 @@ sel("#gameType").addEventListener("change", function (e) {
 sel("#prompt").scrollTop = 0;
 setInterval(function () {
     var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
-    sel("#currentCount").value = sum;
-}, 2000);
+    sel("#currentCount").value = sum.toString();
+}, 250);
 var route = function (state) {
     sel("#gameType").value = state.game;
     // TODO: exponential to linear
@@ -715,3 +723,13 @@ var route = function (state) {
 };
 route(hashStorage.state());
 window.addEventListener("hashchange", function () { return route(hashStorage.state()); }, false);
+document.addEventListener("visibilitychange", function (event) {
+    if (document.visibilityState == "visible") {
+        if (sel("#masterOn").checked) {
+            masterOnOff = true;
+        }
+    }
+    else {
+        masterOnOff = false;
+    }
+});

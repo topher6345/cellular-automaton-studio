@@ -10,5 +10,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/dom-mediacapture-record": "^1.0.4"
+  },
+  "dependencies": {
+    "canvas": "^2.6.1"
   }
 }

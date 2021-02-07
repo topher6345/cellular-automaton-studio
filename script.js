@@ -312,16 +312,29 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     return CellularAutomatonEngine;
 }());
-var canvas = canvas_1.createCanvas(200, 200);
+var canvas = canvas_1.createCanvas(750, 750);
 var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
-simulation.draw(simulation.blurEnabled);
-simulation.update();
-writeFile(simulation.canvas.toDataURL());
+var cliProgress = require("cli-progress");
+// create a new progress bar instance and use shades_classic theme
+var bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+var limit = 500;
+// start the progress bar with a total value of 200 and start value of 0
+bar1.start(limit, 0);
+for (var index = 0; index < limit; index++) {
+    simulation.draw(true);
+    simulation.update();
+    bar1.update(index);
+}
+// update the current value in your application..
 function writeFile(dataURL) {
     var regex = /^data:.+\/(.+);base64,(.*)$/;
     var matches = dataURL.match(regex);
     var ext = matches[1];
     var data = matches[2];
     var buffer = Buffer.from(data, "base64");
-    fs.writeFileSync("CellularAnimationStudio-" + Date.now() + ext, buffer);
+    fs.writeFileSync("CellularAnimationStudio-" + Date.now() + "." + ext, buffer);
 }
+console.log(" writing File...");
+writeFile(simulation.canvas.toDataURL());
+// stop the progress bar
+bar1.stop();

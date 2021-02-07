@@ -19,11 +19,13 @@ ctx.stroke();
 canvas_1.loadImage("lime-cat.jpg").then(function (image) {
     ctx.drawImage(image, 50, 0, 70, 70);
     console.log('<img src="' + canvas.toDataURL() + '" />');
+    writeFile(canvas.toDataURL());
+});
+function writeFile(dataURL) {
     var regex = /^data:.+\/(.+);base64,(.*)$/;
-    var string = canvas.toDataURL();
-    var matches = string.match(regex);
+    var matches = dataURL.match(regex);
     var ext = matches[1];
     var data = matches[2];
     var buffer = Buffer.from(data, "base64");
     fs.writeFileSync("data." + ext, buffer);
-});
+}

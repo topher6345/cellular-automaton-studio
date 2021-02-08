@@ -109,74 +109,63 @@ var CellularAutomatonEngine = /** @class */ (function () {
             switch (this.game) {
                 case "famine":
                     ( // S6789
-                    (alive && (liveNeighbors > 5)) || spontaneousBirth) && (status_1 = 1);
+                    (alive && (liveNeighbors > 5) || spontaneousBirth)) && (status_1 = 1);
                     break;
                 case "anneal":
                     ( // S35678
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
-                        // B4678
-                        (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                    ( // B4678
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) || (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)))) && (status_1 = 1);
                     break;
                 case "morley":
                     ( // S245
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
-                        // B368
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8)) && (status_1 = 1);
+                    ( // B368
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5) || (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8)))) && (status_1 = 1);
                     break;
                 case "day&night":
                     ( // S34678
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
-                        // B3678
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                    ( // B3678
+                    (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) || (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)))) && (status_1 = 1);
                     break;
                 case "2x2":
                     ( // S125
-                    (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
-                        // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
+                    ( // B36
+                    (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5) || (liveNeighbors === 3 || liveNeighbors === 6)))) && (status_1 = 1);
                     break;
                 case "diamoeba":
                     ( // S5678
-                    (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
-                        // B35678
-                        (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                    ( // B35678
+                    (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8) || (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)))) && (status_1 = 1);
                     break;
                 case "34life":
                     ( // S34
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+                    ((alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
-                        (liveNeighbors === 3 || liveNeighbors === 4) ||
-                        spontaneousBirth) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 4) || spontaneousBirth)) && (status_1 = 1);
                     break;
                 case "B25/S4":
                     ( // S4
-                    (alive && (liveNeighbors === 4)) ||
-                        // B25
-                        (liveNeighbors === 2 || liveNeighbors === 5)) && (status_1 = 1);
+                    ( // B25
+                    (alive && (liveNeighbors === 4) || (liveNeighbors === 2 || liveNeighbors === 5)))) && (status_1 = 1);
                     break;
                 case "seeds":
                     ( // S
-                    (alive) ||
-                        // B2
-                        (liveNeighbors === 2)) && (status_1 = 1);
+                    ( // B2
+                    (alive || liveNeighbors === 2))) && (status_1 = 1);
                     break;
                 case "replicator":
                     ( // S1357
-                    (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
-                        // B1357
-                        (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) && (status_1 = 1);
+                    ( // B1357
+                    (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7) || (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)))) && (status_1 = 1);
                     break;
                 case "highlife":
                     ( // S23
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-                        // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
+                    ( // B36
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 3) || (liveNeighbors === 3 || liveNeighbors === 6)))) && (status_1 = 1);
                     break;
                 case "life":
                     ( // A23
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-                        // B3
-                        liveNeighbors === 3) && (status_1 = 1);
+                    (alive && (liveNeighbors === 2 || liveNeighbors === 3) || // B3
+                        liveNeighbors === 3)) && (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -314,27 +303,48 @@ var CellularAutomatonEngine = /** @class */ (function () {
 }());
 var canvas = canvas_1.createCanvas(750, 750);
 var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
+var writeFile = function (canvas) {
+    console.log(" writing File...");
+    fs.writeFileSync("CellularAnimationStudio-" + Date.now() + ".png", canvas.toBuffer("image/png"));
+};
 var cliProgress = require("cli-progress");
 // create a new progress bar instance and use shades_classic theme
 var bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-var limit = 500;
+var limit = 5000;
 // start the progress bar with a total value of 200 and start value of 0
 bar1.start(limit, 0);
+var sample = function (array) { return array[Math.floor(Math.random() * array.length)]; };
+var blendModes = [
+    "source-over",
+    "source-atop",
+    "lighten",
+    "xor",
+    "multiply",
+    "screen",
+    "overlay",
+    "darken",
+    "color-dodge",
+    "color-burn",
+    "hard-light",
+    "soft-light",
+    "difference",
+    "exclusion",
+    "hue",
+    "saturation",
+    "luminosity",
+];
 for (var index = 0; index < limit; index++) {
     simulation.draw(true);
     simulation.update();
     bar1.update(index);
+    if (index % 100 === 0) {
+        simulation.ctx.globalCompositeOperation = sample(blendModes);
+    }
+    if (index % 500 === 0) {
+        writeFile(canvas);
+    }
 }
 // update the current value in your application..
-function writeFile(dataURL) {
-    var regex = /^data:.+\/(.+);base64,(.*)$/;
-    var matches = dataURL.match(regex);
-    var ext = matches[1];
-    var data = matches[2];
-    var buffer = Buffer.from(data, "base64");
-    fs.writeFileSync("CellularAnimationStudio-" + Date.now() + "." + ext, buffer);
-}
-console.log(" writing File...");
-writeFile(simulation.canvas.toDataURL());
+writeFile(canvas);
 // stop the progress bar
 bar1.stop();

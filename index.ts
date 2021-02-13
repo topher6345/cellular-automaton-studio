@@ -14,6 +14,9 @@ type ControlValues = {
   seedDensity: number;
 };
 
+//@ts-ignore
+const gpu = new GPU();
+
 const INIT_CONTROL_VALUES: ControlValues = {
   alpha: 0.006,
   color: "orange",

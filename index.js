@@ -6,6 +6,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
+//@ts-ignore
+var gpu = new GPU();
 var INIT_CONTROL_VALUES = {
     alpha: 0.006,
     color: "orange",

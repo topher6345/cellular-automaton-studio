@@ -430,32 +430,14 @@ import * as cliProgress from "cli-progress";
 // create a new progress bar instance and use shades_classic theme
 const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
-const limit = 5000;
+const limit = 10000;
 
 // start the progress bar with a total value of 200 and start value of 0
 bar1.start(limit, 0);
 
 const sample = (array) => array[Math.floor(Math.random() * array.length)];
 
-const blendModes = [
-  "source-over",
-  "source-atop",
-  "lighten",
-  "xor",
-  "multiply",
-  "screen",
-  "overlay",
-  "darken",
-  "color-dodge",
-  "color-burn",
-  "hard-light",
-  "soft-light",
-  "difference",
-  "exclusion",
-  "hue",
-  "saturation",
-  "luminosity",
-];
+const blendModes = ["source-over", "source-atop", "lighten", "xor", "multiply"];
 for (let index = 0; index < limit; index++) {
   simulation.draw(true);
   simulation.update();

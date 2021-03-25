@@ -310,29 +310,11 @@ var writeFile = function (canvas) {
 var cliProgress = require("cli-progress");
 // create a new progress bar instance and use shades_classic theme
 var bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-var limit = 5000;
+var limit = 10000;
 // start the progress bar with a total value of 200 and start value of 0
 bar1.start(limit, 0);
 var sample = function (array) { return array[Math.floor(Math.random() * array.length)]; };
-var blendModes = [
-    "source-over",
-    "source-atop",
-    "lighten",
-    "xor",
-    "multiply",
-    "screen",
-    "overlay",
-    "darken",
-    "color-dodge",
-    "color-burn",
-    "hard-light",
-    "soft-light",
-    "difference",
-    "exclusion",
-    "hue",
-    "saturation",
-    "luminosity",
-];
+var blendModes = ["source-over", "source-atop", "lighten", "xor", "multiply"];
 for (var index = 0; index < limit; index++) {
     simulation.draw(true);
     simulation.update();

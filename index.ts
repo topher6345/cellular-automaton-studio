@@ -30,49 +30,6 @@ const INIT_CONTROL_VALUES: ControlValues = {
   seedDensity: 1,
 };
 
-class HashStorage {
-  constructor() {
-    try {
-      if (this.isEmpty(this.decode(window.location.hash))) {
-        window.location.hash = this.encode(INIT_CONTROL_VALUES);
-      }
-    } catch (e) {
-      window.location.hash = this.encode(INIT_CONTROL_VALUES);
-    }
-  }
-
-  isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
-
-  isEmpty = (a: any) => a.length === 0;
-
-  state(): ControlValues {
-    return this.decode(window.location.hash);
-  }
-
-  encode(state: ControlValues) {
-    return btoa(JSON.stringify(state));
-  }
-  decode(hash: any): any {
-    return JSON.parse(atob(hash.substring(1)));
-  }
-
-  update(data: any) {
-    const _state = this.state();
-    const updated = { ..._state, ...data };
-    if (this.isEqual(updated, _state)) {
-      return false;
-    } else {
-      window.location.hash = this.encode(updated);
-      console.log(_state);
-      return updated;
-    }
-  }
-
-  setMasterGain(e: string) {
-    this.update({ masterGain: e });
-  }
-}
-
 class CellularAutomatonEngine {
   size: number;
   data: Uint8Array;
@@ -300,6 +257,12 @@ class CellularAutomatonEngine {
           break;
       }
 
+      // A23
+      ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+        // B3
+        liveNeighbors === 3) &&
+        (status = 1);
+
       this.buffer[i] = status;
     }
     [this.data, this.buffer] = [this.buffer, this.data];
@@ -465,14 +428,11 @@ class CellularAutomatonEngine {
 
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 
-const hashStorage = new HashStorage();
-console.log(hashStorage.state());
-
 const canvas = sel("canvas") as HTMLCanvasElement;
 const simulation = new CellularAutomatonEngine(
   750,
   canvas,
-  hashStorage.state()
+  INIT_CONTROL_VALUES
 );
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
@@ -485,13 +445,13 @@ let msPerFrame: number = 7;
 let masterOnOff: boolean = true;
 
 function tick(now: number) {
-  if (!msPast) msPast = now;
+  // if (!msPast) msPast = now;
 
-  if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
-    msPast = now;
-    simulation.draw(simulation.blurEnabled);
-    simulation.update();
-  }
+  // if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+  //   msPast = now;
+  simulation.draw(simulation.blurEnabled);
+  simulation.update();
+  // }
   window.requestAnimationFrame(tick);
 }
 
@@ -532,14 +492,6 @@ interface EventTarget {
 sel("#delay").addEventListener(
   "input",
   (e) => (simulation.alpha = rangeOver(e.target.value, 1.0, 0)),
-  false
-);
-
-sel("#delay").addEventListener(
-  "change",
-  () => {
-    hashStorage.update({ alpha: simulation.alpha });
-  },
   false
 );
 
@@ -835,7 +787,7 @@ sel("#recStart").addEventListener("change", () => {
 
   // only when the recorder stops, we construct a complete Blob from all the chunks
   rec.onstop = () => {
-    const vid = document.createElement("video");
+    const vid: HTMLVideoElement = document.createElement("video");
     vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
     const vidName = `CellularAnimationStudio-${Date.now()}`;
     vid.download = `${vidName}.webm`;
@@ -950,7 +902,6 @@ const gameLink = (game: string): string => {
 
 sel("#gameType").addEventListener("change", (e) => {
   simulation.game = e.target.value;
-  hashStorage.update({ game: e.target.value });
   log("Game changed to ", gameLink(simulation.game), simulation.game);
 });
 
@@ -987,15 +938,3 @@ const route = (state: ControlValues) => {
   // TODO: exponential to linear
   // sel("#seedDensity").value = state.seedDensity;
 };
-
-route(hashStorage.state());
-window.addEventListener("hashchange", () => route(hashStorage.state()), false);
-document.addEventListener("visibilitychange", (event) => {
-  if (document.visibilityState == "visible") {
-    if ((sel("#masterOn") as HTMLInputElement).checked) {
-      masterOnOff = true;
-    }
-  } else {
-    masterOnOff = false;
-  }
-});

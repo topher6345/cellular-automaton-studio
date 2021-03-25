@@ -1,11 +1,3 @@
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 var INIT_CONTROL_VALUES = {
     alpha: 0.006,
     color: "orange",
@@ -21,45 +13,6 @@ var INIT_CONTROL_VALUES = {
     game: "life",
     seedDensity: 1
 };
-var HashStorage = /** @class */ (function () {
-    function HashStorage() {
-        this.isEqual = function (a, b) { return JSON.stringify(a) === JSON.stringify(b); };
-        this.isEmpty = function (a) { return a.length === 0; };
-        try {
-            if (this.isEmpty(this.decode(window.location.hash))) {
-                window.location.hash = this.encode(INIT_CONTROL_VALUES);
-            }
-        }
-        catch (e) {
-            window.location.hash = this.encode(INIT_CONTROL_VALUES);
-        }
-    }
-    HashStorage.prototype.state = function () {
-        return this.decode(window.location.hash);
-    };
-    HashStorage.prototype.encode = function (state) {
-        return btoa(JSON.stringify(state));
-    };
-    HashStorage.prototype.decode = function (hash) {
-        return JSON.parse(atob(hash.substring(1)));
-    };
-    HashStorage.prototype.update = function (data) {
-        var _state = this.state();
-        var updated = __assign({}, _state, data);
-        if (this.isEqual(updated, _state)) {
-            return false;
-        }
-        else {
-            window.location.hash = this.encode(updated);
-            console.log(_state);
-            return updated;
-        }
-    };
-    HashStorage.prototype.setMasterGain = function (e) {
-        this.update({ masterGain: e });
-    };
-    return HashStorage;
-}());
 var CellularAutomatonEngine = /** @class */ (function () {
     function CellularAutomatonEngine(size, canvas, controlValues) {
         this.size = size;
@@ -222,6 +175,11 @@ var CellularAutomatonEngine = /** @class */ (function () {
                         liveNeighbors === 3) && (status_1 = 1);
                     break;
             }
+            // A23
+            ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                // B3
+                liveNeighbors === 3) &&
+                (status_1 = 1);
             this.buffer[i] = status_1;
         }
         _a = [this.buffer, this.data], this.data = _a[0], this.buffer = _a[1];
@@ -356,10 +314,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
     return CellularAutomatonEngine;
 }());
 var sel = function (selector) { return document.querySelector(selector); };
-var hashStorage = new HashStorage();
-console.log(hashStorage.state());
 var canvas = sel("canvas");
-var simulation = new CellularAutomatonEngine(750, canvas, hashStorage.state());
+var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
@@ -368,13 +324,12 @@ var msPast = null;
 var msPerFrame = 7;
 var masterOnOff = true;
 function tick(now) {
-    if (!msPast)
-        msPast = now;
-    if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
-        msPast = now;
-        simulation.draw(simulation.blurEnabled);
-        simulation.update();
-    }
+    // if (!msPast) msPast = now;
+    // if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+    //   msPast = now;
+    simulation.draw(simulation.blurEnabled);
+    simulation.update();
+    // }
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
@@ -403,9 +358,6 @@ var expon = function (x) {
     return -Math.sqrt(-value + 1) + 1;
 };
 sel("#delay").addEventListener("input", function (e) { return (simulation.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
-sel("#delay").addEventListener("change", function () {
-    hashStorage.update({ alpha: simulation.alpha });
-}, false);
 var blendModeLink = {
     "source-over": "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcover",
     "source-atop": "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcatop",
@@ -693,7 +645,6 @@ var gameLink = function (game) {
 };
 sel("#gameType").addEventListener("change", function (e) {
     simulation.game = e.target.value;
-    hashStorage.update({ game: e.target.value });
     log("Game changed to ", gameLink(simulation.game), simulation.game);
 });
 sel("#prompt").scrollTop = 0;
@@ -720,15 +671,3 @@ var route = function (state) {
     // TODO: exponential to linear
     // sel("#seedDensity").value = state.seedDensity;
 };
-route(hashStorage.state());
-window.addEventListener("hashchange", function () { return route(hashStorage.state()); }, false);
-document.addEventListener("visibilitychange", function (event) {
-    if (document.visibilityState == "visible") {
-        if (sel("#masterOn").checked) {
-            masterOnOff = true;
-        }
-    }
-    else {
-        masterOnOff = false;
-    }
-});

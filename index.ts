@@ -805,7 +805,7 @@ sel("#recStart").addEventListener("change", () => {
     recorders && recorders.stop();
     recorders && log("Recording Stopped after 30 seconds");
     (sel("#recStop") as HTMLInputElement).checked = true;
-  }, 1000 * 30);
+  }, 1000 * 90);
 });
 
 sel("#recStop").addEventListener("change", () => {

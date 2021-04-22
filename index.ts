@@ -803,7 +803,7 @@ sel("#recStart").addEventListener("change", () => {
   log(`Recording started at ${new Date()}..`);
   setTimeout(() => {
     recorders && recorders.stop();
-    recorders && log("Recording Stopped after 30 seconds");
+    recorders && log("Recording Stopped after 90 seconds");
     (sel("#recStop") as HTMLInputElement).checked = true;
   }, 1000 * 90);
 });

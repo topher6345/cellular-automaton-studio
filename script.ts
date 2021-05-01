@@ -416,6 +416,9 @@ const simulation = new CellularAutomatonEngine(
   INIT_CONTROL_VALUES
 );
 
+simulation.blurEnabled = false;
+simulation.clearEveryFrame = false;
+
 const writeFile = (canvas) => {
   console.log(" writing File...");
 
@@ -428,33 +431,28 @@ const writeFile = (canvas) => {
 import * as cliProgress from "cli-progress";
 
 // create a new progress bar instance and use shades_classic theme
-const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+const progress = new cliProgress.SingleBar(
+  {},
+  cliProgress.Presets.shades_classic
+);
 
-const limit = 10000;
+const limit = 30000;
 
 // start the progress bar with a total value of 200 and start value of 0
-bar1.start(limit, 0);
+progress.start(limit, 0);
 
-const sample = (array) => array[Math.floor(Math.random() * array.length)];
-
-const blendModes = ["source-over", "source-atop", "lighten", "xor", "multiply"];
 for (let index = 0; index < limit; index++) {
   simulation.draw(true);
   simulation.update();
-  bar1.update(index);
+  progress.update(index);
 
-  if (index % 100 === 0) {
-    simulation.ctx.globalCompositeOperation = sample(blendModes);
+  if (index % 5000 === 0) {
+    simulation.seedDensity = 55;
+    simulation.seed();
   }
-
-  if (index % 500 === 0) {
+  if (index % 1000 === 0) {
     writeFile(canvas);
   }
 }
-
-// update the current value in your application..
-
 writeFile(canvas);
-
-// stop the progress bar
-bar1.stop();
+progress.stop();

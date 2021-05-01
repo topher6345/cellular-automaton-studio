@@ -573,9 +573,9 @@ sel("#recStart").addEventListener("change", function () {
     log("Recording started at " + new Date() + "..");
     setTimeout(function () {
         recorders && recorders.stop();
-        recorders && log("Recording Stopped after 30 seconds");
+        recorders && log("Recording Stopped after 90 seconds");
         sel("#recStop").checked = true;
-    }, 1000 * 30);
+    }, 1000 * 90);
 });
 sel("#recStop").addEventListener("change", function () {
     recorders.stop();

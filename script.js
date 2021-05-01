@@ -303,30 +303,29 @@ var CellularAutomatonEngine = /** @class */ (function () {
 }());
 var canvas = canvas_1.createCanvas(750, 750);
 var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
+simulation.blurEnabled = false;
+simulation.clearEveryFrame = false;
 var writeFile = function (canvas) {
     console.log(" writing File...");
     fs.writeFileSync("CellularAnimationStudio-" + Date.now() + ".png", canvas.toBuffer("image/png"));
 };
 var cliProgress = require("cli-progress");
 // create a new progress bar instance and use shades_classic theme
-var bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-var limit = 10000;
+var progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+var limit = 30000;
 // start the progress bar with a total value of 200 and start value of 0
-bar1.start(limit, 0);
-var sample = function (array) { return array[Math.floor(Math.random() * array.length)]; };
-var blendModes = ["source-over", "source-atop", "lighten", "xor", "multiply"];
+progress.start(limit, 0);
 for (var index = 0; index < limit; index++) {
     simulation.draw(true);
     simulation.update();
-    bar1.update(index);
-    if (index % 100 === 0) {
-        simulation.ctx.globalCompositeOperation = sample(blendModes);
+    progress.update(index);
+    if (index % 5000 === 0) {
+        simulation.seedDensity = 55;
+        simulation.seed();
     }
-    if (index % 500 === 0) {
+    if (index % 1000 === 0) {
         writeFile(canvas);
     }
 }
-// update the current value in your application..
 writeFile(canvas);
-// stop the progress bar
-bar1.stop();
+progress.stop();

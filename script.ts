@@ -24,7 +24,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
   hoverShape: "gliderse",
   colorMode: "full",
   colorRadix: 16777215,
-  blurEnabled: true,
+  blurEnabled: false,
   clearEveryFrame: false,
   colorRateFrames: 120,
   noiseEnabled: false,
@@ -362,7 +362,7 @@ class CellularAutomatonEngine {
 
   draw(isAnimating = true): void {
     if (isAnimating) {
-      this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
+      this.ctx.fillStyle = `rgba(1,1,1,0)`;
       this.ctx.fillRect(
         0,
         0,
@@ -408,19 +408,17 @@ class CellularAutomatonEngine {
   }
 }
 
-const canvas = createCanvas(750, 750);
+const SIMULATION_SIZE = 1000;
+const canvas = createCanvas(SIMULATION_SIZE, SIMULATION_SIZE);
 
 const simulation = new CellularAutomatonEngine(
-  750,
+  SIMULATION_SIZE,
   canvas,
   INIT_CONTROL_VALUES
 );
 
-simulation.blurEnabled = false;
-simulation.clearEveryFrame = false;
-
 const writeFile = (canvas) => {
-  console.log(" writing File...");
+  // console.log(" writing File...");
 
   fs.writeFileSync(
     `CellularAnimationStudio-${Date.now()}.png`,
@@ -436,21 +434,21 @@ const progress = new cliProgress.SingleBar(
   cliProgress.Presets.shades_classic
 );
 
-const limit = 30000;
+const TOTAL_FRAMES = 90000;
 
 // start the progress bar with a total value of 200 and start value of 0
-progress.start(limit, 0);
+progress.start(TOTAL_FRAMES, 0);
 
-for (let index = 0; index < limit; index++) {
+for (let index = 0; index < TOTAL_FRAMES; index++) {
   simulation.draw(true);
   simulation.update();
   progress.update(index);
 
-  if (index % 5000 === 0) {
-    simulation.seedDensity = 55;
+  if (index % 3000 === 0) {
+    simulation.seedDensity = 45;
     simulation.seed();
   }
-  if (index % 1000 === 0) {
+  if (index % 5000 === 0) {
     writeFile(canvas);
   }
 }

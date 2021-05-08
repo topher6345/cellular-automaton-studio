@@ -256,13 +256,6 @@ class CellularAutomatonEngine {
         ) && (status = 1);
           break;
       }
-
-      // A23
-      ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-        // B3
-        liveNeighbors === 3) &&
-        (status = 1);
-
       this.buffer[i] = status;
     }
     [this.data, this.buffer] = [this.buffer, this.data];

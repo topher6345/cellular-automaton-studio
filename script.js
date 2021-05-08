@@ -9,7 +9,7 @@ var INIT_CONTROL_VALUES = {
     hoverShape: "gliderse",
     colorMode: "full",
     colorRadix: 16777215,
-    blurEnabled: true,
+    blurEnabled: false,
     clearEveryFrame: false,
     colorRateFrames: 120,
     noiseEnabled: false,
@@ -274,7 +274,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
     CellularAutomatonEngine.prototype.draw = function (isAnimating) {
         if (isAnimating === void 0) { isAnimating = true; }
         if (isAnimating) {
-            this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
+            this.ctx.fillStyle = "rgba(1,1,1,0)";
             this.ctx.fillRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
         }
         if (this.clearEveryFrame)
@@ -301,29 +301,28 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     return CellularAutomatonEngine;
 }());
-var canvas = canvas_1.createCanvas(750, 750);
-var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
-simulation.blurEnabled = false;
-simulation.clearEveryFrame = false;
+var SIMULATION_SIZE = 1000;
+var canvas = canvas_1.createCanvas(SIMULATION_SIZE, SIMULATION_SIZE);
+var simulation = new CellularAutomatonEngine(SIMULATION_SIZE, canvas, INIT_CONTROL_VALUES);
 var writeFile = function (canvas) {
-    console.log(" writing File...");
+    // console.log(" writing File...");
     fs.writeFileSync("CellularAnimationStudio-" + Date.now() + ".png", canvas.toBuffer("image/png"));
 };
 var cliProgress = require("cli-progress");
 // create a new progress bar instance and use shades_classic theme
 var progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-var limit = 30000;
+var TOTAL_FRAMES = 90000;
 // start the progress bar with a total value of 200 and start value of 0
-progress.start(limit, 0);
-for (var index = 0; index < limit; index++) {
+progress.start(TOTAL_FRAMES, 0);
+for (var index = 0; index < TOTAL_FRAMES; index++) {
     simulation.draw(true);
     simulation.update();
     progress.update(index);
-    if (index % 5000 === 0) {
-        simulation.seedDensity = 55;
+    if (index % 3000 === 0) {
+        simulation.seedDensity = 45;
         simulation.seed();
     }
-    if (index % 1000 === 0) {
+    if (index % 5000 === 0) {
         writeFile(canvas);
     }
 }

@@ -175,11 +175,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
                         liveNeighbors === 3) && (status_1 = 1);
                     break;
             }
-            // A23
-            ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-                // B3
-                liveNeighbors === 3) &&
-                (status_1 = 1);
             this.buffer[i] = status_1;
         }
         _a = [this.buffer, this.data], this.data = _a[0], this.buffer = _a[1];

@@ -9,6 +9,8 @@ type ControlValues = {
   clearEveryFrame: boolean;
   colorRateFrames: number;
   noiseEnabled: boolean;
+  rotations: number;
+  rotationsEnabled: boolean;
   noiseRangeValue: number;
   game: string;
   seedDensity: number;
@@ -24,6 +26,8 @@ const INIT_CONTROL_VALUES: ControlValues = {
   blurEnabled: true,
   clearEveryFrame: false,
   colorRateFrames: 120,
+  rotations: 3,
+  rotationsEnabled: false,
   noiseEnabled: false,
   noiseRangeValue: 0,
   game: "life",
@@ -45,6 +49,8 @@ class CellularAutomatonEngine {
   buffer: Uint8Array;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
+  rotations: number;
+  rotationsEnabled: boolean;
   colorRateFrames: number;
   colorCache: string;
   colorRateCounter: number;
@@ -77,7 +83,8 @@ class CellularAutomatonEngine {
       this.size * this.pixelSize,
       this.size * this.pixelSize
     );
-
+    this.rotations = 6;
+    this.rotationsEnabled = false;
     this.alpha = controlValues.alpha;
     this.blurEnabled = controlValues.blurEnabled;
     this.clearEveryFrame = controlValues.clearEveryFrame;
@@ -396,6 +403,9 @@ class CellularAutomatonEngine {
       this.ctx.fillStyle = this.color;
     }
 
+    const da = (2 * Math.PI) / this.rotations;
+    const translate = this.size / 2;
+
     for (let row = 0; row < this.size; row++) {
       if (this.colorMode === "row") {
         this.ctx.fillStyle = this.randColor();
@@ -407,12 +417,27 @@ class CellularAutomatonEngine {
             this.ctx.fillStyle = this.randColor();
           }
 
-          this.ctx.fillRect(
-            col * this.pixelSize,
-            row * this.pixelSize,
-            this.pixelSize,
-            this.pixelSize
-          );
+          if (this.rotationsEnabled) {
+            for (let v = 0; v < this.rotations; v++) {
+              this.ctx.translate(translate, translate);
+              this.ctx.rotate(da);
+              this.ctx.fillRect(
+                col * this.pixelSize,
+                row * this.pixelSize,
+                this.pixelSize,
+                this.pixelSize
+              );
+              this.ctx.translate(-translate, -translate);
+              this.ctx.rotate(0);
+            }
+          } else {
+            this.ctx.fillRect(
+              col * this.pixelSize,
+              row * this.pixelSize,
+              this.pixelSize,
+              this.pixelSize
+            );
+          }
         }
       }
     }

@@ -45,21 +45,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.noiseRangeValue = controlValues.noiseRangeValue;
         this.game = controlValues.game;
         this.seedDensity = controlValues.seedDensity;
-        this.colors = [
-            "bfa09f",
-            "5e7468",
-            "181f1e",
-            "c49e5a",
-            "9e7c7a",
-            "a9908f",
-            "2f3d37",
-            "5a5b5e",
-            "786e4c",
-            "b09f7e",
-            "23302f",
-            "424232",
-        ];
-        this.colorLength = this.colors.length;
     }
     CellularAutomatonEngine.prototype.seed = function () {
         var data = CellularAutomatonEngine.randBoard(this.size, this.seedDensity);
@@ -284,7 +269,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         return this.colorCache;
     };
     CellularAutomatonEngine.prototype.randColorString = function () {
-        return "#" + this.colors[Math.floor(Math.random() * this.colorLength)];
+        return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
     CellularAutomatonEngine.prototype.draw = function (isAnimating) {
         if (isAnimating === void 0) { isAnimating = true; }
@@ -321,12 +306,12 @@ var canvas = canvas_1.createCanvas(SIMULATION_SIZE, SIMULATION_SIZE);
 var simulation = new CellularAutomatonEngine(SIMULATION_SIZE, canvas, INIT_CONTROL_VALUES);
 var writeFile = function (canvas) {
     // console.log(" writing File...");
-    fs.writeFileSync("CellularAnimationStudio-" + Date.now() + ".png", canvas.toBuffer("image/png"));
+    fs.writeFileSync("tmp/CellularAnimationStudio-" + Date.now() + ".png", canvas.toBuffer("image/png"));
 };
 var cliProgress = require("cli-progress");
 // create a new progress bar instance and use shades_classic theme
 var progress = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-var TOTAL_FRAMES = 90000;
+var TOTAL_FRAMES = 4800;
 // start the progress bar with a total value of 200 and start value of 0
 progress.start(TOTAL_FRAMES, 0);
 var random = function (min, max) {
@@ -342,7 +327,7 @@ for (var index = 0; index < TOTAL_FRAMES; index++) {
         simulation.kill();
         simulation.set(random(0, 1000), random(0, 1000), 1);
     }
-    if (index % 300 === 0) {
+    if (index > 1200 && index % 4 === 0) {
         writeFile(canvas);
     }
 }

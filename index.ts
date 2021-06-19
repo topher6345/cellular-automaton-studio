@@ -12,6 +12,7 @@ type ControlValues = {
   noiseRangeValue: number;
   game: string;
   seedDensity: number;
+  amp: number;
 };
 
 const INIT_CONTROL_VALUES: ControlValues = {
@@ -28,6 +29,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
   noiseRangeValue: 0,
   game: "life",
   seedDensity: 1,
+  amp: 1
 };
 
 class CellularAutomatonEngine {
@@ -54,6 +56,7 @@ class CellularAutomatonEngine {
   bufferLength: number;
   game: string;
   seedDensity: number;
+  amp: number;
 
   constructor(
     size: number,
@@ -93,6 +96,7 @@ class CellularAutomatonEngine {
     this.noiseRangeValue = controlValues.noiseRangeValue;
     this.game = controlValues.game;
     this.seedDensity = controlValues.seedDensity;
+    this.amp = controlValues.amp;
   }
 
   seed(): void {
@@ -159,14 +163,15 @@ class CellularAutomatonEngine {
 
       // Optimization - array-based algorithm led to GC Pressure and low frame rate
       let liveNeighbors = 0;
-      this.get(row - 1, col - 1) && liveNeighbors++;
-      this.get(row, col - 1) && liveNeighbors++;
-      this.get(row + 1, col - 1) && liveNeighbors++;
-      this.get(row - 1, col) && liveNeighbors++;
-      this.get(row + 1, col) && liveNeighbors++;
-      this.get(row - 1, col + 1) && liveNeighbors++;
-      this.get(row, col + 1) && liveNeighbors++;
-      this.get(row + 1, col + 1) && liveNeighbors++;
+      const amp = this.amp;
+      this.get(amp * row - 1, amp * (col - 1)) && liveNeighbors++;
+      this.get(amp * row, amp * (col - 1)) && liveNeighbors++;
+      this.get(amp * row + 1, amp * (col - 1)) && liveNeighbors++;
+      this.get(amp * row - 1, amp * (col)) && liveNeighbors++;
+      this.get(amp * row + 1, amp * (col)) && liveNeighbors++;
+      this.get(amp * row - 1, amp * (col + 1)) && liveNeighbors++;
+      this.get(amp * row, amp * (col + 1)) && liveNeighbors++;
+      this.get(amp * row + 1, amp * (col + 1)) && liveNeighbors++;
 
       let status = 0;
       const alive = this.get(row, col);
@@ -239,6 +244,27 @@ class CellularAutomatonEngine {
             (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
             // B1357
             (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)
+          ) && (status = 1);
+          break;
+         case "gems":
+          ( // S4568
+            (alive && (liveNeighbors === 4 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 8)) ||
+            // B3457
+            (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 5 || liveNeighbors === 7)
+          ) && (status = 1);
+          break;
+        case "fredkin":
+          ( // S1357
+            (alive && (liveNeighbors === 0 || liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 8)) ||
+            // B1357
+            (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)
+          ) && (status = 1);
+          break;
+         case "dotlife":
+          ( // 023
+            (alive && (liveNeighbors === 0 || liveNeighbors === 2) ||
+            // B3
+            (liveNeighbors === 3)
           ) && (status = 1);
           break;
         case "highlife":
@@ -438,13 +464,13 @@ let msPerFrame: number = 7;
 let masterOnOff: boolean = true;
 
 function tick(now: number) {
-  // if (!msPast) msPast = now;
+  if (!msPast) msPast = now;
 
-  // if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
-  //   msPast = now;
+  if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+    msPast = now;
   simulation.draw(simulation.blurEnabled);
   simulation.update();
-  // }
+  }
   window.requestAnimationFrame(tick);
 }
 
@@ -494,8 +520,7 @@ const blendModeLink: any = {
   "source-atop":
     "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcatop",
   lighten: "https://drafts.fxtf.org/compositing-1/#blendinglighten",
-  xor:
-    "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
+  xor: "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
   multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
   screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
   overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
@@ -842,6 +867,11 @@ sel("#randCycle").addEventListener("input", (e) => {
 sel("#noiseRangeValue").addEventListener(
   "input",
   (e) => (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12))
+);
+
+sel("#amp").addEventListener(
+  "input",
+  (e) => (simulation.amp = parseFloat(e.target.value))
 );
 
 sel("#noiseRangeValue").addEventListener("change", () => {

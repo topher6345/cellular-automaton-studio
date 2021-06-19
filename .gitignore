@@ -2,3 +2,6 @@ node_modules
 build
 *.png
 .DS_Store
+*.mp4
+*.aif
+*.webm

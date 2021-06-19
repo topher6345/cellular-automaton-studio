@@ -57,8 +57,6 @@ class CellularAutomatonEngine {
   bufferLength: number;
   game: string;
   seedDensity: number;
-  colors: string[];
-  colorLength: number;
 
   constructor(size: number, canvas: Canvas, controlValues: ControlValues) {
     this.size = size;
@@ -94,21 +92,6 @@ class CellularAutomatonEngine {
     this.noiseRangeValue = controlValues.noiseRangeValue;
     this.game = controlValues.game;
     this.seedDensity = controlValues.seedDensity;
-    this.colors = [
-      "bfa09f",
-      "5e7468",
-      "181f1e",
-      "c49e5a",
-      "9e7c7a",
-      "a9908f",
-      "2f3d37",
-      "5a5b5e",
-      "786e4c",
-      "b09f7e",
-      "23302f",
-      "424232",
-    ];
-    this.colorLength = this.colors.length;
   }
 
   seed(): void {
@@ -374,7 +357,7 @@ class CellularAutomatonEngine {
   }
 
   randColorString(): string {
-    return `#${this.colors[Math.floor(Math.random() * this.colorLength)]}`;
+    return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
   }
 
   draw(isAnimating = true): void {
@@ -438,7 +421,7 @@ const writeFile = (canvas) => {
   // console.log(" writing File...");
 
   fs.writeFileSync(
-    `CellularAnimationStudio-${Date.now()}.png`,
+    `tmp/CellularAnimationStudio-${Date.now()}.png`,
     canvas.toBuffer("image/png")
   );
 };
@@ -451,7 +434,7 @@ const progress = new cliProgress.SingleBar(
   cliProgress.Presets.shades_classic
 );
 
-const TOTAL_FRAMES = 90000;
+const TOTAL_FRAMES = 4800;
 
 // start the progress bar with a total value of 200 and start value of 0
 progress.start(TOTAL_FRAMES, 0);
@@ -470,7 +453,7 @@ for (let index = 0; index < TOTAL_FRAMES; index++) {
     simulation.kill();
     simulation.set(random(0, 1000), random(0, 1000), 1);
   }
-  if (index % 300 === 0) {
+  if (index > 1200 && index % 4 === 0) {
     writeFile(canvas);
   }
 }

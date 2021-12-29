@@ -264,7 +264,7 @@ class CellularAutomatonEngine {
           ( // 023
             (alive && (liveNeighbors === 0 || liveNeighbors === 2) ||
             // B3
-            (liveNeighbors === 3)
+            liveNeighbors === 3)
           ) && (status = 1);
           break;
         case "highlife":

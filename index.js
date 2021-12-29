@@ -455,10 +455,6 @@ sel(".input-hex").addEventListener("input", function (e) {
 sel("#colorMode").addEventListener("change", function (e) {
     switch (e.target.value) {
         case "picker":
-            sel("#colorRadix").style.display = "none";
-            sel('label[for="colorRadix"]').style.display = "none";
-            sel("#randCycle").style.display = "none";
-            sel('label[for="randCycle"]').style.display = "none";
             sel("#picker").style.display = "none";
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
@@ -467,10 +463,6 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel('label[for="colorDisplay"]').style.display = "none";
             break;
         case "hsluv":
-            sel("#colorRadix").style.display = "none";
-            sel('label[for="colorRadix"]').style.display = "none";
-            sel("#randCycle").style.display = "none";
-            sel('label[for="randCycle"]').style.display = "none";
             sel('label[for="color"]').style.display = "none";
             sel("#picker").style.display = "block";
             sel("#color").style.display = "none";
@@ -478,31 +470,13 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#colorDisplay").style.display = "none";
             sel('label[for="colorDisplay"]').style.display = "none";
             break;
-        case "full":
-            sel("#colorDisplay").style.display = "block";
-            sel('label[for="colorDisplay"]').style.display = "block";
-            sel("#picker").style.display = "none";
-            log("Color mode is now Random Frame - all pixels of each frame will be the same random color");
-            break;
-        case "row":
-            sel("#colorDisplay").style.display = "none";
-            sel('label[for="colorDisplay"]').style.display = "none";
-            log("Color mode is now Random Row - all pixels of each row will be the same random color");
-            break;
-        case "each":
-            log("Color mode is now Random Pixel- every pixel is a new random color");
-            sel("#colorDisplay").style.display = "none";
-            sel('label[for="colorDisplay"]').style.display = "none";
-            break;
         default:
-            sel("#colorRadix").style.display = "block";
-            sel('label[for="colorRadix"]').style.display = "block";
-            sel("#randCycle").style.display = "block";
-            sel('label[for="randCycle"]').style.display = "block";
-            sel("#color").style.display = "none";
             sel("#picker").style.display = "none";
-            sel('label[for="color"]').style.display = "none";
+            sel("#color").style.display = "block";
+            sel('label[for="color"]').style.display = "block";
+            log("Color mode is now the native color picker in your browser");
             sel("#colorDisplay").style.display = "none";
+            sel('label[for="colorDisplay"]').style.display = "none";
     }
 });
 var recorders = null;

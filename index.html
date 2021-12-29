@@ -150,37 +150,7 @@
             <select name="colorMode" id="colorMode">
               <option value="picker">Color Picker</option>
               <option value="hsluv">HSLUV</option>
-              <option value="full" selected>Random Frame</option>
-              <option value="row">Random Row</option>
-              <option value="each">Random Pixel</option>
             </select>
-            <label
-              title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
-              for="colorRadix"
-              >Color Range</label
-            >
-            <input
-              name="colorRadix"
-              id="colorRadix"
-              type="range"
-              min="1"
-              max="16777215"
-              value="16777215"
-            />
-            <label
-              title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
-              for="randCycle"
-              >Color Rate</label
-            >
-            <input
-              name="randCycle"
-              type="range"
-              min="0.0"
-              max="1.0"
-              step="0.0001"
-              id="randCycle"
-              value="0.01"
-            />
             <label
               style="display: none;"
               title="The color of the new pixels."

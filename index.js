@@ -8,7 +8,6 @@ var INIT_CONTROL_VALUES = {
 };
 var Palette = /** @class */ (function () {
     function Palette(color) {
-        if (color === void 0) { color = "rgba(0,1,0,1)"; }
         this.color = color;
     }
     return Palette;
@@ -286,7 +285,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
 }());
 var sel = function (selector) { return document.querySelector(selector); };
 var canvas = sel("canvas");
-var palette = new Palette();
+var palette = new Palette("#ffffff");
 var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
@@ -441,8 +440,8 @@ sel("#setClickShape").addEventListener("change", function (e) {
     log("Click Shape is now ", shapeLink(simulation.clickShape), simulation.clickShape);
 });
 sel("#color").addEventListener("input", function (e) {
+    debugger;
     palette.color = e.target.value;
-    sel("#colorDisplay").value = e.target.value;
     // redraw if paused so the user can see what colors
     masterOnOff || simulation.draw(false, palette.color);
 }, false);

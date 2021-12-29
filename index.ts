@@ -19,7 +19,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
 class Palette {
   color: string;
 
-  constructor(color = "rgba(0,1,0,1)") {
+  constructor(color) {
     this.color = color;
   }
 }
@@ -379,7 +379,7 @@ const sel = (selector: string): HTMLElement => document.querySelector(selector);
 
 const canvas = sel("canvas") as HTMLCanvasElement;
 
-const palette = new Palette();
+const palette = new Palette("#ffffff");
 const simulation = new CellularAutomatonEngine(
   750,
   canvas,
@@ -603,8 +603,9 @@ sel("#setClickShape").addEventListener("change", (e) => {
 sel("#color").addEventListener(
   "input",
   (e) => {
+    debugger;
     palette.color = e.target.value;
-    sel("#colorDisplay").value = e.target.value;
+
     // redraw if paused so the user can see what colors
     masterOnOff || simulation.draw(false, palette.color);
   },

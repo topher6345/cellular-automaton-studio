@@ -49,7 +49,11 @@
             >
             <input type="radio" id="masterOff" name="master" value="off" />
           </div>
-
+          <div>
+            <label title="Speed - left is faster, right is slower" for="rate">Speed</label>
+            <input type="range" name="rate" id="rate" min="1" max="1000" />
+            <div id='fps'></div>
+          </div>
           <div>
             <label
               for="gameType"
@@ -90,6 +94,7 @@
                 height="400"
                 width="400"
               ></svg>
+              
             </div>
             <table>
               <tr id="control-h">
@@ -234,12 +239,7 @@
               <option value="luminosity">luminosity</option>
             </select>
           </div>
-          <div>
-            <label title="Speed - left is faster, right is slower" for="rate"
-              >Speed</label
-            >
-            <input type="range" name="rate" id="rate" min="1" max="1000" />
-          </div>
+          
 
           <div>
             <label

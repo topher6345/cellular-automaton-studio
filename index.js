@@ -1,5 +1,5 @@
 var INIT_CONTROL_VALUES = {
-    alpha: 0.006,
+    alpha: 0.00095,
     clickShape: "gliderse",
     blurEnabled: true,
     clearEveryFrame: false,
@@ -292,12 +292,14 @@ var favicon = sel("#favicon");
 favicon.href = canvas.toDataURL();
 window.setInterval(function () { return (favicon.href = canvas.toDataURL()); }, 5000);
 var msPast = null;
-var msPerFrame = 7;
+var msPerFrame = 250;
 var masterOnOff = true;
+var fps = 0;
 function tick(now) {
     if (!msPast)
         msPast = now;
     if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+        fps = now - msPast;
         msPast = now;
         simulation.draw(simulation.blurEnabled, palette.color);
         simulation.update();
@@ -320,6 +322,7 @@ var log = function (message, link, linkText) {
     prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 setTimeout(function () { return log("Hover over controls for help"); }, 3000);
+setInterval(function () { return (sel("#fps").innerText = fps.toFixed(1) + "ms/f"); }, 1000);
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
@@ -330,7 +333,7 @@ var expon = function (x) {
     return -Math.sqrt(-value + 1) + 1;
 };
 sel("#delay").addEventListener("input", function (e) {
-    simulation.alpha = rangeOver(e.target.value, 0.001, 0.00000001);
+    simulation.alpha = rangeOver(e.target.value, 0.004, 0.0000001);
     log("Delay is now ", simulation.alpha.toString(), "");
 }, false);
 var blendModeLink = {
@@ -445,13 +448,7 @@ sel("#color").addEventListener("input", function (e) {
     // redraw if paused so the user can see what colors
     masterOnOff || simulation.draw(false, palette.color);
 }, false);
-// HSLUV picker
-sel(".input-hex").addEventListener("input", function (e) {
-    palette.color = e.target.value;
-    // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, palette.color);
-}, false);
-sel("#colorMode").addEventListener("change", function (e) {
+var routeColorMode = function (e) {
     switch (e.target.value) {
         case "picker":
             sel("#picker").style.display = "none";
@@ -470,7 +467,9 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
     }
-});
+};
+sel("#colorMode").addEventListener("change", routeColorMode);
+routeColorMode({ target: { value: sel("#colorMode").value } });
 var recorders = null;
 sel("#recStart").addEventListener("change", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)

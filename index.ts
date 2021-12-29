@@ -8,7 +8,7 @@ type ControlValues = {
 };
 
 const INIT_CONTROL_VALUES: ControlValues = {
-  alpha: 0.006,
+  alpha: 0.00095,
   clickShape: "gliderse",
   blurEnabled: true,
   clearEveryFrame: false,
@@ -392,13 +392,14 @@ favicon.href = canvas.toDataURL();
 window.setInterval(() => (favicon.href = canvas.toDataURL()), 5000);
 
 let msPast: number = null;
-let msPerFrame: number = 7;
+let msPerFrame: number = 250;
 let masterOnOff: boolean = true;
-
+let fps = 0;
 function tick(now: number) {
   if (!msPast) msPast = now;
 
   if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+    fps = now - msPast;
     msPast = now;
 
     simulation.draw(simulation.blurEnabled, palette.color);
@@ -427,6 +428,8 @@ const log = (message: string, link?: string, linkText?: string) => {
 
 setTimeout(() => log("Hover over controls for help"), 3000);
 
+setInterval(() => (sel("#fps").innerText = `${fps.toFixed(1)}ms/f`), 1000);
+
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
 
@@ -444,7 +447,7 @@ interface EventTarget {
 sel("#delay").addEventListener(
   "input",
   (e) => {
-    simulation.alpha = rangeOver(e.target.value, 0.001, 0.00000001);
+    simulation.alpha = rangeOver(e.target.value, 0.004, 0.0000001);
     log("Delay is now ", simulation.alpha.toString(), "");
   },
   false
@@ -612,19 +615,7 @@ sel("#color").addEventListener(
   false
 );
 
-// HSLUV picker
-sel(".input-hex").addEventListener(
-  "input",
-  (e) => {
-    palette.color = e.target.value;
-
-    // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, palette.color);
-  },
-  false
-);
-
-sel("#colorMode").addEventListener("change", (e) => {
+const routeColorMode: any = (e) => {
   switch (e.target.value) {
     case "picker":
       sel("#picker").style.display = "none";
@@ -643,8 +634,9 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
   }
-});
-
+};
+sel("#colorMode").addEventListener("change", routeColorMode);
+routeColorMode({ target: { value: sel("#colorMode").value } });
 interface HTMLCanvasElement {
   captureStream(): MediaStream;
 }

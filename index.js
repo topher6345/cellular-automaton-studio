@@ -2,10 +2,8 @@ var INIT_CONTROL_VALUES = {
     alpha: 0.006,
     clickShape: "gliderse",
     hoverShape: "gliderse",
-    colorRadix: 16777215,
     blurEnabled: true,
     clearEveryFrame: false,
-    colorRateFrames: 120,
     noiseEnabled: false,
     noiseRangeValue: 0,
     game: "life",
@@ -37,8 +35,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.clearEveryFrame = controlValues.clearEveryFrame;
         this.clickShape = controlValues.clickShape;
         this.hoverShape = controlValues.hoverShape;
-        this.colorRadix = controlValues.colorRadix;
-        this.colorRateFrames = controlValues.colorRateFrames;
         this.colorRateCounter = 0;
         this.colorCache = this.randColorString();
         this.noiseEnabled = controlValues.noiseEnabled;
@@ -672,7 +668,6 @@ var route = function (state) {
     // sel("").value = state.color;
     sel("#setClickShape").value = state.clickShape;
     sel("#setHoverShape").value = state.hoverShape;
-    sel("#colorRadix").value = state.colorRadix.toString();
     sel("#clearFrame").checked = state.blurEnabled;
     sel("#clearFrame").checked = state.clearEveryFrame;
     // TODO: exponential to linear

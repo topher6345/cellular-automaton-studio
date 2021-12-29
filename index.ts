@@ -2,10 +2,8 @@ type ControlValues = {
   alpha: number;
   clickShape: string;
   hoverShape: string;
-  colorRadix: number;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
-  colorRateFrames: number;
   noiseEnabled: boolean;
   noiseRangeValue: number;
   game: string;
@@ -17,10 +15,8 @@ const INIT_CONTROL_VALUES: ControlValues = {
   alpha: 0.006,
   clickShape: "gliderse",
   hoverShape: "gliderse",
-  colorRadix: 16777215,
   blurEnabled: true,
   clearEveryFrame: false,
-  colorRateFrames: 120,
   noiseEnabled: false,
   noiseRangeValue: 0,
   game: "life",
@@ -88,8 +84,6 @@ class CellularAutomatonEngine {
     this.clearEveryFrame = controlValues.clearEveryFrame;
     this.clickShape = controlValues.clickShape;
     this.hoverShape = controlValues.hoverShape;
-    this.colorRadix = controlValues.colorRadix;
-    this.colorRateFrames = controlValues.colorRateFrames;
     this.colorRateCounter = 0;
     this.colorCache = this.randColorString();
     this.noiseEnabled = controlValues.noiseEnabled;
@@ -933,7 +927,6 @@ const route = (state: ControlValues) => {
 
   sel("#setClickShape").value = state.clickShape;
   sel("#setHoverShape").value = state.hoverShape;
-  sel("#colorRadix").value = state.colorRadix.toString();
   (sel("#clearFrame") as HTMLInputElement).checked = state.blurEnabled;
   (sel("#clearFrame") as HTMLInputElement).checked = state.clearEveryFrame;
 

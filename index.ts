@@ -1,9 +1,7 @@
 type ControlValues = {
   alpha: number;
-  color: string;
   clickShape: string;
   hoverShape: string;
-  colorMode: string;
   colorRadix: number;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
@@ -17,10 +15,8 @@ type ControlValues = {
 
 const INIT_CONTROL_VALUES: ControlValues = {
   alpha: 0.006,
-  color: "orange",
   clickShape: "gliderse",
   hoverShape: "gliderse",
-  colorMode: "full",
   colorRadix: 16777215,
   blurEnabled: true,
   clearEveryFrame: false,
@@ -32,17 +28,23 @@ const INIT_CONTROL_VALUES: ControlValues = {
   amp: 1,
 };
 
+class Palette {
+  color: string;
+
+  constructor(color = "rgba(0,0,0,1)") {
+    this.color = color;
+  }
+}
+
 class CellularAutomatonEngine {
   size: number;
   data: Uint8Array;
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   alpha: number;
-  color: string;
   pixelSize: number;
   clickShape: string;
   hoverShape: string;
-  colorMode: string;
   colorRadix: number;
   buffer: Uint8Array;
   blurEnabled: boolean;
@@ -84,10 +86,8 @@ class CellularAutomatonEngine {
     this.alpha = controlValues.alpha;
     this.blurEnabled = controlValues.blurEnabled;
     this.clearEveryFrame = controlValues.clearEveryFrame;
-    this.color = controlValues.color;
     this.clickShape = controlValues.clickShape;
     this.hoverShape = controlValues.hoverShape;
-    this.colorMode = controlValues.colorMode;
     this.colorRadix = controlValues.colorRadix;
     this.colorRateFrames = controlValues.colorRateFrames;
     this.colorRateCounter = 0;
@@ -435,6 +435,8 @@ class CellularAutomatonEngine {
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 
 const canvas = sel("canvas") as HTMLCanvasElement;
+
+const palette = new Palette();
 const simulation = new CellularAutomatonEngine(
   750,
   canvas,
@@ -456,7 +458,7 @@ function tick(now: number) {
   if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
     msPast = now;
 
-    simulation.draw(simulation.blurEnabled, simulation.color);
+    simulation.draw(simulation.blurEnabled, palette.color);
     simulation.update();
   }
   window.requestAnimationFrame(tick);
@@ -686,10 +688,10 @@ sel("#setHoverShape").addEventListener("change", (e) => {
 sel("#color").addEventListener(
   "input",
   (e) => {
-    simulation.color = e.target.value;
+    palette.color = e.target.value;
     sel("#colorDisplay").value = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, simulation.color);
+    masterOnOff || simulation.draw(false, palette.color);
   },
   false
 );
@@ -698,17 +700,15 @@ sel("#color").addEventListener(
 sel(".input-hex").addEventListener(
   "input",
   (e) => {
-    simulation.color = e.target.value;
+    palette.color = e.target.value;
 
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, simulation.color);
+    masterOnOff || simulation.draw(false, palette.color);
   },
   false
 );
 
 sel("#colorMode").addEventListener("change", (e) => {
-  simulation.colorMode = e.target.value;
-
   switch (e.target.value) {
     case "picker":
       sel("#colorRadix").style.display = "none";
@@ -768,12 +768,6 @@ sel("#colorMode").addEventListener("change", (e) => {
       sel("#colorDisplay").style.display = "none";
   }
 });
-
-setInterval(() => {
-  if (simulation.colorMode == "full") {
-    sel("#colorDisplay").value = simulation.ctx.fillStyle.toString();
-  }
-}, 250);
 
 sel("#colorRadix").addEventListener(
   "input",
@@ -939,7 +933,6 @@ const route = (state: ControlValues) => {
 
   sel("#setClickShape").value = state.clickShape;
   sel("#setHoverShape").value = state.hoverShape;
-  sel("#colorMode").value = state.colorMode;
   sel("#colorRadix").value = state.colorRadix.toString();
   (sel("#clearFrame") as HTMLInputElement).checked = state.blurEnabled;
   (sel("#clearFrame") as HTMLInputElement).checked = state.clearEveryFrame;

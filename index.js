@@ -1,9 +1,7 @@
 var INIT_CONTROL_VALUES = {
     alpha: 0.006,
-    color: "orange",
     clickShape: "gliderse",
     hoverShape: "gliderse",
-    colorMode: "full",
     colorRadix: 16777215,
     blurEnabled: true,
     clearEveryFrame: false,
@@ -14,6 +12,13 @@ var INIT_CONTROL_VALUES = {
     seedDensity: 1,
     amp: 1
 };
+var Palette = /** @class */ (function () {
+    function Palette(color) {
+        if (color === void 0) { color = "rgba(0,0,0,1)"; }
+        this.color = color;
+    }
+    return Palette;
+}());
 var CellularAutomatonEngine = /** @class */ (function () {
     function CellularAutomatonEngine(size, canvas, controlValues) {
         this.size = size;
@@ -30,10 +35,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.alpha = controlValues.alpha;
         this.blurEnabled = controlValues.blurEnabled;
         this.clearEveryFrame = controlValues.clearEveryFrame;
-        this.color = controlValues.color;
         this.clickShape = controlValues.clickShape;
         this.hoverShape = controlValues.hoverShape;
-        this.colorMode = controlValues.colorMode;
         this.colorRadix = controlValues.colorRadix;
         this.colorRateFrames = controlValues.colorRateFrames;
         this.colorRateCounter = 0;
@@ -320,6 +323,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
 }());
 var sel = function (selector) { return document.querySelector(selector); };
 var canvas = sel("canvas");
+var palette = new Palette();
 var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
@@ -333,7 +337,7 @@ function tick(now) {
         msPast = now;
     if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
         msPast = now;
-        simulation.draw(simulation.blurEnabled, simulation.color);
+        simulation.draw(simulation.blurEnabled, palette.color);
         simulation.update();
     }
     window.requestAnimationFrame(tick);
@@ -488,19 +492,18 @@ sel("#setHoverShape").addEventListener("change", function (e) {
     log("Hover Shape (" + (isHovering ? "ON" : "OFF") + ") is now " + simulation.hoverShape, shapeLink(simulation.hoverShape));
 });
 sel("#color").addEventListener("input", function (e) {
-    simulation.color = e.target.value;
+    palette.color = e.target.value;
     sel("#colorDisplay").value = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, simulation.color);
+    masterOnOff || simulation.draw(false, palette.color);
 }, false);
 // HSLUV picker
 sel(".input-hex").addEventListener("input", function (e) {
-    simulation.color = e.target.value;
+    palette.color = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, simulation.color);
+    masterOnOff || simulation.draw(false, palette.color);
 }, false);
 sel("#colorMode").addEventListener("change", function (e) {
-    simulation.colorMode = e.target.value;
     switch (e.target.value) {
         case "picker":
             sel("#colorRadix").style.display = "none";
@@ -553,11 +556,6 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#colorDisplay").style.display = "none";
     }
 });
-setInterval(function () {
-    if (simulation.colorMode == "full") {
-        sel("#colorDisplay").value = simulation.ctx.fillStyle.toString();
-    }
-}, 250);
 sel("#colorRadix").addEventListener("input", function (e) { return (simulation.colorRadix = parseInt(e.target.value)); });
 var recorders = null;
 sel("#recStart").addEventListener("change", function () {
@@ -674,7 +672,6 @@ var route = function (state) {
     // sel("").value = state.color;
     sel("#setClickShape").value = state.clickShape;
     sel("#setHoverShape").value = state.hoverShape;
-    sel("#colorMode").value = state.colorMode;
     sel("#colorRadix").value = state.colorRadix.toString();
     sel("#clearFrame").checked = state.blurEnabled;
     sel("#clearFrame").checked = state.clearEveryFrame;

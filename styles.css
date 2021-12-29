@@ -191,23 +191,23 @@ button {
   }
 }
 #masterOff:checked {
-  animation: blink 1s infinite;
+  animation: blink 0.5s infinite;
 }
 
 #masterOff:checked {
-  animation: blink 1s infinite;
+  animation: blink 0.5s infinite;
 }
 
 #recStart:checked {
-  animation: blink 1s infinite;
+  animation: blink 0.5s infinite;
 }
 
 #noiseOn:checked {
-  animation: blink 1s infinite;
+  animation: blink 0.5s infinite;
 }
 
 #hoverOn:checked {
-  animation: blink 1s infinite;
+  animation: blink 0.5s infinite;
 }
 
 #prompt {

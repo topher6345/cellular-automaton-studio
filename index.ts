@@ -397,7 +397,7 @@ class CellularAutomatonEngine {
     return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
   }
 
-  draw(isAnimating = true): void {
+  draw(isAnimating = true, fillStyle: string): void {
     if (isAnimating) {
       this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
       this.ctx.fillRect(
@@ -416,23 +416,10 @@ class CellularAutomatonEngine {
         this.size * this.pixelSize
       );
 
-    if (this.colorMode === "full") {
-      this.ctx.fillStyle = this.randColor();
-    } else if (this.colorMode === "picker" || this.colorMode === "hsluv") {
-      this.ctx.fillStyle = this.color;
-    }
-
+    this.ctx.fillStyle = fillStyle;
     for (let row = 0; row < this.size; row++) {
-      if (this.colorMode === "row") {
-        this.ctx.fillStyle = this.randColor();
-      }
-
       for (let col = 0; col < this.size; col++) {
         if (this.get(row, col) === 1) {
-          if (this.colorMode === "each") {
-            this.ctx.fillStyle = this.randColor();
-          }
-
           this.ctx.fillRect(
             col * this.pixelSize,
             row * this.pixelSize,
@@ -468,7 +455,8 @@ function tick(now: number) {
 
   if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
     msPast = now;
-    simulation.draw(simulation.blurEnabled);
+
+    simulation.draw(simulation.blurEnabled, simulation.color);
     simulation.update();
   }
   window.requestAnimationFrame(tick);
@@ -701,7 +689,7 @@ sel("#color").addEventListener(
     simulation.color = e.target.value;
     sel("#colorDisplay").value = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false);
+    masterOnOff || simulation.draw(false, simulation.color);
   },
   false
 );
@@ -713,7 +701,7 @@ sel(".input-hex").addEventListener(
     simulation.color = e.target.value;
 
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false);
+    masterOnOff || simulation.draw(false, simulation.color);
   },
   false
 );

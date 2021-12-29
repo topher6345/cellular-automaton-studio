@@ -336,43 +336,6 @@
               <option value="1x1">1x1</option>
             </select>
           </div>
-          <div>
-            <label
-              title="When checked, hovering the mouse over the canvas will draw a pixel"
-              for="hover"
-              >Hover On</label
-            >
-            <input title="Hover" name="hover" type="radio" id="hoverOn" />
-            <label
-              title="When checked, hovering the mouse over the canvas will draw a pixel"
-              for="hover"
-              >Hover Off</label
-            >
-            <input
-              title="Hover"
-              name="hover"
-              type="radio"
-              id="hoverOff"
-              checked
-            />
-            <label
-              title="Hover Shape: the shape of new live cells in the animation when you hover the mouse"
-              for="setHoverShape"
-              >Hover Shape</label
-            >
-            <select name="setHoverShape" id="setHoverShape">
-              <option value="gliderse">Glider SE</option>
-              <option value="glidersw">Glider SW</option>
-              <option value="gliderne">Glider NE</option>
-              <option value="glidernw">Glider NW</option>
-              <option value="r-pentomino">R-pentomino</option>
-              <option value="pi-heptomino">Pi-heptomino</option>
-              <option value="c-heptomino">C-heptomino</option>
-              <option value="3x3" selected>3x3</option>
-              <option value="1x1">1x1</option>
-            </select>
-          </div>
-
           <div id="record">
             <label
               title="Recording: This will start recording video, automatically stops after 30 seconds"
@@ -386,35 +349,6 @@
               >Stopped</label
             >
             <input type="radio" id="recStop" name="record-video" checked />
-          </div>
-          <div id="noise">
-            <label
-              title="Adds random live cells to the simulation"
-              for="noiseOn"
-              >Noise On</label
-            >
-            <input type="radio" id="noiseOn" name="noise" />
-
-            <label
-              title="Disables random live cells in the simulation"
-              for="noiseOff"
-              >Noise Off</label
-            >
-            <input type="radio" id="noiseOff" name="noise" checked />
-            <label
-              title="How likely live cells spontaneously appear"
-              for="noiseRangeValue"
-              >Amount</label
-            >
-            <input
-              name="noiseRangeValue"
-              type="range"
-              min="0.0"
-              max="1.0"
-              step="0.001"
-              id="noiseRangeValue"
-              value="0.0"
-            />
           </div>
         </div>
       </div>

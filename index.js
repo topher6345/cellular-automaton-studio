@@ -1,14 +1,10 @@
 var INIT_CONTROL_VALUES = {
     alpha: 0.006,
     clickShape: "gliderse",
-    hoverShape: "gliderse",
     blurEnabled: true,
     clearEveryFrame: false,
-    noiseEnabled: false,
-    noiseRangeValue: 0,
     game: "life",
-    seedDensity: 1,
-    amp: 1
+    seedDensity: 1
 };
 var Palette = /** @class */ (function () {
     function Palette(color) {
@@ -34,14 +30,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.blurEnabled = controlValues.blurEnabled;
         this.clearEveryFrame = controlValues.clearEveryFrame;
         this.clickShape = controlValues.clickShape;
-        this.hoverShape = controlValues.hoverShape;
-        this.colorRateCounter = 0;
-        this.colorCache = this.randColorString();
-        this.noiseEnabled = controlValues.noiseEnabled;
-        this.noiseRangeValue = controlValues.noiseRangeValue;
         this.game = controlValues.game;
         this.seedDensity = controlValues.seedDensity;
-        this.amp = controlValues.amp;
     }
     CellularAutomatonEngine.prototype.seed = function () {
         var data = CellularAutomatonEngine.randBoard(this.size, this.seedDensity);
@@ -81,18 +71,11 @@ var CellularAutomatonEngine = /** @class */ (function () {
     CellularAutomatonEngine.prototype.update = function () {
         var _a;
         for (var i = 0; i < this.buffer.length; i++) {
-            // Noise
-            var spontaneousBirth = this.noiseEnabled &&
-                CellularAutomatonEngine.rand(0, 1000, 0) > 985 + this.noiseRangeValue;
-            if (spontaneousBirth) {
-                this.buffer[i] = 1;
-                continue;
-            }
             var row = i % this.size;
             var col = Math.floor(i / this.size);
             // Optimization - array-based algorithm led to GC Pressure and low frame rate
             var liveNeighbors = 0;
-            var amp = this.amp;
+            var amp = 1;
             this.get(amp * row - 1, amp * (col - 1)) && liveNeighbors++;
             this.get(amp * row, amp * (col - 1)) && liveNeighbors++;
             this.get(amp * row + 1, amp * (col - 1)) && liveNeighbors++;
@@ -107,7 +90,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
             switch (this.game) {
                 case "famine":
                     ( // S6789
-                    (alive && (liveNeighbors > 5)) || spontaneousBirth) && (status_1 = 1);
+                    (alive && (liveNeighbors > 5))) && (status_1 = 1);
                     break;
                 case "anneal":
                     ( // S35678
@@ -143,8 +126,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
                     ( // S34
                     (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
-                        (liveNeighbors === 3 || liveNeighbors === 4) ||
-                        spontaneousBirth) && (status_1 = 1);
+                        (liveNeighbors === 3 || liveNeighbors === 4)) && (status_1 = 1);
                     break;
                 case "B25/S4":
                     ( // S4
@@ -206,10 +188,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
             y: Math.floor(((event.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
             x: Math.floor(((event.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
         };
-    };
-    CellularAutomatonEngine.prototype.hover = function (e) {
-        var _a = this.getMousePos(e), x = _a.x, y = _a.y;
-        this.drawShape(x, y, this.hoverShape);
     };
     CellularAutomatonEngine.prototype.drawShape = function (x, y, shape) {
         switch (shape) {
@@ -286,17 +264,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
     CellularAutomatonEngine.prototype.clickDown = function (e) {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         this.drawShape(x, y, this.clickShape);
-    };
-    CellularAutomatonEngine.prototype.randColor = function () {
-        if (this.colorRateCounter > this.colorRateFrames) {
-            this.colorCache = this.randColorString();
-            this.colorRateCounter = 0;
-        }
-        this.colorRateCounter = this.colorRateCounter + 1;
-        return this.colorCache;
-    };
-    CellularAutomatonEngine.prototype.randColorString = function () {
-        return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
     };
     CellularAutomatonEngine.prototype.draw = function (isAnimating, fillStyle) {
         if (isAnimating === void 0) { isAnimating = true; }
@@ -399,16 +366,6 @@ sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parse
 sel("#rate").addEventListener("change", function () {
     return log("Speed is now " + msPerFrame + " milliseconds per generation");
 });
-var isHovering = false;
-sel("#hoverOn").addEventListener("input", function () {
-    isHovering = true;
-    log("Hover ON - the mouse over the canvas will now draw a shape");
-});
-sel("#hoverOff").addEventListener("input", function () {
-    isHovering = false;
-    log("Hover OFF - the mouse over the canvas will not draw");
-});
-canvas.addEventListener("mousemove", function (e) { return isHovering && simulation.hover(e); }, false);
 canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
 sel("#masterOn").addEventListener("change", function () {
     masterOnOff = true;
@@ -483,10 +440,6 @@ sel("#setClickShape").addEventListener("change", function (e) {
     simulation.clickShape = e.target.value;
     log("Click Shape is now ", shapeLink(simulation.clickShape), simulation.clickShape);
 });
-sel("#setHoverShape").addEventListener("change", function (e) {
-    simulation.hoverShape = e.target.value;
-    log("Hover Shape (" + (isHovering ? "ON" : "OFF") + ") is now " + simulation.hoverShape, shapeLink(simulation.hoverShape));
-});
 sel("#color").addEventListener("input", function (e) {
     palette.color = e.target.value;
     sel("#colorDisplay").value = e.target.value;
@@ -552,7 +505,6 @@ sel("#colorMode").addEventListener("change", function (e) {
             sel("#colorDisplay").style.display = "none";
     }
 });
-sel("#colorRadix").addEventListener("input", function (e) { return (simulation.colorRadix = parseInt(e.target.value)); });
 var recorders = null;
 sel("#recStart").addEventListener("change", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
@@ -604,31 +556,6 @@ sel("#clearFrame").addEventListener("change", function () {
     sel("#delay").disabled = true;
     log("Clear Frame ON - draw only current generation, erase previous generations");
 });
-sel("#randCycle").addEventListener("input", function (e) {
-    simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
-    simulation.colorRateCounter = 0;
-});
-sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
-// sel("#amp").addEventListener(
-//   "input",
-//   (e) => (simulation.amp = parseFloat(e.target.value))
-// );
-sel("#noiseRangeValue").addEventListener("change", function () {
-    if (simulation.noiseEnabled) {
-        log("Noise (ON) Amount is now 1 in " + simulation.noiseRangeValue.toFixed(2) + " chance of being born");
-    }
-    else {
-        log("Noise (OFF) Amount is now 1 in " + simulation.noiseRangeValue.toFixed(2) + " chace of being born");
-    }
-});
-sel("#noiseOn").addEventListener("change", function () {
-    simulation.noiseEnabled = true;
-    log("Noise On - cells will be born randomly");
-});
-sel("#noiseOff").addEventListener("change", function () {
-    simulation.noiseEnabled = false;
-    log("Noise Off - cells will be born according to game rules only");
-});
 var gameLink = function (game) {
     switch (game) {
         case "life":
@@ -666,14 +593,10 @@ var route = function (state) {
     // sel("#delay").value = state.alpha.toString();
     // Don't set color in UI
     // sel("").value = state.color;
-    sel("#setClickShape").value = state.clickShape;
-    sel("#setHoverShape").value = state.hoverShape;
     sel("#clearFrame").checked = state.blurEnabled;
     sel("#clearFrame").checked = state.clearEveryFrame;
     // TODO: exponential to linear
     // sel("#randCycle").value = state.colorRateFrames;
-    sel("#noiseOn").checked = state.noiseEnabled;
-    sel("#noiseRangeValue").value = state.noiseRangeValue.toString();
     // TODO: exponential to linear
     // sel("#seedDensity").value = state.seedDensity;
 };

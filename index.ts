@@ -1,27 +1,19 @@
 type ControlValues = {
   alpha: number;
   clickShape: string;
-  hoverShape: string;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
-  noiseEnabled: boolean;
-  noiseRangeValue: number;
   game: string;
   seedDensity: number;
-  amp: number;
 };
 
 const INIT_CONTROL_VALUES: ControlValues = {
   alpha: 0.006,
   clickShape: "gliderse",
-  hoverShape: "gliderse",
   blurEnabled: true,
   clearEveryFrame: false,
-  noiseEnabled: false,
-  noiseRangeValue: 0,
   game: "life",
   seedDensity: 1,
-  amp: 1,
 };
 
 class Palette {
@@ -40,21 +32,13 @@ class CellularAutomatonEngine {
   alpha: number;
   pixelSize: number;
   clickShape: string;
-  hoverShape: string;
-  colorRadix: number;
   buffer: Uint8Array;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
-  colorRateFrames: number;
-  colorCache: string;
-  colorRateCounter: number;
-  noiseEnabled: boolean;
-  noiseRangeValue: number;
   pixelScalar: number;
   bufferLength: number;
   game: string;
   seedDensity: number;
-  amp: number;
 
   constructor(
     size: number,
@@ -83,14 +67,8 @@ class CellularAutomatonEngine {
     this.blurEnabled = controlValues.blurEnabled;
     this.clearEveryFrame = controlValues.clearEveryFrame;
     this.clickShape = controlValues.clickShape;
-    this.hoverShape = controlValues.hoverShape;
-    this.colorRateCounter = 0;
-    this.colorCache = this.randColorString();
-    this.noiseEnabled = controlValues.noiseEnabled;
-    this.noiseRangeValue = controlValues.noiseRangeValue;
     this.game = controlValues.game;
     this.seedDensity = controlValues.seedDensity;
-    this.amp = controlValues.amp;
   }
 
   seed(): void {
@@ -142,22 +120,12 @@ class CellularAutomatonEngine {
 
   update() {
     for (let i = 0; i < this.buffer.length; i++) {
-      // Noise
-      const spontaneousBirth =
-        this.noiseEnabled &&
-        CellularAutomatonEngine.rand(0, 1000, 0) > 985 + this.noiseRangeValue;
-
-      if (spontaneousBirth) {
-        this.buffer[i] = 1;
-        continue;
-      }
-
       const row = i % this.size;
       const col = Math.floor(i / this.size);
 
       // Optimization - array-based algorithm led to GC Pressure and low frame rate
       let liveNeighbors = 0;
-      const amp = this.amp;
+      const amp = 1;
       this.get(amp * row - 1, amp * (col - 1)) && liveNeighbors++;
       this.get(amp * row, amp * (col - 1)) && liveNeighbors++;
       this.get(amp * row + 1, amp * (col - 1)) && liveNeighbors++;
@@ -173,7 +141,7 @@ class CellularAutomatonEngine {
       switch (this.game) {
         case "famine":
           ( // S6789
-            (alive && (liveNeighbors > 5)) || spontaneousBirth
+            (alive && (liveNeighbors > 5))
           ) && (status = 1);
           break;
         case "anneal":
@@ -215,8 +183,7 @@ class CellularAutomatonEngine {
           ( // S34
             (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
             // B34
-            (liveNeighbors === 3 || liveNeighbors === 4) ||
-            spontaneousBirth
+            (liveNeighbors === 3 || liveNeighbors === 4)
           ) && (status = 1);
           break;
         case "B25/S4":
@@ -292,11 +259,6 @@ class CellularAutomatonEngine {
         ((event.clientY - rect.top) / this.pixelSize) * this.pixelScalar
       ),
     };
-  }
-
-  hover(e: MouseEvent) {
-    const { x, y } = this.getMousePos(e);
-    this.drawShape(x, y, this.hoverShape);
   }
 
   drawShape(x: number, y: number, shape: string) {
@@ -376,19 +338,6 @@ class CellularAutomatonEngine {
   clickDown(e: MouseEvent) {
     const { x, y } = this.getMousePos(e);
     this.drawShape(x, y, this.clickShape);
-  }
-
-  randColor(): string {
-    if (this.colorRateCounter > this.colorRateFrames) {
-      this.colorCache = this.randColorString();
-      this.colorRateCounter = 0;
-    }
-    this.colorRateCounter = this.colorRateCounter + 1;
-    return this.colorCache;
-  }
-
-  randColorString(): string {
-    return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
   }
 
   draw(isAnimating = true, fillStyle: string): void {
@@ -543,23 +492,6 @@ sel("#rate").addEventListener("change", () =>
   log(`Speed is now ${msPerFrame} milliseconds per generation`)
 );
 
-let isHovering = false;
-sel("#hoverOn").addEventListener("input", () => {
-  isHovering = true;
-  log("Hover ON - the mouse over the canvas will now draw a shape");
-});
-
-sel("#hoverOff").addEventListener("input", () => {
-  isHovering = false;
-  log("Hover OFF - the mouse over the canvas will not draw");
-});
-
-canvas.addEventListener(
-  "mousemove",
-  (e) => isHovering && simulation.hover(e),
-  false
-);
-
 canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
 
 sel("#masterOn").addEventListener("change", () => {
@@ -668,17 +600,6 @@ sel("#setClickShape").addEventListener("change", (e) => {
   );
 });
 
-sel("#setHoverShape").addEventListener("change", (e) => {
-  simulation.hoverShape = e.target.value;
-
-  log(
-    `Hover Shape (${isHovering ? "ON" : "OFF"}) is now ${
-      simulation.hoverShape
-    }`,
-    shapeLink(simulation.hoverShape)
-  );
-});
-
 sel("#color").addEventListener(
   "input",
   (e) => {
@@ -763,11 +684,6 @@ sel("#colorMode").addEventListener("change", (e) => {
   }
 });
 
-sel("#colorRadix").addEventListener(
-  "input",
-  (e) => (simulation.colorRadix = parseInt(e.target.value))
-);
-
 interface HTMLCanvasElement {
   captureStream(): MediaStream;
 }
@@ -839,47 +755,6 @@ sel("#clearFrame").addEventListener("change", () => {
   );
 });
 
-sel("#randCycle").addEventListener("input", (e) => {
-  simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
-  simulation.colorRateCounter = 0;
-});
-
-sel("#noiseRangeValue").addEventListener(
-  "input",
-  (e) => (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12))
-);
-
-// sel("#amp").addEventListener(
-//   "input",
-//   (e) => (simulation.amp = parseFloat(e.target.value))
-// );
-
-sel("#noiseRangeValue").addEventListener("change", () => {
-  if (simulation.noiseEnabled) {
-    log(
-      `Noise (ON) Amount is now 1 in ${simulation.noiseRangeValue.toFixed(
-        2
-      )} chance of being born`
-    );
-  } else {
-    log(
-      `Noise (OFF) Amount is now 1 in ${simulation.noiseRangeValue.toFixed(
-        2
-      )} chace of being born`
-    );
-  }
-});
-
-sel("#noiseOn").addEventListener("change", () => {
-  simulation.noiseEnabled = true;
-  log("Noise On - cells will be born randomly");
-});
-
-sel("#noiseOff").addEventListener("change", () => {
-  simulation.noiseEnabled = false;
-  log("Noise Off - cells will be born according to game rules only");
-});
-
 const gameLink = (game: string): string => {
   switch (game) {
     case "life":
@@ -925,16 +800,11 @@ const route = (state: ControlValues) => {
   // Don't set color in UI
   // sel("").value = state.color;
 
-  sel("#setClickShape").value = state.clickShape;
-  sel("#setHoverShape").value = state.hoverShape;
   (sel("#clearFrame") as HTMLInputElement).checked = state.blurEnabled;
   (sel("#clearFrame") as HTMLInputElement).checked = state.clearEveryFrame;
 
   // TODO: exponential to linear
   // sel("#randCycle").value = state.colorRateFrames;
-
-  (sel("#noiseOn") as HTMLInputElement).checked = state.noiseEnabled;
-  sel("#noiseRangeValue").value = state.noiseRangeValue.toString();
 
   // TODO: exponential to linear
   // sel("#seedDensity").value = state.seedDensity;

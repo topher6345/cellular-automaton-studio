@@ -8,7 +8,7 @@ var INIT_CONTROL_VALUES = {
 };
 var Palette = /** @class */ (function () {
     function Palette(color) {
-        if (color === void 0) { color = "rgba(0,0,0,1)"; }
+        if (color === void 0) { color = "rgba(0,1,0,1)"; }
         this.color = color;
     }
     return Palette;

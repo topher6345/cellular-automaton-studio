@@ -19,7 +19,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
 class Palette {
   color: string;
 
-  constructor(color = "rgba(0,0,0,1)") {
+  constructor(color = "rgba(0,1,0,1)") {
     this.color = color;
   }
 }

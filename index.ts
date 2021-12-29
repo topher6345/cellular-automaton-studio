@@ -29,7 +29,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
   noiseRangeValue: 0,
   game: "life",
   seedDensity: 1,
-  amp: 1
+  amp: 1,
 };
 
 class CellularAutomatonEngine {
@@ -167,8 +167,8 @@ class CellularAutomatonEngine {
       this.get(amp * row - 1, amp * (col - 1)) && liveNeighbors++;
       this.get(amp * row, amp * (col - 1)) && liveNeighbors++;
       this.get(amp * row + 1, amp * (col - 1)) && liveNeighbors++;
-      this.get(amp * row - 1, amp * (col)) && liveNeighbors++;
-      this.get(amp * row + 1, amp * (col)) && liveNeighbors++;
+      this.get(amp * row - 1, amp * col) && liveNeighbors++;
+      this.get(amp * row + 1, amp * col) && liveNeighbors++;
       this.get(amp * row - 1, amp * (col + 1)) && liveNeighbors++;
       this.get(amp * row, amp * (col + 1)) && liveNeighbors++;
       this.get(amp * row + 1, amp * (col + 1)) && liveNeighbors++;
@@ -468,8 +468,8 @@ function tick(now: number) {
 
   if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
     msPast = now;
-  simulation.draw(simulation.blurEnabled);
-  simulation.update();
+    simulation.draw(simulation.blurEnabled);
+    simulation.update();
   }
   window.requestAnimationFrame(tick);
 }
@@ -510,7 +510,10 @@ interface EventTarget {
 
 sel("#delay").addEventListener(
   "input",
-  (e) => (simulation.alpha = rangeOver(e.target.value, 1.0, 0)),
+  (e) => {
+    simulation.alpha = parseFloat(e.target.value);
+    log("Delay is now ", simulation.alpha.toString(), "");
+  },
   false
 );
 
@@ -808,6 +811,7 @@ sel("#recStart").addEventListener("change", () => {
     const vid: HTMLVideoElement = document.createElement("video");
     vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
     const vidName = `CellularAnimationStudio-${Date.now()}`;
+    // @ts-ignore
     vid.download = `${vidName}.webm`;
     vid.controls = true;
 
@@ -869,10 +873,10 @@ sel("#noiseRangeValue").addEventListener(
   (e) => (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12))
 );
 
-sel("#amp").addEventListener(
-  "input",
-  (e) => (simulation.amp = parseFloat(e.target.value))
-);
+// sel("#amp").addEventListener(
+//   "input",
+//   (e) => (simulation.amp = parseFloat(e.target.value))
+// );
 
 sel("#noiseRangeValue").addEventListener("change", () => {
   if (simulation.noiseEnabled) {

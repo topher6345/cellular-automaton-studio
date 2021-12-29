@@ -627,29 +627,20 @@ sel("#colorMode").addEventListener("change", (e) => {
   switch (e.target.value) {
     case "picker":
       sel("#picker").style.display = "none";
-
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
       log("Color mode is now the native color picker in your browser");
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
       break;
     case "hsluv":
       sel('label[for="color"]').style.display = "none";
       sel("#picker").style.display = "block";
       sel("#color").style.display = "none";
       log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
       break;
     default:
       sel("#picker").style.display = "none";
-
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
-      log("Color mode is now the native color picker in your browser");
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
   }
 });
 
@@ -759,22 +750,3 @@ setInterval(() => {
 
   sel("#currentCount").value = sum.toString();
 }, 250);
-
-const route = (state: ControlValues) => {
-  sel("#gameType").value = state.game;
-
-  // TODO: exponential to linear
-  // sel("#delay").value = state.alpha.toString();
-
-  // Don't set color in UI
-  // sel("").value = state.color;
-
-  (sel("#clearFrame") as HTMLInputElement).checked = state.blurEnabled;
-  (sel("#clearFrame") as HTMLInputElement).checked = state.clearEveryFrame;
-
-  // TODO: exponential to linear
-  // sel("#randCycle").value = state.colorRateFrames;
-
-  // TODO: exponential to linear
-  // sel("#seedDensity").value = state.seedDensity;
-};

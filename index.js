@@ -375,7 +375,7 @@ var expon = function (x) {
     return -Math.sqrt(-value + 1) + 1;
 };
 sel("#delay").addEventListener("input", function (e) {
-    simulation.alpha = parseFloat(e.target.value);
+    simulation.alpha = rangeOver(e.target.value, 0.001, 0.00000001);
     log("Delay is now ", simulation.alpha.toString(), "");
 }, false);
 var blendModeLink = {
@@ -583,6 +583,7 @@ sel("#recStart").addEventListener("change", function () {
         var vid = document.createElement("video");
         vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
         var vidName = "CellularAnimationStudio-" + Date.now();
+        // @ts-ignore
         vid.download = vidName + ".webm";
         vid.controls = true;
         sel("#modal-capture-preview").prepend(vid);

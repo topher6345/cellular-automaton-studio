@@ -511,7 +511,7 @@ interface EventTarget {
 sel("#delay").addEventListener(
   "input",
   (e) => {
-    simulation.alpha = parseFloat(e.target.value);
+    simulation.alpha = rangeOver(e.target.value, 0.001, 0.00000001);
     log("Delay is now ", simulation.alpha.toString(), "");
   },
   false

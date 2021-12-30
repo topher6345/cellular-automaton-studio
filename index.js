@@ -1,11 +1,3 @@
-var INIT_CONTROL_VALUES = {
-    alpha: 0.00095,
-    clickShape: "gliderse",
-    blurEnabled: true,
-    clearEveryFrame: false,
-    game: "life",
-    seedDensity: 1
-};
 var Palette = /** @class */ (function () {
     function Palette(color) {
         this.color = color;
@@ -15,8 +7,8 @@ var Palette = /** @class */ (function () {
 var CellularAutomatonEngine = /** @class */ (function () {
     function CellularAutomatonEngine(size, canvas, controlValues) {
         this.size = size;
-        this.pixelSize = 1.5;
-        this.pixelScalar = 1.5;
+        this.pixelSize = 1;
+        this.pixelScalar = 1;
         this.data = CellularAutomatonEngine.randBoard(this.size);
         this.buffer = new Uint8Array(this.size * this.size);
         this.bufferLength = this.buffer.length;
@@ -295,7 +287,14 @@ var onInput = on("input");
 var onChange = on("change");
 var canvas = sel("canvas");
 var palette = new Palette("#ffffff");
-var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
+var simulation = new CellularAutomatonEngine(750, canvas, {
+    alpha: 0.00095,
+    clickShape: "gliderse",
+    blurEnabled: true,
+    clearEveryFrame: false,
+    game: "life",
+    seedDensity: 1
+});
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
@@ -341,8 +340,9 @@ var expon = function (x) {
     value = value > 1.0 ? 1.0 : value;
     return -Math.sqrt(-value + 1) + 1;
 };
-onInput("#delay", function (e) {
-    simulation.alpha = rangeOver(e.target.value, 0.004, 0.0000001);
+onInput("#delay", function (_a) {
+    var value = _a.target.value;
+    simulation.alpha = rangeOver(value, 0.004, 0.0000001);
     log("Delay is now ", simulation.alpha.toString(), "");
 }, false);
 var blendModeLink = {
@@ -364,16 +364,20 @@ var blendModeLink = {
     saturation: "https://drafts.fxtf.org/compositing-1/#blendingsaturation",
     luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity"
 };
-onInput("#setBlendMode", function (e) {
+onInput("#setBlendMode", function (_a) {
+    var value = _a.target.value;
     var currentState = isSimulationActive;
     if (currentState)
         isSimulationActive = false;
-    var blendMode = e.target.value;
+    var blendMode = value;
     simulation.ctx.globalCompositeOperation = blendMode;
     isSimulationActive = currentState;
     log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
-onInput("#rate", function (e) { return (msPerFrame = parseInt(e.target.value)); });
+onInput("#rate", function (_a) {
+    var value = _a.target.value;
+    return (msPerFrame = parseInt(value));
+});
 onChange("#rate", function () {
     return log("Speed is now " + msPerFrame + " milliseconds per generation");
 });
@@ -426,8 +430,9 @@ onClick("#kill", function () {
     log("Cells Killed - click Seed or the canvas to add live cells");
 });
 onInput("#seedDensity", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
-onChange("#seedDensity", function (e) {
-    return log("Seed Density changed to " + e.target.value);
+onChange("#seedDensity", function (_a) {
+    var value = _a.target.value;
+    return log("Seed Density changed to " + value);
 });
 var shapeLink = function (shape) {
     switch (shape) {
@@ -447,17 +452,20 @@ var shapeLink = function (shape) {
             return null;
     }
 };
-onChange("#setClickShape", function (e) {
-    simulation.clickShape = e.target.value;
+onChange("#setClickShape", function (_a) {
+    var value = _a.target.value;
+    simulation.clickShape = value;
     log("Click Shape is now ", shapeLink(simulation.clickShape), simulation.clickShape);
 });
-onInput("#color", function (e) {
-    palette.color = e.target.value;
+onInput("#color", function (_a) {
+    var value = _a.target.value;
+    palette.color = value;
     // redraw if paused so the user can see what colors
     isSimulationActive || simulation.draw(false, palette.color);
 }, false);
-var routeColorMode = function (e) {
-    switch (e.target.value) {
+var routeColorMode = function (_a) {
+    var value = _a.target.value;
+    switch (value) {
         case "picker":
             sel("#picker").style.display = "none";
             sel("#color").style.display = "block";
@@ -551,8 +559,9 @@ var gameLink = function (game) {
             return null;
     }
 };
-onChange("#gameType", function (e) {
-    simulation.game = e.target.value;
+onChange("#gameType", function (_a) {
+    var value = _a.target.value;
+    simulation.game = value;
     log("Game changed to ", gameLink(simulation.game), simulation.game);
 });
 sel("#prompt").scrollTop = 0;

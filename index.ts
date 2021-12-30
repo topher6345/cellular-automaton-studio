@@ -7,15 +7,6 @@ type ControlValues = {
   seedDensity: number;
 };
 
-const INIT_CONTROL_VALUES: ControlValues = {
-  alpha: 0.00095,
-  clickShape: "gliderse",
-  blurEnabled: true,
-  clearEveryFrame: false,
-  game: "life",
-  seedDensity: 1,
-};
-
 class Palette {
   color: string;
 
@@ -46,8 +37,8 @@ class CellularAutomatonEngine {
     controlValues: ControlValues
   ) {
     this.size = size;
-    this.pixelSize = 1.5;
-    this.pixelScalar = 1.5;
+    this.pixelSize = 1;
+    this.pixelScalar = 1;
     this.data = CellularAutomatonEngine.randBoard(this.size);
     this.buffer = new Uint8Array(this.size * this.size);
     this.bufferLength = this.buffer.length;
@@ -392,11 +383,14 @@ const onChange = on("change");
 
 const canvas = sel("canvas") as HTMLCanvasElement;
 const palette = new Palette("#ffffff");
-const simulation = new CellularAutomatonEngine(
-  750,
-  canvas,
-  INIT_CONTROL_VALUES
-);
+const simulation = new CellularAutomatonEngine(750, canvas, {
+  alpha: 0.00095,
+  clickShape: "gliderse",
+  blurEnabled: true,
+  clearEveryFrame: false,
+  game: "life",
+  seedDensity: 1,
+});
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
 // Update the favicon with the current canvas
@@ -458,8 +452,8 @@ interface EventTarget {
 
 onInput(
   "#delay",
-  (e) => {
-    simulation.alpha = rangeOver(e.target.value, 0.004, 0.0000001);
+  ({ target: { value } }) => {
+    simulation.alpha = rangeOver(value, 0.004, 0.0000001);
     log("Delay is now ", simulation.alpha.toString(), "");
   },
   false
@@ -487,18 +481,18 @@ const blendModeLink: any = {
   luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity",
 };
 
-onInput("#setBlendMode", (e) => {
+onInput("#setBlendMode", ({ target: { value } }) => {
   const currentState = isSimulationActive;
   if (currentState) isSimulationActive = false;
 
-  const blendMode = e.target.value;
+  const blendMode = value;
   simulation.ctx.globalCompositeOperation = blendMode;
 
   isSimulationActive = currentState;
   log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
 
-onInput("#rate", (e) => (msPerFrame = parseInt(e.target.value)));
+onInput("#rate", ({ target: { value } }) => (msPerFrame = parseInt(value)));
 
 onChange("#rate", () =>
   log(`Speed is now ${msPerFrame} milliseconds per generation`)
@@ -578,8 +572,8 @@ onInput(
   (e) => (simulation.seedDensity = parseInt(e.target.value))
 );
 
-onChange("#seedDensity", (e) =>
-  log(`Seed Density changed to ${e.target.value}`)
+onChange("#seedDensity", ({ target: { value } }) =>
+  log(`Seed Density changed to ${value}`)
 );
 
 const shapeLink = (shape: string): string => {
@@ -601,8 +595,8 @@ const shapeLink = (shape: string): string => {
   }
 };
 
-onChange("#setClickShape", (e) => {
-  simulation.clickShape = e.target.value;
+onChange("#setClickShape", ({ target: { value } }) => {
+  simulation.clickShape = value;
   log(
     "Click Shape is now ",
     shapeLink(simulation.clickShape),
@@ -612,8 +606,8 @@ onChange("#setClickShape", (e) => {
 
 onInput(
   "#color",
-  (e) => {
-    palette.color = e.target.value;
+  ({ target: { value } }) => {
+    palette.color = value;
 
     // redraw if paused so the user can see what colors
     isSimulationActive || simulation.draw(false, palette.color);
@@ -621,8 +615,8 @@ onInput(
   false
 );
 
-const routeColorMode: any = (e: { target: any }) => {
-  switch (e.target.value) {
+const routeColorMode = ({ target: { value } }) => {
+  switch (value) {
     case "picker":
       sel("#picker").style.display = "none";
       sel("#color").style.display = "block";
@@ -737,8 +731,8 @@ const gameLink = (game: string): string => {
   }
 };
 
-onChange("#gameType", (e) => {
-  simulation.game = e.target.value;
+onChange("#gameType", ({ target: { value } }) => {
+  simulation.game = value;
   log("Game changed to ", gameLink(simulation.game), simulation.game);
 });
 

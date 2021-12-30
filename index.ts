@@ -519,18 +519,21 @@ onChange("#masterOff", () => {
   log("Simulation OFF");
 });
 
-onInput("#rate", ({ target: { value } }) => (msPerFrame = parseInt(value)));
+onInput(
+  "#msPerFrame",
+  ({ target: { value } }) => (msPerFrame = parseInt(value))
+);
 
-onChange("#rate", () =>
+onChange("#msPerFrame", () =>
   log(`Speed is now ${msPerFrame} milliseconds per generation`)
 );
+
+setInterval(() => (sel("#fps").innerText = `${fps.toFixed(1)}ms/f`), 1000);
 
 onChange("#gameType", ({ target: { value } }) => {
   simulation.gameType = value;
   log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
 });
-
-setInterval(() => (sel("#fps").innerText = `${fps.toFixed(1)}ms/f`), 1000);
 
 const routeColorMode = ({ target: { value } }) => {
   switch (value) {
@@ -685,7 +688,7 @@ onClick("#seed", () => {
   log(`Simulation seeded - 1 in ${simulation.seedDensity} odds`);
 });
 
-onClick("#clear", () => {
+onClick("#clearSimulation", () => {
   simulation.clear();
   log("Screen cleared");
 });

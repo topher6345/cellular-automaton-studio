@@ -414,19 +414,19 @@ onChange("#masterOff", function () {
     isSimulationActive = false;
     log("Simulation OFF");
 });
-onInput("#rate", function (_a) {
+onInput("#msPerFrame", function (_a) {
     var value = _a.target.value;
     return (msPerFrame = parseInt(value));
 });
-onChange("#rate", function () {
+onChange("#msPerFrame", function () {
     return log("Speed is now " + msPerFrame + " milliseconds per generation");
 });
+setInterval(function () { return (sel("#fps").innerText = fps.toFixed(1) + "ms/f"); }, 1000);
 onChange("#gameType", function (_a) {
     var value = _a.target.value;
     simulation.gameType = value;
     log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
 });
-setInterval(function () { return (sel("#fps").innerText = fps.toFixed(1) + "ms/f"); }, 1000);
 var routeColorMode = function (_a) {
     var value = _a.target.value;
     switch (value) {
@@ -544,7 +544,7 @@ onClick("#seed", function () {
     simulation.seed();
     log("Simulation seeded - 1 in " + simulation.seedDensity + " odds");
 });
-onClick("#clear", function () {
+onClick("#clearSimulation", function () {
     simulation.clear();
     log("Screen cleared");
 });

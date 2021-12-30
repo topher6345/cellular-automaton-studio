@@ -1,3 +1,7 @@
+interface HTMLElement {
+  disabled: boolean;
+}
+
 type ControlValues = {
   alpha: number;
   clickShape: string;
@@ -366,6 +370,10 @@ class CellularAutomatonEngine {
   }
 }
 
+interface HTMLCanvasElement {
+  captureStream(): MediaStream;
+}
+
 // DOM Combinators
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 const on =
@@ -434,7 +442,51 @@ const log = (message: string, link?: string, linkText?: string) => {
 
 setTimeout(() => log("Hover over controls for help"), 3000);
 
+onChange("#masterOn", () => {
+  isSimulationActive = true;
+  log("Simulation ON");
+});
+
+onChange("#masterOff", () => {
+  isSimulationActive = false;
+  log("Simulation OFF");
+});
+
+onInput("#rate", ({ target: { value } }) => (msPerFrame = parseInt(value)));
+
+onChange("#rate", () =>
+  log(`Speed is now ${msPerFrame} milliseconds per generation`)
+);
+
+onChange("#gameType", ({ target: { value } }) => {
+  simulation.game = value;
+  log("Game changed to ", gameLink(simulation.game), simulation.game);
+});
+
 setInterval(() => (sel("#fps").innerText = `${fps.toFixed(1)}ms/f`), 1000);
+
+const routeColorMode = ({ target: { value } }) => {
+  switch (value) {
+    case "picker":
+      sel("#picker").style.display = "none";
+      sel("#color").style.display = "block";
+      sel('label[for="color"]').style.display = "block";
+      log("Color mode is now the native color picker in your browser");
+      break;
+    case "hsluv":
+      sel('label[for="color"]').style.display = "none";
+      sel("#picker").style.display = "block";
+      sel("#color").style.display = "none";
+      log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
+      break;
+    default:
+      sel("#picker").style.display = "none";
+      sel("#color").style.display = "block";
+      sel('label[for="color"]').style.display = "block";
+  }
+};
+onChange("#colorMode", routeColorMode);
+routeColorMode({ target: { value: sel("#colorMode").value } });
 
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
@@ -492,23 +544,7 @@ onInput("#setBlendMode", ({ target: { value } }) => {
   log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
 
-onInput("#rate", ({ target: { value } }) => (msPerFrame = parseInt(value)));
-
-onChange("#rate", () =>
-  log(`Speed is now ${msPerFrame} milliseconds per generation`)
-);
-
 canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
-
-onChange("#masterOn", () => {
-  isSimulationActive = true;
-  log("Simulation ON");
-});
-
-onChange("#masterOff", () => {
-  isSimulationActive = false;
-  log("Simulation OFF");
-});
 
 onClick(
   "#modal-capture-preview",
@@ -615,32 +651,6 @@ onInput(
   false
 );
 
-const routeColorMode = ({ target: { value } }) => {
-  switch (value) {
-    case "picker":
-      sel("#picker").style.display = "none";
-      sel("#color").style.display = "block";
-      sel('label[for="color"]').style.display = "block";
-      log("Color mode is now the native color picker in your browser");
-      break;
-    case "hsluv":
-      sel('label[for="color"]').style.display = "none";
-      sel("#picker").style.display = "block";
-      sel("#color").style.display = "none";
-      log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
-      break;
-    default:
-      sel("#picker").style.display = "none";
-      sel("#color").style.display = "block";
-      sel('label[for="color"]').style.display = "block";
-  }
-};
-onChange("#colorMode", routeColorMode);
-routeColorMode({ target: { value: sel("#colorMode").value } });
-interface HTMLCanvasElement {
-  captureStream(): MediaStream;
-}
-
 let recorders: MediaRecorder = null;
 onChange("#recStart", () => {
   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
@@ -680,10 +690,6 @@ onChange("#recStop", () => {
   recorders = null;
   log("Recording Stopped, click Gallery to view and download the recording");
 });
-
-interface HTMLElement {
-  disabled: boolean;
-}
 
 onInput("#blurOn", () => {
   simulation.blurEnabled = true;
@@ -730,11 +736,6 @@ const gameLink = (game: string): string => {
       return null;
   }
 };
-
-onChange("#gameType", ({ target: { value } }) => {
-  simulation.game = value;
-  log("Game changed to ", gameLink(simulation.game), simulation.game);
-});
 
 sel("#prompt").scrollTop = 0;
 

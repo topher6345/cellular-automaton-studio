@@ -330,7 +330,50 @@ var log = function (message, link, linkText) {
     prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 setTimeout(function () { return log("Hover over controls for help"); }, 3000);
+onChange("#masterOn", function () {
+    isSimulationActive = true;
+    log("Simulation ON");
+});
+onChange("#masterOff", function () {
+    isSimulationActive = false;
+    log("Simulation OFF");
+});
+onInput("#rate", function (_a) {
+    var value = _a.target.value;
+    return (msPerFrame = parseInt(value));
+});
+onChange("#rate", function () {
+    return log("Speed is now " + msPerFrame + " milliseconds per generation");
+});
+onChange("#gameType", function (_a) {
+    var value = _a.target.value;
+    simulation.game = value;
+    log("Game changed to ", gameLink(simulation.game), simulation.game);
+});
 setInterval(function () { return (sel("#fps").innerText = fps.toFixed(1) + "ms/f"); }, 1000);
+var routeColorMode = function (_a) {
+    var value = _a.target.value;
+    switch (value) {
+        case "picker":
+            sel("#picker").style.display = "none";
+            sel("#color").style.display = "block";
+            sel('label[for="color"]').style.display = "block";
+            log("Color mode is now the native color picker in your browser");
+            break;
+        case "hsluv":
+            sel('label[for="color"]').style.display = "none";
+            sel("#picker").style.display = "block";
+            sel("#color").style.display = "none";
+            log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
+            break;
+        default:
+            sel("#picker").style.display = "none";
+            sel("#color").style.display = "block";
+            sel('label[for="color"]').style.display = "block";
+    }
+};
+onChange("#colorMode", routeColorMode);
+routeColorMode({ target: { value: sel("#colorMode").value } });
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
@@ -374,22 +417,7 @@ onInput("#setBlendMode", function (_a) {
     isSimulationActive = currentState;
     log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
-onInput("#rate", function (_a) {
-    var value = _a.target.value;
-    return (msPerFrame = parseInt(value));
-});
-onChange("#rate", function () {
-    return log("Speed is now " + msPerFrame + " milliseconds per generation");
-});
 canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
-onChange("#masterOn", function () {
-    isSimulationActive = true;
-    log("Simulation ON");
-});
-onChange("#masterOff", function () {
-    isSimulationActive = false;
-    log("Simulation OFF");
-});
 onClick("#modal-capture-preview", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
 var takeSnapshot = function () {
     var img = new Image();
@@ -463,29 +491,6 @@ onInput("#color", function (_a) {
     // redraw if paused so the user can see what colors
     isSimulationActive || simulation.draw(false, palette.color);
 }, false);
-var routeColorMode = function (_a) {
-    var value = _a.target.value;
-    switch (value) {
-        case "picker":
-            sel("#picker").style.display = "none";
-            sel("#color").style.display = "block";
-            sel('label[for="color"]').style.display = "block";
-            log("Color mode is now the native color picker in your browser");
-            break;
-        case "hsluv":
-            sel('label[for="color"]').style.display = "none";
-            sel("#picker").style.display = "block";
-            sel("#color").style.display = "none";
-            log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
-            break;
-        default:
-            sel("#picker").style.display = "none";
-            sel("#color").style.display = "block";
-            sel('label[for="color"]').style.display = "block";
-    }
-};
-onChange("#colorMode", routeColorMode);
-routeColorMode({ target: { value: sel("#colorMode").value } });
 var recorders = null;
 onChange("#recStart", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
@@ -559,11 +564,6 @@ var gameLink = function (game) {
             return null;
     }
 };
-onChange("#gameType", function (_a) {
-    var value = _a.target.value;
-    simulation.game = value;
-    log("Game changed to ", gameLink(simulation.game), simulation.game);
-});
 sel("#prompt").scrollTop = 0;
 setInterval(function () {
     var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);

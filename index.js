@@ -391,10 +391,10 @@ function tick(now) {
 }
 window.requestAnimationFrame(tick);
 var log = function (message, link, linkText) {
-    var prompt = sel("#prompt");
+    var display = sel("#logDisplay");
     var p = document.createElement("p");
     p.innerText = "> " + message;
-    prompt.append(p);
+    display.append(p);
     if (link) {
         var a = document.createElement("a");
         a.href = link;
@@ -402,10 +402,10 @@ var log = function (message, link, linkText) {
         a.target = "_blank";
         p.append(a);
     }
-    prompt.scrollTop = sel("#prompt").scrollHeight;
+    display.scrollTop = sel("#logDisplay").scrollHeight;
 };
 setTimeout(function () { return log("Hover over controls for help"); }, 3000);
-sel("#prompt").scrollTop = 0;
+sel("#logDisplay").scrollTop = 0;
 onChange("#masterOn", function () {
     isSimulationActive = true;
     log("Simulation ON");
@@ -427,6 +427,10 @@ onChange("#gameType", function (_a) {
     simulation.gameType = value;
     log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
 });
+setInterval(function () {
+    var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
+    sel("#currentLiveCellCount").value = sum.toString();
+}, 250);
 var routeColorMode = function (_a) {
     var value = _a.target.value;
     switch (value) {
@@ -638,7 +642,3 @@ var gameLink = function (game) {
             return null;
     }
 };
-setInterval(function () {
-    var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
-    sel("#currentCount").value = sum.toString();
-}, 250);

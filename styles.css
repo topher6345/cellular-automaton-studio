@@ -210,7 +210,7 @@ button {
   animation: blink 0.5s infinite;
 }
 
-#prompt {
+#logDisplay {
   color: white;
   font-family: monospace;
   width: 100%;
@@ -218,25 +218,25 @@ button {
   overflow: scroll;
   scroll-behavior: smooth;
 }
-#prompt > p {
+#logDisplay > p {
   padding-left: 1em;
   padding-right: 1em;
   line-height: 1em;
 }
 
-#prompt > p > a {
+#logDisplay > p > a {
   text-decoration: none;
   color: #00dbff;
 }
-#prompt > p > a:visited {
+#logDisplay > p > a:visited {
   color: #d300ff;
 }
 
-#currentCount {
+#currentLiveCellCount {
   text-align: right;
   max-width: 8em;
 }
 
-#currentCount:hover {
+#currentLiveCellCount:hover {
   cursor: default;
 }

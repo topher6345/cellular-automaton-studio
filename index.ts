@@ -491,10 +491,10 @@ function tick(now: number) {
 window.requestAnimationFrame(tick);
 
 const log = (message: string, link?: string, linkText?: string) => {
-  const prompt = sel("#prompt");
+  const display = sel("#logDisplay");
   const p = document.createElement("p");
   p.innerText = `> ${message}`;
-  prompt.append(p);
+  display.append(p);
 
   if (link) {
     const a = document.createElement("a");
@@ -503,11 +503,11 @@ const log = (message: string, link?: string, linkText?: string) => {
     a.target = "_blank";
     p.append(a);
   }
-  prompt.scrollTop = sel("#prompt").scrollHeight;
+  display.scrollTop = sel("#logDisplay").scrollHeight;
 };
 
 setTimeout(() => log("Hover over controls for help"), 3000);
-sel("#prompt").scrollTop = 0;
+sel("#logDisplay").scrollTop = 0;
 
 onChange("#masterOn", () => {
   isSimulationActive = true;
@@ -534,6 +534,12 @@ onChange("#gameType", ({ target: { value } }) => {
   simulation.gameType = value;
   log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
 });
+
+setInterval(() => {
+  const sum = simulation.data.reduce((a, b) => a + b, 0);
+
+  sel("#currentLiveCellCount").value = sum.toString();
+}, 250);
 
 const routeColorMode = ({ target: { value } }) => {
   switch (value) {
@@ -797,9 +803,3 @@ const gameLink = (game: string): string => {
       return null;
   }
 };
-
-setInterval(() => {
-  const sum = simulation.data.reduce((a, b) => a + b, 0);
-
-  sel("#currentCount").value = sum.toString();
-}, 250);

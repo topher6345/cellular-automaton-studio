@@ -21,7 +21,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.blurEnabled = controlValues.blurEnabled;
         this.clearEveryFrame = controlValues.clearEveryFrame;
         this.clickShape = controlValues.clickShape;
-        this.game = controlValues.game;
+        this.gameType = controlValues.gameType;
         this.seedDensity = controlValues.seedDensity;
     }
     CellularAutomatonEngine.prototype.seed = function () {
@@ -78,94 +78,168 @@ var CellularAutomatonEngine = /** @class */ (function () {
             var status_1 = 0;
             var alive = this.get(row, col);
             // prettier-ignore
-            switch (this.game) {
+            switch (this.gameType) {
                 case "famine":
-                    ( // S6789
-                    (alive && (liveNeighbors > 5))) && (status_1 = 1);
+                    // S6789
+                    alive &&
+                        liveNeighbors > 5 &&
+                        (status_1 = 1);
                     break;
                 case "anneal":
-                    ( // S35678
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    // S35678
+                    ((alive &&
+                        (liveNeighbors === 3 ||
+                            liveNeighbors === 5 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 7 ||
+                            liveNeighbors === 8)) ||
                         // B4678
-                        (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 4 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 7 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "morley":
-                    ( // S245
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+                    // S245
+                    ((alive &&
+                        (liveNeighbors === 2 ||
+                            liveNeighbors === 4 ||
+                            liveNeighbors === 5)) ||
                         // B368
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "day&night":
-                    ( // S34678
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    // S34678
+                    ((alive &&
+                        (liveNeighbors === 3 ||
+                            liveNeighbors === 4 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 7 ||
+                            liveNeighbors === 8)) ||
                         // B3678
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 7 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "2x2":
-                    ( // S125
-                    (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+                    // S125
+                    ((alive &&
+                        (liveNeighbors === 1 ||
+                            liveNeighbors === 2 ||
+                            liveNeighbors === 5)) ||
                         // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6) &&
+                        (status_1 = 1);
                     break;
                 case "diamoeba":
-                    ( // S5678
-                    (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    // S5678
+                    ((alive &&
+                        (liveNeighbors === 5 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 7 ||
+                            liveNeighbors === 8)) ||
                         // B35678
-                        (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 7 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "34life":
-                    ( // S34
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+                    // S34
+                    ((alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
-                        (liveNeighbors === 3 || liveNeighbors === 4)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 4) &&
+                        (status_1 = 1);
                     break;
                 case "B25/S4":
-                    ( // S4
-                    (alive && (liveNeighbors === 4)) ||
+                    // S4
+                    ((alive && liveNeighbors === 4) ||
                         // B25
-                        (liveNeighbors === 2 || liveNeighbors === 5)) && (status_1 = 1);
+                        liveNeighbors === 2 ||
+                        liveNeighbors === 5) &&
+                        (status_1 = 1);
                     break;
                 case "seeds":
-                    ( // S
-                    (alive) ||
+                    // S
+                    (alive ||
                         // B2
-                        (liveNeighbors === 2)) && (status_1 = 1);
+                        liveNeighbors === 2) &&
+                        (status_1 = 1);
                     break;
                 case "replicator":
-                    ( // S1357
-                    (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+                    // S1357
+                    ((alive &&
+                        (liveNeighbors === 1 ||
+                            liveNeighbors === 3 ||
+                            liveNeighbors === 5 ||
+                            liveNeighbors === 7)) ||
                         // B1357
-                        (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) && (status_1 = 1);
+                        liveNeighbors === 1 ||
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 7) &&
+                        (status_1 = 1);
                     break;
                 case "gems":
-                    ( // S4568
-                    (alive && (liveNeighbors === 4 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 8)) ||
+                    // S4568
+                    ((alive &&
+                        (liveNeighbors === 4 ||
+                            liveNeighbors === 5 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 8)) ||
                         // B3457
-                        (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 5 || liveNeighbors === 7)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 4 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 7) &&
+                        (status_1 = 1);
                     break;
                 case "fredkin":
-                    ( // S1357
-                    (alive && (liveNeighbors === 0 || liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 8)) ||
+                    // S1357
+                    ((alive &&
+                        (liveNeighbors === 0 ||
+                            liveNeighbors === 2 ||
+                            liveNeighbors === 4 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 8)) ||
                         // B1357
-                        (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) && (status_1 = 1);
+                        liveNeighbors === 1 ||
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 7) &&
+                        (status_1 = 1);
                     break;
                 case "dotlife":
-                    ( // 023
-                    (alive && (liveNeighbors === 0 || liveNeighbors === 2) ||
+                    // 023
+                    ((alive && (liveNeighbors === 0 || liveNeighbors === 2)) ||
                         // B3
-                        liveNeighbors === 3)) && (status_1 = 1);
+                        liveNeighbors === 3) &&
+                        (status_1 = 1);
                     break;
                 case "highlife":
-                    ( // S23
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    // S23
+                    ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6) &&
+                        (status_1 = 1);
                     break;
                 case "life":
-                    ( // A23
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    // A23
+                    ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // B3
-                        liveNeighbors === 3) && (status_1 = 1);
+                        liveNeighbors === 3) &&
+                        (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -292,7 +366,7 @@ var simulation = new CellularAutomatonEngine(750, canvas, {
     clickShape: "gliderse",
     blurEnabled: true,
     clearEveryFrame: false,
-    game: "life",
+    gameType: "life",
     seedDensity: 1
 });
 var favicon = sel("#favicon");
@@ -347,8 +421,8 @@ onChange("#rate", function () {
 });
 onChange("#gameType", function (_a) {
     var value = _a.target.value;
-    simulation.game = value;
-    log("Game changed to ", gameLink(simulation.game), simulation.game);
+    simulation.gameType = value;
+    log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
 });
 setInterval(function () { return (sel("#fps").innerText = fps.toFixed(1) + "ms/f"); }, 1000);
 var routeColorMode = function (_a) {
@@ -471,7 +545,10 @@ onClick("#kill", function () {
     simulation.kill();
     log("Cells Killed - click Seed or the canvas to add live cells");
 });
-onInput("#seedDensity", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
+onInput("#seedDensity", function (_a) {
+    var value = _a.target.value;
+    return (simulation.seedDensity = parseInt(value));
+});
 onChange("#seedDensity", function (_a) {
     var value = _a.target.value;
     return log("Seed Density changed to " + value);

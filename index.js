@@ -15,8 +15,8 @@ var Palette = /** @class */ (function () {
 var CellularAutomatonEngine = /** @class */ (function () {
     function CellularAutomatonEngine(size, canvas, controlValues) {
         this.size = size;
-        this.pixelSize = 1;
-        this.pixelScalar = 1;
+        this.pixelSize = 1.5;
+        this.pixelScalar = 1.5;
         this.data = CellularAutomatonEngine.randBoard(this.size);
         this.buffer = new Uint8Array(this.size * this.size);
         this.bufferLength = this.buffer.length;
@@ -283,7 +283,16 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     return CellularAutomatonEngine;
 }());
+// DOM Combinators
 var sel = function (selector) { return document.querySelector(selector); };
+var on = function (eventType) {
+    return function (selector, callback, preventDefault) {
+        return sel(selector).addEventListener(eventType, callback, preventDefault);
+    };
+};
+var onClick = on("click");
+var onInput = on("input");
+var onChange = on("change");
 var canvas = sel("canvas");
 var palette = new Palette("#ffffff");
 var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
@@ -292,13 +301,13 @@ var favicon = sel("#favicon");
 favicon.href = canvas.toDataURL();
 window.setInterval(function () { return (favicon.href = canvas.toDataURL()); }, 5000);
 var msPast = null;
-var msPerFrame = 250;
-var masterOnOff = true;
+var msPerFrame = 100;
+var isSimulationActive = true;
 var fps = 0;
 function tick(now) {
     if (!msPast)
         msPast = now;
-    if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+    if (!msPast || (now - msPast > msPerFrame && isSimulationActive)) {
         fps = now - msPast;
         msPast = now;
         simulation.draw(simulation.blurEnabled, palette.color);
@@ -332,7 +341,7 @@ var expon = function (x) {
     value = value > 1.0 ? 1.0 : value;
     return -Math.sqrt(-value + 1) + 1;
 };
-sel("#delay").addEventListener("input", function (e) {
+onInput("#delay", function (e) {
     simulation.alpha = rangeOver(e.target.value, 0.004, 0.0000001);
     log("Delay is now ", simulation.alpha.toString(), "");
 }, false);
@@ -355,29 +364,29 @@ var blendModeLink = {
     saturation: "https://drafts.fxtf.org/compositing-1/#blendingsaturation",
     luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity"
 };
-sel("#setBlendMode").addEventListener("input", function (e) {
-    var currentState = masterOnOff;
+onInput("#setBlendMode", function (e) {
+    var currentState = isSimulationActive;
     if (currentState)
-        masterOnOff = false;
+        isSimulationActive = false;
     var blendMode = e.target.value;
     simulation.ctx.globalCompositeOperation = blendMode;
-    masterOnOff = currentState;
+    isSimulationActive = currentState;
     log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
-sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
-sel("#rate").addEventListener("change", function () {
+onInput("#rate", function (e) { return (msPerFrame = parseInt(e.target.value)); });
+onChange("#rate", function () {
     return log("Speed is now " + msPerFrame + " milliseconds per generation");
 });
 canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
-sel("#masterOn").addEventListener("change", function () {
-    masterOnOff = true;
+onChange("#masterOn", function () {
+    isSimulationActive = true;
     log("Simulation ON");
 });
-sel("#masterOff").addEventListener("change", function () {
-    masterOnOff = false;
+onChange("#masterOff", function () {
+    isSimulationActive = false;
     log("Simulation OFF");
 });
-sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
+onClick("#modal-capture-preview", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
 var takeSnapshot = function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
@@ -392,10 +401,10 @@ var takeSnapshot = function () {
     log("Screenshot captured, the simulation has been paused.");
     sel("#modal-capture").style.display = "flex";
     sel("#modal-capture-preview").prepend(a);
-    masterOnOff = false;
+    isSimulationActive = false;
     sel("#masterOff").checked = true;
 };
-sel("#screencap").addEventListener("click", takeSnapshot);
+onClick("#screencap", takeSnapshot);
 window.addEventListener("keydown", function (event) {
     if (event.defaultPrevented) {
         return; // Do nothing if event already handled
@@ -403,21 +412,21 @@ window.addEventListener("keydown", function (event) {
     if (event.code == "Space")
         takeSnapshot();
 });
-sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
-sel("#seed").addEventListener("click", function () {
+onClick("#showGallery", function () { return (sel("#modal-capture").style.display = "flex"); });
+onClick("#seed", function () {
     simulation.seed();
     log("Simulation seeded - 1 in " + simulation.seedDensity + " odds");
 });
-sel("#clear").addEventListener("click", function () {
+onClick("#clear", function () {
     simulation.clear();
     log("Screen cleared");
 });
-sel("#kill").addEventListener("click", function () {
+onClick("#kill", function () {
     simulation.kill();
     log("Cells Killed - click Seed or the canvas to add live cells");
 });
-sel("#seedDensity").addEventListener("input", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
-sel("#seedDensity").addEventListener("change", function (e) {
+onInput("#seedDensity", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
+onChange("#seedDensity", function (e) {
     return log("Seed Density changed to " + e.target.value);
 });
 var shapeLink = function (shape) {
@@ -438,15 +447,14 @@ var shapeLink = function (shape) {
             return null;
     }
 };
-sel("#setClickShape").addEventListener("change", function (e) {
+onChange("#setClickShape", function (e) {
     simulation.clickShape = e.target.value;
     log("Click Shape is now ", shapeLink(simulation.clickShape), simulation.clickShape);
 });
-sel("#color").addEventListener("input", function (e) {
-    debugger;
+onInput("#color", function (e) {
     palette.color = e.target.value;
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, palette.color);
+    isSimulationActive || simulation.draw(false, palette.color);
 }, false);
 var routeColorMode = function (e) {
     switch (e.target.value) {
@@ -468,10 +476,10 @@ var routeColorMode = function (e) {
             sel('label[for="color"]').style.display = "block";
     }
 };
-sel("#colorMode").addEventListener("change", routeColorMode);
+onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
 var recorders = null;
-sel("#recStart").addEventListener("change", function () {
+onChange("#recStart", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
     var stream = canvas.captureStream();
     var rec = new MediaRecorder(stream);
@@ -487,7 +495,7 @@ sel("#recStart").addEventListener("change", function () {
         vid.download = vidName + ".webm";
         vid.controls = true;
         sel("#modal-capture-preview").prepend(vid);
-        masterOnOff = false;
+        isSimulationActive = false;
         sel("#masterOff").checked = true;
     };
     rec.start();
@@ -498,24 +506,24 @@ sel("#recStart").addEventListener("change", function () {
         sel("#recStop").checked = true;
     }, 1000 * 90);
 });
-sel("#recStop").addEventListener("change", function () {
+onChange("#recStop", function () {
     recorders.stop();
     recorders = null;
     log("Recording Stopped, click Gallery to view and download the recording");
 });
-sel("#blurOn").addEventListener("input", function () {
+onInput("#blurOn", function () {
     simulation.blurEnabled = true;
     simulation.clearEveryFrame = false;
     sel("#delay").disabled = false;
     log("Blur ON - previous generations will fade out based on Blur Amount");
 });
-sel("#blurOff").addEventListener("input", function () {
+onInput("#blurOff", function () {
     simulation.blurEnabled = false;
     simulation.clearEveryFrame = false;
     sel("#delay").disabled = true;
     log("Overlay ON - new generation will paint on top of previous one");
 });
-sel("#clearFrame").addEventListener("change", function () {
+onChange("#clearFrame", function () {
     simulation.clearEveryFrame = true;
     simulation.blurEnabled = false;
     sel("#delay").disabled = true;
@@ -543,7 +551,7 @@ var gameLink = function (game) {
             return null;
     }
 };
-sel("#gameType").addEventListener("change", function (e) {
+onChange("#gameType", function (e) {
     simulation.game = e.target.value;
     log("Game changed to ", gameLink(simulation.game), simulation.game);
 });

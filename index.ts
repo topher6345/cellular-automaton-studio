@@ -19,7 +19,7 @@ const INIT_CONTROL_VALUES: ControlValues = {
 class Palette {
   color: string;
 
-  constructor(color) {
+  constructor(color: string) {
     this.color = color;
   }
 }
@@ -46,8 +46,8 @@ class CellularAutomatonEngine {
     controlValues: ControlValues
   ) {
     this.size = size;
-    this.pixelSize = 1;
-    this.pixelScalar = 1;
+    this.pixelSize = 1.5;
+    this.pixelScalar = 1.5;
     this.data = CellularAutomatonEngine.randBoard(this.size);
     this.buffer = new Uint8Array(this.size * this.size);
     this.bufferLength = this.buffer.length;
@@ -375,10 +375,22 @@ class CellularAutomatonEngine {
   }
 }
 
+// DOM Combinators
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
+const on =
+  (eventType: string) =>
+  (
+    selector: string,
+    callback: (e: MouseEvent) => void,
+    preventDefault?: boolean
+  ) =>
+    sel(selector).addEventListener(eventType, callback, preventDefault);
+
+const onClick = on("click");
+const onInput = on("input");
+const onChange = on("change");
 
 const canvas = sel("canvas") as HTMLCanvasElement;
-
 const palette = new Palette("#ffffff");
 const simulation = new CellularAutomatonEngine(
   750,
@@ -392,13 +404,13 @@ favicon.href = canvas.toDataURL();
 window.setInterval(() => (favicon.href = canvas.toDataURL()), 5000);
 
 let msPast: number = null;
-let msPerFrame: number = 250;
-let masterOnOff: boolean = true;
+let msPerFrame: number = 100;
+let isSimulationActive: boolean = true;
 let fps = 0;
 function tick(now: number) {
   if (!msPast) msPast = now;
 
-  if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
+  if (!msPast || (now - msPast > msPerFrame && isSimulationActive)) {
     fps = now - msPast;
     msPast = now;
 
@@ -444,8 +456,8 @@ interface EventTarget {
   value: string;
 }
 
-sel("#delay").addEventListener(
-  "input",
+onInput(
+  "#delay",
   (e) => {
     simulation.alpha = rangeOver(e.target.value, 0.004, 0.0000001);
     log("Delay is now ", simulation.alpha.toString(), "");
@@ -475,40 +487,37 @@ const blendModeLink: any = {
   luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity",
 };
 
-sel("#setBlendMode").addEventListener("input", (e) => {
-  const currentState = masterOnOff;
-  if (currentState) masterOnOff = false;
+onInput("#setBlendMode", (e) => {
+  const currentState = isSimulationActive;
+  if (currentState) isSimulationActive = false;
 
   const blendMode = e.target.value;
   simulation.ctx.globalCompositeOperation = blendMode;
 
-  masterOnOff = currentState;
+  isSimulationActive = currentState;
   log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
 
-sel("#rate").addEventListener(
-  "input",
-  (e) => (msPerFrame = parseInt(e.target.value))
-);
+onInput("#rate", (e) => (msPerFrame = parseInt(e.target.value)));
 
-sel("#rate").addEventListener("change", () =>
+onChange("#rate", () =>
   log(`Speed is now ${msPerFrame} milliseconds per generation`)
 );
 
 canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
 
-sel("#masterOn").addEventListener("change", () => {
-  masterOnOff = true;
+onChange("#masterOn", () => {
+  isSimulationActive = true;
   log("Simulation ON");
 });
 
-sel("#masterOff").addEventListener("change", () => {
-  masterOnOff = false;
+onChange("#masterOff", () => {
+  isSimulationActive = false;
   log("Simulation OFF");
 });
 
-sel("#modal-capture-preview").addEventListener(
-  "click",
+onClick(
+  "#modal-capture-preview",
   () => (sel("#modal-capture ").style.display = "none"),
   false
 );
@@ -533,11 +542,12 @@ Click grey border to exit (Simulation has been paused)
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a);
 
-  masterOnOff = false;
+  isSimulationActive = false;
   (sel("#masterOff") as HTMLInputElement).checked = true;
 };
 
-sel("#screencap").addEventListener("click", takeSnapshot);
+onClick("#screencap", takeSnapshot);
+
 window.addEventListener("keydown", function (event) {
   if (event.defaultPrevented) {
     return; // Do nothing if event already handled
@@ -546,32 +556,29 @@ window.addEventListener("keydown", function (event) {
   if (event.code == "Space") takeSnapshot();
 });
 
-sel("#showGallery").addEventListener(
-  "click",
-  () => (sel("#modal-capture").style.display = "flex")
-);
+onClick("#showGallery", () => (sel("#modal-capture").style.display = "flex"));
 
-sel("#seed").addEventListener("click", () => {
+onClick("#seed", () => {
   simulation.seed();
   log(`Simulation seeded - 1 in ${simulation.seedDensity} odds`);
 });
 
-sel("#clear").addEventListener("click", () => {
+onClick("#clear", () => {
   simulation.clear();
   log("Screen cleared");
 });
 
-sel("#kill").addEventListener("click", () => {
+onClick("#kill", () => {
   simulation.kill();
   log("Cells Killed - click Seed or the canvas to add live cells");
 });
 
-sel("#seedDensity").addEventListener(
-  "input",
+onInput(
+  "#seedDensity",
   (e) => (simulation.seedDensity = parseInt(e.target.value))
 );
 
-sel("#seedDensity").addEventListener("change", (e) =>
+onChange("#seedDensity", (e) =>
   log(`Seed Density changed to ${e.target.value}`)
 );
 
@@ -594,7 +601,7 @@ const shapeLink = (shape: string): string => {
   }
 };
 
-sel("#setClickShape").addEventListener("change", (e) => {
+onChange("#setClickShape", (e) => {
   simulation.clickShape = e.target.value;
   log(
     "Click Shape is now ",
@@ -603,19 +610,18 @@ sel("#setClickShape").addEventListener("change", (e) => {
   );
 });
 
-sel("#color").addEventListener(
-  "input",
+onInput(
+  "#color",
   (e) => {
-    debugger;
     palette.color = e.target.value;
 
     // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false, palette.color);
+    isSimulationActive || simulation.draw(false, palette.color);
   },
   false
 );
 
-const routeColorMode: any = (e) => {
+const routeColorMode: any = (e: { target: any }) => {
   switch (e.target.value) {
     case "picker":
       sel("#picker").style.display = "none";
@@ -635,14 +641,14 @@ const routeColorMode: any = (e) => {
       sel('label[for="color"]').style.display = "block";
   }
 };
-sel("#colorMode").addEventListener("change", routeColorMode);
+onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
 interface HTMLCanvasElement {
   captureStream(): MediaStream;
 }
 
 let recorders: MediaRecorder = null;
-sel("#recStart").addEventListener("change", () => {
+onChange("#recStart", () => {
   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
   const stream = canvas.captureStream();
   const rec = new MediaRecorder(stream);
@@ -662,7 +668,7 @@ sel("#recStart").addEventListener("change", () => {
 
     sel("#modal-capture-preview").prepend(vid);
 
-    masterOnOff = false;
+    isSimulationActive = false;
     (sel("#masterOff") as HTMLInputElement).checked = true;
   };
 
@@ -675,7 +681,7 @@ sel("#recStart").addEventListener("change", () => {
   }, 1000 * 90);
 });
 
-sel("#recStop").addEventListener("change", () => {
+onChange("#recStop", () => {
   recorders.stop();
   recorders = null;
   log("Recording Stopped, click Gallery to view and download the recording");
@@ -685,21 +691,21 @@ interface HTMLElement {
   disabled: boolean;
 }
 
-sel("#blurOn").addEventListener("input", () => {
+onInput("#blurOn", () => {
   simulation.blurEnabled = true;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = false;
   log("Blur ON - previous generations will fade out based on Blur Amount");
 });
 
-sel("#blurOff").addEventListener("input", () => {
+onInput("#blurOff", () => {
   simulation.blurEnabled = false;
   simulation.clearEveryFrame = false;
   sel("#delay").disabled = true;
   log("Overlay ON - new generation will paint on top of previous one");
 });
 
-sel("#clearFrame").addEventListener("change", () => {
+onChange("#clearFrame", () => {
   simulation.clearEveryFrame = true;
   simulation.blurEnabled = false;
   sel("#delay").disabled = true;
@@ -731,7 +737,7 @@ const gameLink = (game: string): string => {
   }
 };
 
-sel("#gameType").addEventListener("change", (e) => {
+onChange("#gameType", (e) => {
   simulation.game = e.target.value;
   log("Game changed to ", gameLink(simulation.game), simulation.game);
 });

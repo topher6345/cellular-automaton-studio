@@ -374,15 +374,29 @@ var routeColorMode = function (_a) {
 };
 onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
+onInput("#blurOn", function () {
+    simulation.blurEnabled = true;
+    simulation.clearEveryFrame = false;
+    sel("#delay").disabled = false;
+    log("Blur ON - previous generations will fade out based on Blur Amount");
+});
+onInput("#blurOff", function () {
+    simulation.blurEnabled = false;
+    simulation.clearEveryFrame = false;
+    sel("#delay").disabled = true;
+    log("Overlay ON - new generation will paint on top of previous one");
+});
+onChange("#clearFrame", function () {
+    simulation.clearEveryFrame = true;
+    simulation.blurEnabled = false;
+    sel("#delay").disabled = true;
+    log("Clear Frame ON - draw only current generation, erase previous generations");
+});
+var clamp = function (num) { return Math.min(Math.max(num, 0.0), 1.0); };
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
-var expon = function (x) {
-    var value = parseFloat(x);
-    value = value < 0.0 ? 0.0 : value;
-    value = value > 1.0 ? 1.0 : value;
-    return -Math.sqrt(-value + 1) + 1;
-};
+var expon = function (x) { return -Math.sqrt(-clamp(parseFloat(x)) + 1) + 1; };
 onInput("#delay", function (_a) {
     var value = _a.target.value;
     simulation.alpha = rangeOver(value, 0.004, 0.0000001);
@@ -523,24 +537,6 @@ onChange("#recStop", function () {
     recorders.stop();
     recorders = null;
     log("Recording Stopped, click Gallery to view and download the recording");
-});
-onInput("#blurOn", function () {
-    simulation.blurEnabled = true;
-    simulation.clearEveryFrame = false;
-    sel("#delay").disabled = false;
-    log("Blur ON - previous generations will fade out based on Blur Amount");
-});
-onInput("#blurOff", function () {
-    simulation.blurEnabled = false;
-    simulation.clearEveryFrame = false;
-    sel("#delay").disabled = true;
-    log("Overlay ON - new generation will paint on top of previous one");
-});
-onChange("#clearFrame", function () {
-    simulation.clearEveryFrame = true;
-    simulation.blurEnabled = false;
-    sel("#delay").disabled = true;
-    log("Clear Frame ON - draw only current generation, erase previous generations");
 });
 var gameLink = function (game) {
     switch (game) {

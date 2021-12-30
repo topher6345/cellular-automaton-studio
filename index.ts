@@ -11,6 +11,14 @@ type ControlValues = {
   seedDensity: number;
 };
 
+interface EventTarget {
+  value: string;
+}
+
+interface HTMLCanvasElement {
+  captureStream(): MediaStream;
+}
+
 class Palette {
   color: string;
 
@@ -370,10 +378,6 @@ class CellularAutomatonEngine {
   }
 }
 
-interface HTMLCanvasElement {
-  captureStream(): MediaStream;
-}
-
 // DOM Combinators
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
 const on =
@@ -488,19 +492,35 @@ const routeColorMode = ({ target: { value } }) => {
 onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
 
+onInput("#blurOn", () => {
+  simulation.blurEnabled = true;
+  simulation.clearEveryFrame = false;
+  sel("#delay").disabled = false;
+  log("Blur ON - previous generations will fade out based on Blur Amount");
+});
+
+onInput("#blurOff", () => {
+  simulation.blurEnabled = false;
+  simulation.clearEveryFrame = false;
+  sel("#delay").disabled = true;
+  log("Overlay ON - new generation will paint on top of previous one");
+});
+
+onChange("#clearFrame", () => {
+  simulation.clearEveryFrame = true;
+  simulation.blurEnabled = false;
+  sel("#delay").disabled = true;
+  log(
+    "Clear Frame ON - draw only current generation, erase previous generations"
+  );
+});
+
+const clamp = (num: number) => Math.min(Math.max(num, 0.0), 1.0);
+
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
 
-const expon = (x: string): number => {
-  let value = parseFloat(x);
-  value = value < 0.0 ? 0.0 : value;
-  value = value > 1.0 ? 1.0 : value;
-  return -Math.sqrt(-value + 1) + 1;
-};
-
-interface EventTarget {
-  value: string;
-}
+const expon = (x: string): number => -Math.sqrt(-clamp(parseFloat(x)) + 1) + 1;
 
 onInput(
   "#delay",
@@ -689,29 +709,6 @@ onChange("#recStop", () => {
   recorders.stop();
   recorders = null;
   log("Recording Stopped, click Gallery to view and download the recording");
-});
-
-onInput("#blurOn", () => {
-  simulation.blurEnabled = true;
-  simulation.clearEveryFrame = false;
-  sel("#delay").disabled = false;
-  log("Blur ON - previous generations will fade out based on Blur Amount");
-});
-
-onInput("#blurOff", () => {
-  simulation.blurEnabled = false;
-  simulation.clearEveryFrame = false;
-  sel("#delay").disabled = true;
-  log("Overlay ON - new generation will paint on top of previous one");
-});
-
-onChange("#clearFrame", () => {
-  simulation.clearEveryFrame = true;
-  simulation.blurEnabled = false;
-  sel("#delay").disabled = true;
-  log(
-    "Clear Frame ON - draw only current generation, erase previous generations"
-  );
 });
 
 const gameLink = (game: string): string => {

@@ -300,7 +300,7 @@
           <div>
             <label
               for="gameType"
-              title="When selected, the simulation is not animating."
+              title="Selects which cellular automaton game algorithm is active"
               >Game</label
             >
             <select name="gameType" id="gameType">
@@ -320,7 +320,9 @@
               <option value="anneal">anneal</option>
               <option value="famine">famine</option>
             </select>
-            <label for="currentLiveCellCount">Live Cells:</label>
+            <label for="currentLiveCellCount"
+            title="The current number of live cells in the cellular automaton simulation"
+            >Live Cells:</label>
             <meter id="currentLiveCellCount" low="10" high="281250" optimum="5000" min="0" max="562500"></meter>
           </div>
           <div id="hsluv-picker" style="display: none;">
@@ -532,7 +534,7 @@
           </div>
           <div id="record">
             <label
-              title="Recording: This will start recording video, automatically stops after 30 seconds"
+              title="Recording: This will start recording video, automatically stops after 90 seconds"
               for="record-video"
               >Recording</label
             >
@@ -547,6 +549,7 @@
         </div>
       </div>
     </div>
+    <script src="hsluv.js"></script>
     <script src="index.js"></script>
     <script src="picker.js" type="text/javascript"></script>
   </body>

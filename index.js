@@ -369,6 +369,7 @@ var simulation = new CellularAutomatonEngine(750, canvas, {
     gameType: "life",
     seedDensity: 1
 });
+canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
@@ -404,6 +405,7 @@ var log = function (message, link, linkText) {
     prompt.scrollTop = sel("#prompt").scrollHeight;
 };
 setTimeout(function () { return log("Hover over controls for help"); }, 3000);
+sel("#prompt").scrollTop = 0;
 onChange("#masterOn", function () {
     isSimulationActive = true;
     log("Simulation ON");
@@ -429,25 +431,31 @@ var routeColorMode = function (_a) {
     var value = _a.target.value;
     switch (value) {
         case "picker":
-            sel("#picker").style.display = "none";
+            sel("#hsluv-picker").style.display = "none";
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
             log("Color mode is now the native color picker in your browser");
             break;
         case "hsluv":
             sel('label[for="color"]').style.display = "none";
-            sel("#picker").style.display = "block";
+            sel("#hsluv-picker").style.display = "block";
             sel("#color").style.display = "none";
             log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
             break;
         default:
-            sel("#picker").style.display = "none";
+            sel("#hsluv-picker").style.display = "none";
             sel("#color").style.display = "block";
             sel('label[for="color"]').style.display = "block";
     }
 };
 onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
+onInput("#color", function (_a) {
+    var value = _a.target.value;
+    palette.color = value;
+    // redraw if paused so the user can see what colors
+    isSimulationActive || simulation.draw(false, palette.color);
+}, false);
 onInput("#blurOn", function () {
     simulation.blurEnabled = true;
     simulation.clearEveryFrame = false;
@@ -505,9 +513,8 @@ onInput("#setBlendMode", function (_a) {
     isSimulationActive = currentState;
     log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
-canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
 onClick("#modal-capture-preview", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
-var takeSnapshot = function () {
+var captureScreenshot = function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
     var imgName = "CellularAnimationStudio-" + Date.now();
@@ -524,13 +531,13 @@ var takeSnapshot = function () {
     isSimulationActive = false;
     sel("#masterOff").checked = true;
 };
-onClick("#screencap", takeSnapshot);
+onClick("#screencap", captureScreenshot);
 window.addEventListener("keydown", function (event) {
     if (event.defaultPrevented) {
         return; // Do nothing if event already handled
     }
     if (event.code == "Space")
-        takeSnapshot();
+        captureScreenshot();
 });
 onClick("#showGallery", function () { return (sel("#modal-capture").style.display = "flex"); });
 onClick("#seed", function () {
@@ -576,12 +583,6 @@ onChange("#setClickShape", function (_a) {
     simulation.clickShape = value;
     log("Click Shape is now ", shapeLink(simulation.clickShape), simulation.clickShape);
 });
-onInput("#color", function (_a) {
-    var value = _a.target.value;
-    palette.color = value;
-    // redraw if paused so the user can see what colors
-    isSimulationActive || simulation.draw(false, palette.color);
-}, false);
 var recorders = null;
 onChange("#recStart", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
@@ -637,7 +638,6 @@ var gameLink = function (game) {
             return null;
     }
 };
-sel("#prompt").scrollTop = 0;
 setInterval(function () {
     var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
     sel("#currentCount").value = sum.toString();

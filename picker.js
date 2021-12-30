@@ -382,7 +382,7 @@
       m = 1,
       n,
       t,
-      h = document.getElementById("picker"),
+      h = document.getElementById("hsluv-picker"),
       k = h.getElementsByTagName("canvas")[0].getContext("2d"),
       l = document
         .getElementById("control-s")

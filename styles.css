@@ -106,17 +106,17 @@ button {
   height: 400px;
 }
 
-#picker {
+#hsluv-picker {
   width: 400px;
   margin: auto;
 }
 
-#picker td.cell-input {
+#hsluv-picker td.cell-input {
   width: 80px;
   padding-right: 20px;
 }
 
-#picker td.cell-input input {
+#hsluv-picker td.cell-input input {
   margin: 0;
   height: 22px;
   background: transparent;
@@ -129,33 +129,33 @@ button {
   padding: 0 5px;
 }
 
-#picker td.cell-input.cell-input-hex input {
+#hsluv-picker td.cell-input.cell-input-hex input {
   font-family: monospace;
   border-color: #555;
 }
 
-#picker table {
+#hsluv-picker table {
   margin-top: 20px;
   width: 100%;
 }
 
-#picker table td {
+#hsluv-picker table td {
   padding: 5px 5px;
   vertical-align: top;
   border: none;
 }
 
-#picker table td.picker-label {
+#hsluv-picker table td.picker-label {
   color: #eeeeee;
   width: 30px;
   line-height: 22px;
 }
 
-#picker table .swatch {
+#hsluv-picker table .swatch {
   height: 40px;
 }
 
-#picker .explanation-text {
+#hsluv-picker .explanation-text {
   margin-bottom: 60px;
   margin-top: 100px;
 }

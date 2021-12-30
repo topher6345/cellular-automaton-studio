@@ -462,6 +462,9 @@ const simulation = new CellularAutomatonEngine(750, canvas, {
   gameType: "life",
   seedDensity: 1,
 });
+
+canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
+
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
 // Update the favicon with the current canvas
@@ -504,6 +507,7 @@ const log = (message: string, link?: string, linkText?: string) => {
 };
 
 setTimeout(() => log("Hover over controls for help"), 3000);
+sel("#prompt").scrollTop = 0;
 
 onChange("#masterOn", () => {
   isSimulationActive = true;
@@ -531,25 +535,36 @@ setInterval(() => (sel("#fps").innerText = `${fps.toFixed(1)}ms/f`), 1000);
 const routeColorMode = ({ target: { value } }) => {
   switch (value) {
     case "picker":
-      sel("#picker").style.display = "none";
+      sel("#hsluv-picker").style.display = "none";
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
       log("Color mode is now the native color picker in your browser");
       break;
     case "hsluv":
       sel('label[for="color"]').style.display = "none";
-      sel("#picker").style.display = "block";
+      sel("#hsluv-picker").style.display = "block";
       sel("#color").style.display = "none";
       log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
       break;
     default:
-      sel("#picker").style.display = "none";
+      sel("#hsluv-picker").style.display = "none";
       sel("#color").style.display = "block";
       sel('label[for="color"]').style.display = "block";
   }
 };
 onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
+
+onInput(
+  "#color",
+  ({ target: { value } }) => {
+    palette.color = value;
+
+    // redraw if paused so the user can see what colors
+    isSimulationActive || simulation.draw(false, palette.color);
+  },
+  false
+);
 
 onInput("#blurOn", () => {
   simulation.blurEnabled = true;
@@ -623,15 +638,13 @@ onInput("#setBlendMode", ({ target: { value } }) => {
   log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
 
-canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
-
 onClick(
   "#modal-capture-preview",
   () => (sel("#modal-capture ").style.display = "none"),
   false
 );
 
-const takeSnapshot = () => {
+const captureScreenshot = () => {
   const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
   const imgName = `CellularAnimationStudio-${Date.now()}`;
@@ -655,14 +668,14 @@ Click grey border to exit (Simulation has been paused)
   (sel("#masterOff") as HTMLInputElement).checked = true;
 };
 
-onClick("#screencap", takeSnapshot);
+onClick("#screencap", captureScreenshot);
 
 window.addEventListener("keydown", function (event) {
   if (event.defaultPrevented) {
     return; // Do nothing if event already handled
   }
 
-  if (event.code == "Space") takeSnapshot();
+  if (event.code == "Space") captureScreenshot();
 });
 
 onClick("#showGallery", () => (sel("#modal-capture").style.display = "flex"));
@@ -718,17 +731,6 @@ onChange("#setClickShape", ({ target: { value } }) => {
     simulation.clickShape
   );
 });
-
-onInput(
-  "#color",
-  ({ target: { value } }) => {
-    palette.color = value;
-
-    // redraw if paused so the user can see what colors
-    isSimulationActive || simulation.draw(false, palette.color);
-  },
-  false
-);
 
 let recorders: MediaRecorder = null;
 onChange("#recStart", () => {
@@ -792,8 +794,6 @@ const gameLink = (game: string): string => {
       return null;
   }
 };
-
-sel("#prompt").scrollTop = 0;
 
 setInterval(() => {
   const sum = simulation.data.reduce((a, b) => a + b, 0);

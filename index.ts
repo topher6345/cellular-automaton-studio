@@ -564,22 +564,6 @@ const routeColorMode = ({ target: { value } }) => {
 onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
 
-let currentColor = "";
-let hue = 0;
-let saturation = 63;
-setInterval(() => {
-  // @ts-ignore
-  currentColor = [
-    "#",
-    ...window.hsluv
-      .hsluvToRgb([hue, saturation, 50.0])
-      .map((e: number) => Math.round(e * 255.0))
-      .map((e: number) => e.toString(16)),
-  ].join("");
-  palette.color = currentColor;
-  hue = (hue + 1.5) % 360;
-}, 1000);
-
 onInput(
   "#color",
   ({ target: { value } }) => {

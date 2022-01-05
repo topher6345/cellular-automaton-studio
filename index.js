@@ -1,10 +1,3 @@
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
 var Palette = /** @class */ (function () {
     function Palette(color) {
         this.color = color;
@@ -461,20 +454,6 @@ var routeColorMode = function (_a) {
 };
 onChange("#colorMode", routeColorMode);
 routeColorMode({ target: { value: sel("#colorMode").value } });
-var currentColor = "";
-var hue = 0;
-var saturation = 63;
-setInterval(function () {
-    // @ts-ignore
-    currentColor = __spreadArrays([
-        "#"
-    ], window.hsluv
-        .hsluvToRgb([hue, saturation, 50.0])
-        .map(function (e) { return Math.round(e * 255.0); })
-        .map(function (e) { return e.toString(16); })).join("");
-    palette.color = currentColor;
-    hue = (hue + 1.5) % 360;
-}, 1000);
 onInput("#color", function (_a) {
     var value = _a.target.value;
     palette.color = value;

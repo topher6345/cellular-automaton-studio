@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc script.ts && npx node script.js"
+    "build": "npx tsc offline-hsluv.ts && npx node offline-hsluv.js"
   },
   "author": "Christopher Saunders",
   "license": "MIT",

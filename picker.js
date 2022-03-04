@@ -338,7 +338,7 @@
       K && ((t = 70 < f ? "#1b1b1b" : "#ffffff"), (n = ca(f)), (m = 190 / n.o));
       c();
       var u = T(O(P(R(S([e, g, f])))));
-      simulation.color = u;
+      palette.color = u;
       ya.style.backgroundColor = u;
       6 !== h && (y.value = u);
       if (
@@ -382,7 +382,7 @@
       m = 1,
       n,
       t,
-      h = document.getElementById("picker"),
+      h = document.getElementById("hsluv-picker"),
       k = h.getElementsByTagName("canvas")[0].getContext("2d"),
       l = document
         .getElementById("control-s")

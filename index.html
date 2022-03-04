@@ -3,7 +3,250 @@
   <head>
     <meta charset="utf-8" />
     <title>Cellular Automaton Studio - @topher6345</title>
-    <link href="styles.css" rel="stylesheet" />
+    <style>
+      #game {
+        min-width: 750px;
+        max-height: 750px;
+        border: 1px solid white;
+      }
+
+      body {
+        background-color: black;
+        font-family: Futura;
+      }
+      input {
+        margin: 1em 0;
+      }
+
+      select {
+        margin: 1em 0 1em;
+      }
+
+      h1 {
+        color: white;
+        width: 100%;
+        font-size: 1em;
+      }
+
+      #root {
+        display: flex;
+        max-width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .controls {
+        display: flex;
+        align-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .controls a {
+        font-size: 0.5em;
+        text-decoration: none;
+        color: white;
+      }
+
+      .controls > div {
+        display: block;
+        padding: 0.5em;
+        border: 1px solid black;
+        color: white;
+        background: rgba(40, 40, 40, 0.9);
+        flex-grow: 2;
+      }
+
+      .controls > div:hover {
+        background: rgba(50, 50, 50, 0.9);
+      }
+
+      .controls > div:first-child {
+        max-width: 6em;
+        font-weight: 800;
+        flex-grow: 1;
+      }
+
+      .controls input,
+      .controls select,
+      .controls button {
+        display: block;
+      }
+
+      .controls > label:hover {
+        cursor: help;
+      }
+
+      #modal-capture {
+        position: absolute;
+        width: 100%;
+        top: 0px;
+        left: 0px;
+        z-index: 3;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+      }
+      #modal-capture-preview {
+        width: 900px;
+        display: flex;
+        align-content: center;
+        background-color: darkgrey;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      #modal-capture-preview img {
+        margin: 40px 0;
+        border: 5px solid black;
+        width: 750px;
+      }
+
+      select,
+      button {
+        margin-top: 1em;
+      }
+
+      #display {
+        position: relative;
+        width: 400px;
+        height: 400px;
+      }
+
+      #hsluv-picker {
+        width: 400px;
+        margin: auto;
+      }
+
+      #hsluv-picker td.cell-input {
+        width: 80px;
+        padding-right: 20px;
+      }
+
+      #hsluv-picker td.cell-input input {
+        margin: 0;
+        height: 22px;
+        background: transparent;
+        color: #888;
+        outline: none;
+        border: 1px solid #333;
+        border-radius: 0;
+        text-align: right;
+        width: 100%;
+        padding: 0 5px;
+      }
+
+      #hsluv-picker td.cell-input.cell-input-hex input {
+        font-family: monospace;
+        border-color: #555;
+      }
+
+      #hsluv-picker table {
+        margin-top: 20px;
+        width: 100%;
+      }
+
+      #hsluv-picker table td {
+        padding: 5px 5px;
+        vertical-align: top;
+        border: none;
+      }
+
+      #hsluv-picker table td.picker-label {
+        color: #eeeeee;
+        width: 30px;
+        line-height: 22px;
+      }
+
+      #hsluv-picker table .swatch {
+        height: 40px;
+      }
+
+      #hsluv-picker .explanation-text {
+        margin-bottom: 60px;
+        margin-top: 100px;
+      }
+
+      .range-slider {
+        height: 22px;
+        display: block;
+        position: relative;
+      }
+
+      .range-slider-handle {
+        display: inline-block;
+        position: absolute;
+        width: 6px;
+        top: -2px;
+        left: -5px;
+        height: 100%;
+        cursor: default;
+        border: 2px solid #fff;
+        touch-action: pan-y;
+        -ms-touch-action: pan-y;
+      }
+
+      @keyframes blink {
+        0% {
+          opacity: 0;
+        }
+        49% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      #masterOff:checked {
+        animation: blink 0.5s infinite;
+      }
+
+      #masterOff:checked {
+        animation: blink 0.5s infinite;
+      }
+
+      #recStart:checked {
+        animation: blink 0.5s infinite;
+      }
+
+      #noiseOn:checked {
+        animation: blink 0.5s infinite;
+      }
+
+      #hoverOn:checked {
+        animation: blink 0.5s infinite;
+      }
+
+      #logDisplay {
+        color: white;
+        font-family: monospace;
+        width: 100%;
+        max-height: 3em;
+        overflow: scroll;
+        scroll-behavior: smooth;
+      }
+      #logDisplay > p {
+        padding-left: 1em;
+        padding-right: 1em;
+        line-height: 1em;
+      }
+
+      #logDisplay > p > a {
+        text-decoration: none;
+        color: #00dbff;
+      }
+      #logDisplay > p > a:visited {
+        color: #d300ff;
+      }
+
+      #currentLiveCellCount {
+        text-align: right;
+        max-width: 8em;
+      }
+
+      #currentLiveCellCount:hover {
+        cursor: default;
+      }
+    </style>
     <link
       id="favicon"
       rel="icon"
@@ -18,8 +261,8 @@
         <div id="modal-capture-preview"></div>
       </div>
       <canvas id="game" width="750" height="750"></canvas>
-      <div class="foo">
-        <div id="prompt">
+      <div>
+        <div id="logDisplay">
           <p>
             > Welcome to Cellular Animation Studio
           </p>
@@ -49,17 +292,24 @@
             >
             <input type="radio" id="masterOff" name="master" value="off" />
           </div>
-
+          <div>
+            <label title="Speed - left is faster, right is slower" for="msPerFrame">Speed</label>
+            <input type="range" name="msPerFrame" id="msPerFrame" min="1" max="1000" />
+            <div id='fps'></div>
+          </div>
           <div>
             <label
               for="gameType"
-              title="When selected, the simulation is not animating."
+              title="Selects which cellular automaton game algorithm is active"
               >Game</label
             >
             <select name="gameType" id="gameType">
               <option value="life" selected>Life</option>
               <option value="highlife">High Life</option>
               <option value="replicator">Replicator</option>
+              <option value="gems">Gems</option>
+              <option value="dotlife">Dotlife</option>
+              <option value="fredkin">Fredkin</option>
               <option value="seeds">Seeds</option>
               <option value="B25/S4">B25/S4</option>
               <option value="34life">34 Life</option>
@@ -70,10 +320,12 @@
               <option value="anneal">anneal</option>
               <option value="famine">famine</option>
             </select>
-            <label for="currentCount">Live Cells:</label>
-            <meter id="currentCount" low="10" high="281250" optimum="5000" min="0" max="562500"></meter>
+            <label for="currentLiveCellCount"
+            title="The current number of live cells in the cellular automaton simulation"
+            >Live Cells:</label>
+            <meter id="currentLiveCellCount" low="10" high="281250" optimum="5000" min="0" max="562500"></meter>
           </div>
-          <div id="picker" style="display: none;">
+          <div id="hsluv-picker" style="display: none;">
             <label>HSLUV</label>
             <a href="https://www.hsluv.org/" target="_blank">hsluv.org</a>
             <div id="display">
@@ -87,6 +339,7 @@
                 height="400"
                 width="400"
               ></svg>
+              
             </div>
             <table>
               <tr id="control-h">
@@ -147,69 +400,25 @@
             <select name="colorMode" id="colorMode">
               <option value="picker">Color Picker</option>
               <option value="hsluv">HSLUV</option>
-              <option value="full" selected>Random Frame</option>
-              <option value="row">Random Row</option>
-              <option value="each">Random Pixel</option>
             </select>
             <label
-              title="Color Range: Breadth of the random colors, left is fewer colors, right is more colors"
-              for="colorRadix"
-              >Color Range</label
-            >
-            <input
-              name="colorRadix"
-              id="colorRadix"
-              type="range"
-              min="1"
-              max="16777215"
-              value="16777215"
-            />
-            <label
-              title="Color Rate: How quickly a new random color is chosen, left is less often, right is more often"
-              for="randCycle"
-              >Color Rate</label
-            >
-            <input
-              name="randCycle"
-              type="range"
-              min="0.0"
-              max="1.0"
-              step="0.0001"
-              id="randCycle"
-              value="0.01"
-            />
-            <label
-              style="display: none;"
               title="The color of the new pixels."
               for="color"
               >Picker</label
             >
             <input
-              style="display: none;"
               type="color"
               id="color"
               name="color"
               value="#e66465"
             />
-
-            <label
-              title="The color of the current pixels."
-              for="colorDisplay"
-              >Current color</label
-            >
-            <input
-              disabled="disabled"
-              type="color"
-              id="colorDisplay"
-              name="color"
-              value=""
-            />
           </div>
           <div>
+            <label title="Blur only partially erases each frame, leaving visual trails" for="blurOn">Blur</label>
+            <input type="radio" id="blurOn" name="radio" value="on" checked />
             <label
               title="Each new frame is drawn over the last"
               for="blurOff"
-              checked
               >Overlay</label
             >
             <input type="radio" id="blurOff" name="radio" />
@@ -225,12 +434,7 @@
               type="radio"
               id="clearFrame"
             />
-            <label
-              title="Blur only partially erases each frame, leaving visual trails"
-              for="blurOn"
-              >Blur</label
-            >
-            <input type="radio" id="blurOn" name="radio" value="on" />
+
             <label
               title="Blur Amount: left is more blur and longer trails, right is less blur and shorter trails."
               for="motion-blur"
@@ -241,8 +445,8 @@
               type="range"
               id="delay"
               min="0.0"
-              max="0.076"
-              step="0.0001"
+              max="1"
+              step="0.00001"
               value="0.0005"
             />
           </div>
@@ -254,7 +458,8 @@
             >
             <select id="setBlendMode" name="setBlendMode">
               <option value="source-over">source-over</option>
-              <!-- <option value="source-in">source-in</option> -->
+              <option value="source-in">source-in</option>
+              <!-- These options are commented out because they cause the page to slow down  -->
               <!-- <option value="source-out">source-out</option> -->
               <option value="source-atop">source-atop</option>
               <!-- <option value="destination-over">destination-over</option> -->
@@ -279,12 +484,7 @@
               <option value="luminosity">luminosity</option>
             </select>
           </div>
-          <div>
-            <label title="Speed - left is faster, right is slower" for="rate"
-              >Speed</label
-            >
-            <input type="range" name="rate" id="rate" min="1" max="1000" />
-          </div>
+          
 
           <div>
             <label
@@ -299,7 +499,7 @@
               >Redraw</label
             >
 
-            <button id="clear">Clear</button>
+            <button id="clearSimulation">Clear</button>
             <button id="kill">Kill</button>
 
             <button id="seed">Seed</button>
@@ -332,46 +532,9 @@
               <option value="1x1">1x1</option>
             </select>
           </div>
-          <div>
-            <label
-              title="When checked, hovering the mouse over the canvas will draw a pixel"
-              for="hover"
-              >Hover On</label
-            >
-            <input title="Hover" name="hover" type="radio" id="hoverOn" />
-            <label
-              title="When checked, hovering the mouse over the canvas will draw a pixel"
-              for="hover"
-              >Hover Off</label
-            >
-            <input
-              title="Hover"
-              name="hover"
-              type="radio"
-              id="hoverOff"
-              checked
-            />
-            <label
-              title="Hover Shape: the shape of new live cells in the animation when you hover the mouse"
-              for="setHoverShape"
-              >Hover Shape</label
-            >
-            <select name="setHoverShape" id="setHoverShape">
-              <option value="gliderse">Glider SE</option>
-              <option value="glidersw">Glider SW</option>
-              <option value="gliderne">Glider NE</option>
-              <option value="glidernw">Glider NW</option>
-              <option value="r-pentomino">R-pentomino</option>
-              <option value="pi-heptomino">Pi-heptomino</option>
-              <option value="c-heptomino">C-heptomino</option>
-              <option value="3x3" selected>3x3</option>
-              <option value="1x1">1x1</option>
-            </select>
-          </div>
-
           <div id="record">
             <label
-              title="Recording: This will start recording video, automatically stops after 30 seconds"
+              title="Recording: This will start recording video, automatically stops after 90 seconds"
               for="record-video"
               >Recording</label
             >
@@ -383,38 +546,10 @@
             >
             <input type="radio" id="recStop" name="record-video" checked />
           </div>
-          <div id="noise">
-            <label
-              title="Adds random live cells to the simulation"
-              for="noiseOn"
-              >Noise On</label
-            >
-            <input type="radio" id="noiseOn" name="noise" />
-
-            <label
-              title="Disables random live cells in the simulation"
-              for="noiseOff"
-              >Noise Off</label
-            >
-            <input type="radio" id="noiseOff" name="noise" checked />
-            <label
-              title="How likely live cells spontaneously appear"
-              for="noiseRangeValue"
-              >Amount</label
-            >
-            <input
-              name="noiseRangeValue"
-              type="range"
-              min="0.0"
-              max="1.0"
-              step="0.001"
-              id="noiseRangeValue"
-              value="0.0"
-            />
-          </div>
         </div>
       </div>
     </div>
+    <script src="hsluv.js"></script>
     <script src="index.js"></script>
     <script src="picker.js" type="text/javascript"></script>
   </body>

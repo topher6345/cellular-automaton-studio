@@ -57,6 +57,8 @@ class CellularAutomatonEngine {
   bufferLength: number;
   game: string;
   seedDensity: number;
+  colors: string[];
+  colorLength: number;
 
   constructor(size: number, canvas: Canvas, controlValues: ControlValues) {
     this.size = size;
@@ -92,6 +94,21 @@ class CellularAutomatonEngine {
     this.noiseRangeValue = controlValues.noiseRangeValue;
     this.game = controlValues.game;
     this.seedDensity = controlValues.seedDensity;
+    this.colors = [
+      "bfa09f",
+      "5e7468",
+      "181f1e",
+      "c49e5a",
+      "9e7c7a",
+      "a9908f",
+      "2f3d37",
+      "5a5b5e",
+      "786e4c",
+      "b09f7e",
+      "23302f",
+      "424232",
+    ];
+    this.colorLength = this.colors.length;
   }
 
   seed(): void {
@@ -357,7 +374,7 @@ class CellularAutomatonEngine {
   }
 
   randColorString(): string {
-    return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+    return `#${this.colors[Math.floor(Math.random() * this.colorLength)]}`;
   }
 
   draw(isAnimating = true): void {

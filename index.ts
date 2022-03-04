@@ -1,34 +1,31 @@
+interface HTMLElement {
+  disabled: boolean;
+}
+
 type ControlValues = {
   alpha: number;
-  color: string;
   clickShape: string;
-  hoverShape: string;
-  colorMode: string;
-  colorRadix: number;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
-  colorRateFrames: number;
-  noiseEnabled: boolean;
-  noiseRangeValue: number;
-  game: string;
+  gameType: string;
   seedDensity: number;
 };
 
-const INIT_CONTROL_VALUES: ControlValues = {
-  alpha: 0.006,
-  color: "orange",
-  clickShape: "gliderse",
-  hoverShape: "gliderse",
-  colorMode: "full",
-  colorRadix: 16777215,
-  blurEnabled: true,
-  clearEveryFrame: false,
-  colorRateFrames: 120,
-  noiseEnabled: false,
-  noiseRangeValue: 0,
-  game: "life",
-  seedDensity: 1,
-};
+interface EventTarget {
+  value: string;
+}
+
+interface HTMLCanvasElement {
+  captureStream(): MediaStream;
+}
+
+class Palette {
+  color: string;
+
+  constructor(color: string) {
+    this.color = color;
+  }
+}
 
 class CellularAutomatonEngine {
   size: number;
@@ -36,23 +33,14 @@ class CellularAutomatonEngine {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   alpha: number;
-  color: string;
   pixelSize: number;
   clickShape: string;
-  hoverShape: string;
-  colorMode: string;
-  colorRadix: number;
   buffer: Uint8Array;
   blurEnabled: boolean;
   clearEveryFrame: boolean;
-  colorRateFrames: number;
-  colorCache: string;
-  colorRateCounter: number;
-  noiseEnabled: boolean;
-  noiseRangeValue: number;
   pixelScalar: number;
   bufferLength: number;
-  game: string;
+  gameType: string;
   seedDensity: number;
 
   constructor(
@@ -81,17 +69,8 @@ class CellularAutomatonEngine {
     this.alpha = controlValues.alpha;
     this.blurEnabled = controlValues.blurEnabled;
     this.clearEveryFrame = controlValues.clearEveryFrame;
-    this.color = controlValues.color;
     this.clickShape = controlValues.clickShape;
-    this.hoverShape = controlValues.hoverShape;
-    this.colorMode = controlValues.colorMode;
-    this.colorRadix = controlValues.colorRadix;
-    this.colorRateFrames = controlValues.colorRateFrames;
-    this.colorRateCounter = 0;
-    this.colorCache = this.randColorString();
-    this.noiseEnabled = controlValues.noiseEnabled;
-    this.noiseRangeValue = controlValues.noiseRangeValue;
-    this.game = controlValues.game;
+    this.gameType = controlValues.gameType;
     this.seedDensity = controlValues.seedDensity;
   }
 
@@ -144,116 +123,186 @@ class CellularAutomatonEngine {
 
   update() {
     for (let i = 0; i < this.buffer.length; i++) {
-      // Noise
-      const spontaneousBirth =
-        this.noiseEnabled &&
-        CellularAutomatonEngine.rand(0, 1000, 0) > 985 + this.noiseRangeValue;
-
-      if (spontaneousBirth) {
-        this.buffer[i] = 1;
-        continue;
-      }
-
       const row = i % this.size;
       const col = Math.floor(i / this.size);
 
       // Optimization - array-based algorithm led to GC Pressure and low frame rate
       let liveNeighbors = 0;
-      this.get(row - 1, col - 1) && liveNeighbors++;
-      this.get(row, col - 1) && liveNeighbors++;
-      this.get(row + 1, col - 1) && liveNeighbors++;
-      this.get(row - 1, col) && liveNeighbors++;
-      this.get(row + 1, col) && liveNeighbors++;
-      this.get(row - 1, col + 1) && liveNeighbors++;
-      this.get(row, col + 1) && liveNeighbors++;
-      this.get(row + 1, col + 1) && liveNeighbors++;
+      const amp = 1;
+      this.get(amp * row - 1, amp * (col - 1)) && liveNeighbors++;
+      this.get(amp * row, amp * (col - 1)) && liveNeighbors++;
+      this.get(amp * row + 1, amp * (col - 1)) && liveNeighbors++;
+      this.get(amp * row - 1, amp * col) && liveNeighbors++;
+      this.get(amp * row + 1, amp * col) && liveNeighbors++;
+      this.get(amp * row - 1, amp * (col + 1)) && liveNeighbors++;
+      this.get(amp * row, amp * (col + 1)) && liveNeighbors++;
+      this.get(amp * row + 1, amp * (col + 1)) && liveNeighbors++;
 
       let status = 0;
       const alive = this.get(row, col);
       // prettier-ignore
-      switch (this.game) {
+      switch (this.gameType) {
         case "famine":
-          ( // S6789
-            (alive && (liveNeighbors > 5)) || spontaneousBirth
-          ) && (status = 1);
+          // S6789
+          alive &&
+            liveNeighbors > 5 &&
+            (status = 1);
           break;
         case "anneal":
-          ( // S35678
-            (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)) ||
+          // S35678
+          ((alive &&
+            (liveNeighbors === 3 ||
+              liveNeighbors === 5 ||
+              liveNeighbors === 6 ||
+              liveNeighbors === 7 ||
+              liveNeighbors === 8)) ||
             // B4678
-            (liveNeighbors === 4 || liveNeighbors === 6|| liveNeighbors === 7 || liveNeighbors === 8)
-          ) && (status = 1);
+            liveNeighbors === 4 ||
+            liveNeighbors === 6 ||
+            liveNeighbors === 7 ||
+            liveNeighbors === 8) &&
+            (status = 1);
           break;
         case "morley":
-          ( // S245
-            (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+          // S245
+          ((alive &&
+            (liveNeighbors === 2 ||
+              liveNeighbors === 4 ||
+              liveNeighbors === 5)) ||
             // B368
-            (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 8)
-          ) && (status = 1);
+            liveNeighbors === 3 ||
+            liveNeighbors === 6 ||
+            liveNeighbors === 8) &&
+            (status = 1);
           break;
         case "day&night":
-          ( // S34678
-            (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6  || liveNeighbors === 7 || liveNeighbors === 8)) ||
+          // S34678
+          ((alive &&
+            (liveNeighbors === 3 ||
+              liveNeighbors === 4 ||
+              liveNeighbors === 6 ||
+              liveNeighbors === 7 ||
+              liveNeighbors === 8)) ||
             // B3678
-            (liveNeighbors === 3 || liveNeighbors === 6|| liveNeighbors === 7|| liveNeighbors === 8)
-          ) && (status = 1);
+            liveNeighbors === 3 ||
+            liveNeighbors === 6 ||
+            liveNeighbors === 7 ||
+            liveNeighbors === 8) &&
+            (status = 1);
           break;
         case "2x2":
-          ( // S125
-            (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+          // S125
+          ((alive &&
+            (liveNeighbors === 1 ||
+              liveNeighbors === 2 ||
+              liveNeighbors === 5)) ||
             // B36
-            (liveNeighbors === 3 || liveNeighbors === 6)
-          ) && (status = 1);
+            liveNeighbors === 3 ||
+            liveNeighbors === 6) &&
+            (status = 1);
           break;
         case "diamoeba":
-          ( // S5678
-            (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7|| liveNeighbors === 8)) ||
+          // S5678
+          ((alive &&
+            (liveNeighbors === 5 ||
+              liveNeighbors === 6 ||
+              liveNeighbors === 7 ||
+              liveNeighbors === 8)) ||
             // B35678
-            (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)
-          ) && (status = 1);
+            liveNeighbors === 3 ||
+            liveNeighbors === 5 ||
+            liveNeighbors === 6 ||
+            liveNeighbors === 7 ||
+            liveNeighbors === 8) &&
+            (status = 1);
           break;
         case "34life":
-          ( // S34
-            (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+          // S34
+          ((alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
             // B34
-            (liveNeighbors === 3 || liveNeighbors === 4) ||
-            spontaneousBirth
-          ) && (status = 1);
+            liveNeighbors === 3 ||
+            liveNeighbors === 4) &&
+            (status = 1);
           break;
         case "B25/S4":
-          ( // S4
-            (alive && (liveNeighbors === 4)) ||
+          // S4
+          ((alive && liveNeighbors === 4) ||
             // B25
-            (liveNeighbors === 2 || liveNeighbors === 5)
-          ) && (status = 1);
+            liveNeighbors === 2 ||
+            liveNeighbors === 5) &&
+            (status = 1);
           break;
         case "seeds":
-          ( // S
-            (alive ) ||
+          // S
+          (alive ||
             // B2
-            (liveNeighbors === 2)
-          ) && (status = 1);
+            liveNeighbors === 2) &&
+            (status = 1);
           break;
         case "replicator":
-          ( // S1357
-            (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+          // S1357
+          ((alive &&
+            (liveNeighbors === 1 ||
+              liveNeighbors === 3 ||
+              liveNeighbors === 5 ||
+              liveNeighbors === 7)) ||
             // B1357
-            (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)
-          ) && (status = 1);
+            liveNeighbors === 1 ||
+            liveNeighbors === 3 ||
+            liveNeighbors === 5 ||
+            liveNeighbors === 7) &&
+            (status = 1);
+          break;
+        case "gems":
+          // S4568
+          ((alive &&
+            (liveNeighbors === 4 ||
+              liveNeighbors === 5 ||
+              liveNeighbors === 6 ||
+              liveNeighbors === 8)) ||
+            // B3457
+            liveNeighbors === 3 ||
+            liveNeighbors === 4 ||
+            liveNeighbors === 5 ||
+            liveNeighbors === 7) &&
+            (status = 1);
+          break;
+        case "fredkin":
+          // S1357
+          ((alive &&
+            (liveNeighbors === 0 ||
+              liveNeighbors === 2 ||
+              liveNeighbors === 4 ||
+              liveNeighbors === 6 ||
+              liveNeighbors === 8)) ||
+            // B1357
+            liveNeighbors === 1 ||
+            liveNeighbors === 3 ||
+            liveNeighbors === 5 ||
+            liveNeighbors === 7) &&
+            (status = 1);
+          break;
+        case "dotlife":
+          // 023
+          ((alive && (liveNeighbors === 0 || liveNeighbors === 2)) ||
+            // B3
+            liveNeighbors === 3) &&
+            (status = 1);
           break;
         case "highlife":
-          ( // S23
-          (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-          // B36
-          (liveNeighbors === 3 || liveNeighbors === 6)
-        ) && (status = 1);
+          // S23
+          ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+            // B36
+            liveNeighbors === 3 ||
+            liveNeighbors === 6) &&
+            (status = 1);
           break;
         case "life":
-          (// A23
-          (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
-          // B3
-          liveNeighbors === 3
-        ) && (status = 1);
+          // A23
+          ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+            // B3
+            liveNeighbors === 3) &&
+            (status = 1);
           break;
       }
       this.buffer[i] = status;
@@ -272,11 +321,6 @@ class CellularAutomatonEngine {
         ((event.clientY - rect.top) / this.pixelSize) * this.pixelScalar
       ),
     };
-  }
-
-  hover(e: MouseEvent) {
-    const { x, y } = this.getMousePos(e);
-    this.drawShape(x, y, this.hoverShape);
   }
 
   drawShape(x: number, y: number, shape: string) {
@@ -358,20 +402,7 @@ class CellularAutomatonEngine {
     this.drawShape(x, y, this.clickShape);
   }
 
-  randColor(): string {
-    if (this.colorRateCounter > this.colorRateFrames) {
-      this.colorCache = this.randColorString();
-      this.colorRateCounter = 0;
-    }
-    this.colorRateCounter = this.colorRateCounter + 1;
-    return this.colorCache;
-  }
-
-  randColorString(): string {
-    return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
-  }
-
-  draw(isAnimating = true): void {
+  draw(isAnimating = true, fillStyle: string): void {
     if (isAnimating) {
       this.ctx.fillStyle = `rgba(1,1,1,${this.alpha})`;
       this.ctx.fillRect(
@@ -390,23 +421,10 @@ class CellularAutomatonEngine {
         this.size * this.pixelSize
       );
 
-    if (this.colorMode === "full") {
-      this.ctx.fillStyle = this.randColor();
-    } else if (this.colorMode === "picker" || this.colorMode === "hsluv") {
-      this.ctx.fillStyle = this.color;
-    }
-
+    this.ctx.fillStyle = fillStyle;
     for (let row = 0; row < this.size; row++) {
-      if (this.colorMode === "row") {
-        this.ctx.fillStyle = this.randColor();
-      }
-
       for (let col = 0; col < this.size; col++) {
         if (this.get(row, col) === 1) {
-          if (this.colorMode === "each") {
-            this.ctx.fillStyle = this.randColor();
-          }
-
           this.ctx.fillRect(
             col * this.pixelSize,
             row * this.pixelSize,
@@ -419,14 +437,34 @@ class CellularAutomatonEngine {
   }
 }
 
+// DOM Combinators
 const sel = (selector: string): HTMLElement => document.querySelector(selector);
+const on =
+  (eventType: string) =>
+  (
+    selector: string,
+    callback: (e: MouseEvent) => void,
+    preventDefault?: boolean
+  ) =>
+    sel(selector).addEventListener(eventType, callback, preventDefault);
+
+const onClick = on("click");
+const onInput = on("input");
+const onChange = on("change");
 
 const canvas = sel("canvas") as HTMLCanvasElement;
-const simulation = new CellularAutomatonEngine(
-  750,
-  canvas,
-  INIT_CONTROL_VALUES
-);
+const palette = new Palette("#ffffff");
+const simulation = new CellularAutomatonEngine(750, canvas, {
+  alpha: 0.00095,
+  clickShape: "gliderse",
+  blurEnabled: true,
+  clearEveryFrame: false,
+  gameType: "life",
+  seedDensity: 1,
+});
+
+canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
+
 const favicon = sel("#favicon") as HTMLAnchorElement;
 
 // Update the favicon with the current canvas
@@ -434,27 +472,29 @@ favicon.href = canvas.toDataURL();
 window.setInterval(() => (favicon.href = canvas.toDataURL()), 5000);
 
 let msPast: number = null;
-let msPerFrame: number = 7;
-let masterOnOff: boolean = true;
-
+let msPerFrame: number = 100;
+let isSimulationActive: boolean = true;
+let fps = 0;
 function tick(now: number) {
-  // if (!msPast) msPast = now;
+  if (!msPast) msPast = now;
 
-  // if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
-  //   msPast = now;
-  simulation.draw(simulation.blurEnabled);
-  simulation.update();
-  // }
+  if (!msPast || (now - msPast > msPerFrame && isSimulationActive)) {
+    fps = now - msPast;
+    msPast = now;
+
+    simulation.draw(simulation.blurEnabled, palette.color);
+    simulation.update();
+  }
   window.requestAnimationFrame(tick);
 }
 
 window.requestAnimationFrame(tick);
 
 const log = (message: string, link?: string, linkText?: string) => {
-  const prompt = sel("#prompt");
+  const display = sel("#logDisplay");
   const p = document.createElement("p");
   p.innerText = `> ${message}`;
-  prompt.append(p);
+  display.append(p);
 
   if (link) {
     const a = document.createElement("a");
@@ -463,28 +503,114 @@ const log = (message: string, link?: string, linkText?: string) => {
     a.target = "_blank";
     p.append(a);
   }
-  prompt.scrollTop = sel("#prompt").scrollHeight;
+  display.scrollTop = sel("#logDisplay").scrollHeight;
 };
 
 setTimeout(() => log("Hover over controls for help"), 3000);
+sel("#logDisplay").scrollTop = 0;
+
+onChange("#masterOn", () => {
+  isSimulationActive = true;
+  log("Simulation ON");
+});
+
+onChange("#masterOff", () => {
+  isSimulationActive = false;
+  log("Simulation OFF");
+});
+
+onInput(
+  "#msPerFrame",
+  ({ target: { value } }) => (msPerFrame = parseInt(value))
+);
+
+onChange("#msPerFrame", () =>
+  log(`Speed is now ${msPerFrame} milliseconds per generation`)
+);
+
+setInterval(() => (sel("#fps").innerText = `${fps.toFixed(1)}ms/f`), 1000);
+
+onChange("#gameType", ({ target: { value } }) => {
+  simulation.gameType = value;
+  log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
+});
+
+setInterval(() => {
+  const sum = simulation.data.reduce((a, b) => a + b, 0);
+
+  sel("#currentLiveCellCount").value = sum.toString();
+}, 250);
+
+const routeColorMode = ({ target: { value } }) => {
+  switch (value) {
+    case "picker":
+      sel("#hsluv-picker").style.display = "none";
+      sel("#color").style.display = "block";
+      sel('label[for="color"]').style.display = "block";
+      log("Color mode is now the native color picker in your browser");
+      break;
+    case "hsluv":
+      sel('label[for="color"]').style.display = "none";
+      sel("#hsluv-picker").style.display = "block";
+      sel("#color").style.display = "none";
+      log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
+      break;
+    default:
+      sel("#hsluv-picker").style.display = "none";
+      sel("#color").style.display = "block";
+      sel('label[for="color"]').style.display = "block";
+  }
+};
+onChange("#colorMode", routeColorMode);
+routeColorMode({ target: { value: sel("#colorMode").value } });
+
+onInput(
+  "#color",
+  ({ target: { value } }) => {
+    palette.color = value;
+
+    // redraw if paused so the user can see what colors
+    isSimulationActive || simulation.draw(false, palette.color);
+  },
+  false
+);
+
+onInput("#blurOn", () => {
+  simulation.blurEnabled = true;
+  simulation.clearEveryFrame = false;
+  sel("#delay").disabled = false;
+  log("Blur ON - previous generations will fade out based on Blur Amount");
+});
+
+onInput("#blurOff", () => {
+  simulation.blurEnabled = false;
+  simulation.clearEveryFrame = false;
+  sel("#delay").disabled = true;
+  log("Overlay ON - new generation will paint on top of previous one");
+});
+
+onChange("#clearFrame", () => {
+  simulation.clearEveryFrame = true;
+  simulation.blurEnabled = false;
+  sel("#delay").disabled = true;
+  log(
+    "Clear Frame ON - draw only current generation, erase previous generations"
+  );
+});
+
+const clamp = (num: number) => Math.min(Math.max(num, 0.0), 1.0);
 
 const rangeOver = (input: string, max: number, floor: number) =>
   expon(input) * max + floor;
 
-const expon = (x: string): number => {
-  let value = parseFloat(x);
-  value = value < 0.0 ? 0.0 : value;
-  value = value > 1.0 ? 1.0 : value;
-  return -Math.sqrt(-value + 1) + 1;
-};
+const expon = (x: string): number => -Math.sqrt(-clamp(parseFloat(x)) + 1) + 1;
 
-interface EventTarget {
-  value: string;
-}
-
-sel("#delay").addEventListener(
-  "input",
-  (e) => (simulation.alpha = rangeOver(e.target.value, 1.0, 0)),
+onInput(
+  "#delay",
+  ({ target: { value } }) => {
+    simulation.alpha = rangeOver(value, 0.004, 0.0000001);
+    log("Delay is now ", simulation.alpha.toString(), "");
+  },
   false
 );
 
@@ -494,8 +620,7 @@ const blendModeLink: any = {
   "source-atop":
     "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcatop",
   lighten: "https://drafts.fxtf.org/compositing-1/#blendinglighten",
-  xor:
-    "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
+  xor: "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_xor",
   multiply: "https://drafts.fxtf.org/compositing-1/#blendingmultiply",
   screen: "https://drafts.fxtf.org/compositing-1/#blendingscreen",
   overlay: "https://drafts.fxtf.org/compositing-1/#blendingoverlay",
@@ -511,62 +636,24 @@ const blendModeLink: any = {
   luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity",
 };
 
-sel("#setBlendMode").addEventListener("input", (e) => {
-  const currentState = masterOnOff;
-  if (currentState) masterOnOff = false;
+onInput("#setBlendMode", ({ target: { value } }) => {
+  const currentState = isSimulationActive;
+  if (currentState) isSimulationActive = false;
 
-  const blendMode = e.target.value;
+  const blendMode = value;
   simulation.ctx.globalCompositeOperation = blendMode;
 
-  masterOnOff = currentState;
+  isSimulationActive = currentState;
   log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
 
-sel("#rate").addEventListener(
-  "input",
-  (e) => (msPerFrame = parseInt(e.target.value))
-);
-
-sel("#rate").addEventListener("change", () =>
-  log(`Speed is now ${msPerFrame} milliseconds per generation`)
-);
-
-let isHovering = false;
-sel("#hoverOn").addEventListener("input", () => {
-  isHovering = true;
-  log("Hover ON - the mouse over the canvas will now draw a shape");
-});
-
-sel("#hoverOff").addEventListener("input", () => {
-  isHovering = false;
-  log("Hover OFF - the mouse over the canvas will not draw");
-});
-
-canvas.addEventListener(
-  "mousemove",
-  (e) => isHovering && simulation.hover(e),
-  false
-);
-
-canvas.addEventListener("click", (e) => simulation.clickDown(e), false);
-
-sel("#masterOn").addEventListener("change", () => {
-  masterOnOff = true;
-  log("Simulation ON");
-});
-
-sel("#masterOff").addEventListener("change", () => {
-  masterOnOff = false;
-  log("Simulation OFF");
-});
-
-sel("#modal-capture-preview").addEventListener(
-  "click",
+onClick(
+  "#modal-capture-preview",
   () => (sel("#modal-capture ").style.display = "none"),
   false
 );
 
-const takeSnapshot = () => {
+const captureScreenshot = () => {
   const img = new Image();
   const dataUrl = canvas.toDataURL("image/png");
   const imgName = `CellularAnimationStudio-${Date.now()}`;
@@ -586,46 +673,44 @@ Click grey border to exit (Simulation has been paused)
   sel("#modal-capture").style.display = "flex";
   sel("#modal-capture-preview").prepend(a);
 
-  masterOnOff = false;
+  isSimulationActive = false;
   (sel("#masterOff") as HTMLInputElement).checked = true;
 };
 
-sel("#screencap").addEventListener("click", takeSnapshot);
+onClick("#screencap", captureScreenshot);
+
 window.addEventListener("keydown", function (event) {
   if (event.defaultPrevented) {
     return; // Do nothing if event already handled
   }
 
-  if (event.code == "Space") takeSnapshot();
+  if (event.code == "Space") captureScreenshot();
 });
 
-sel("#showGallery").addEventListener(
-  "click",
-  () => (sel("#modal-capture").style.display = "flex")
-);
+onClick("#showGallery", () => (sel("#modal-capture").style.display = "flex"));
 
-sel("#seed").addEventListener("click", () => {
+onClick("#seed", () => {
   simulation.seed();
   log(`Simulation seeded - 1 in ${simulation.seedDensity} odds`);
 });
 
-sel("#clear").addEventListener("click", () => {
+onClick("#clearSimulation", () => {
   simulation.clear();
   log("Screen cleared");
 });
 
-sel("#kill").addEventListener("click", () => {
+onClick("#kill", () => {
   simulation.kill();
   log("Cells Killed - click Seed or the canvas to add live cells");
 });
 
-sel("#seedDensity").addEventListener(
-  "input",
-  (e) => (simulation.seedDensity = parseInt(e.target.value))
+onInput(
+  "#seedDensity",
+  ({ target: { value } }) => (simulation.seedDensity = parseInt(value))
 );
 
-sel("#seedDensity").addEventListener("change", (e) =>
-  log(`Seed Density changed to ${e.target.value}`)
+onChange("#seedDensity", ({ target: { value } }) =>
+  log(`Seed Density changed to ${value}`)
 );
 
 const shapeLink = (shape: string): string => {
@@ -647,8 +732,8 @@ const shapeLink = (shape: string): string => {
   }
 };
 
-sel("#setClickShape").addEventListener("change", (e) => {
-  simulation.clickShape = e.target.value;
+onChange("#setClickShape", ({ target: { value } }) => {
+  simulation.clickShape = value;
   log(
     "Click Shape is now ",
     shapeLink(simulation.clickShape),
@@ -656,120 +741,8 @@ sel("#setClickShape").addEventListener("change", (e) => {
   );
 });
 
-sel("#setHoverShape").addEventListener("change", (e) => {
-  simulation.hoverShape = e.target.value;
-
-  log(
-    `Hover Shape (${isHovering ? "ON" : "OFF"}) is now ${
-      simulation.hoverShape
-    }`,
-    shapeLink(simulation.hoverShape)
-  );
-});
-
-sel("#color").addEventListener(
-  "input",
-  (e) => {
-    simulation.color = e.target.value;
-    sel("#colorDisplay").value = e.target.value;
-    // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false);
-  },
-  false
-);
-
-// HSLUV picker
-sel(".input-hex").addEventListener(
-  "input",
-  (e) => {
-    simulation.color = e.target.value;
-
-    // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false);
-  },
-  false
-);
-
-sel("#colorMode").addEventListener("change", (e) => {
-  simulation.colorMode = e.target.value;
-
-  switch (e.target.value) {
-    case "picker":
-      sel("#colorRadix").style.display = "none";
-      sel('label[for="colorRadix"]').style.display = "none";
-      sel("#randCycle").style.display = "none";
-      sel('label[for="randCycle"]').style.display = "none";
-      sel("#picker").style.display = "none";
-
-      sel("#color").style.display = "block";
-      sel('label[for="color"]').style.display = "block";
-      log("Color mode is now the native color picker in your browser");
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
-      break;
-    case "hsluv":
-      sel("#colorRadix").style.display = "none";
-      sel('label[for="colorRadix"]').style.display = "none";
-      sel("#randCycle").style.display = "none";
-      sel('label[for="randCycle"]').style.display = "none";
-      sel('label[for="color"]').style.display = "none";
-      sel("#picker").style.display = "block";
-      sel("#color").style.display = "none";
-      log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
-      break;
-    case "full":
-      sel("#colorDisplay").style.display = "block";
-      sel('label[for="colorDisplay"]').style.display = "block";
-      sel("#picker").style.display = "none";
-
-      log(
-        "Color mode is now Random Frame - all pixels of each frame will be the same random color"
-      );
-
-      break;
-    case "row":
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
-      log(
-        "Color mode is now Random Row - all pixels of each row will be the same random color"
-      );
-      break;
-    case "each":
-      log("Color mode is now Random Pixel- every pixel is a new random color");
-      sel("#colorDisplay").style.display = "none";
-      sel('label[for="colorDisplay"]').style.display = "none";
-      break;
-    default:
-      sel("#colorRadix").style.display = "block";
-      sel('label[for="colorRadix"]').style.display = "block";
-      sel("#randCycle").style.display = "block";
-      sel('label[for="randCycle"]').style.display = "block";
-      sel("#color").style.display = "none";
-      sel("#picker").style.display = "none";
-      sel('label[for="color"]').style.display = "none";
-      sel("#colorDisplay").style.display = "none";
-  }
-});
-
-setInterval(() => {
-  if (simulation.colorMode == "full") {
-    sel("#colorDisplay").value = simulation.ctx.fillStyle.toString();
-  }
-}, 250);
-
-sel("#colorRadix").addEventListener(
-  "input",
-  (e) => (simulation.colorRadix = parseInt(e.target.value))
-);
-
-interface HTMLCanvasElement {
-  captureStream(): MediaStream;
-}
-
 let recorders: MediaRecorder = null;
-sel("#recStart").addEventListener("change", () => {
+onChange("#recStart", () => {
   const chunks: BlobPart[] = []; // here we will store our recorded media chunks (Blobs)
   const stream = canvas.captureStream();
   const rec = new MediaRecorder(stream);
@@ -783,12 +756,13 @@ sel("#recStart").addEventListener("change", () => {
     const vid: HTMLVideoElement = document.createElement("video");
     vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
     const vidName = `CellularAnimationStudio-${Date.now()}`;
+    // @ts-ignore
     vid.download = `${vidName}.webm`;
     vid.controls = true;
 
     sel("#modal-capture-preview").prepend(vid);
 
-    masterOnOff = false;
+    isSimulationActive = false;
     (sel("#masterOff") as HTMLInputElement).checked = true;
   };
 
@@ -801,73 +775,10 @@ sel("#recStart").addEventListener("change", () => {
   }, 1000 * 90);
 });
 
-sel("#recStop").addEventListener("change", () => {
+onChange("#recStop", () => {
   recorders.stop();
   recorders = null;
   log("Recording Stopped, click Gallery to view and download the recording");
-});
-
-interface HTMLElement {
-  disabled: boolean;
-}
-
-sel("#blurOn").addEventListener("input", () => {
-  simulation.blurEnabled = true;
-  simulation.clearEveryFrame = false;
-  sel("#delay").disabled = false;
-  log("Blur ON - previous generations will fade out based on Blur Amount");
-});
-
-sel("#blurOff").addEventListener("input", () => {
-  simulation.blurEnabled = false;
-  simulation.clearEveryFrame = false;
-  sel("#delay").disabled = true;
-  log("Overlay ON - new generation will paint on top of previous one");
-});
-
-sel("#clearFrame").addEventListener("change", () => {
-  simulation.clearEveryFrame = true;
-  simulation.blurEnabled = false;
-  sel("#delay").disabled = true;
-  log(
-    "Clear Frame ON - draw only current generation, erase previous generations"
-  );
-});
-
-sel("#randCycle").addEventListener("input", (e) => {
-  simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
-  simulation.colorRateCounter = 0;
-});
-
-sel("#noiseRangeValue").addEventListener(
-  "input",
-  (e) => (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12))
-);
-
-sel("#noiseRangeValue").addEventListener("change", () => {
-  if (simulation.noiseEnabled) {
-    log(
-      `Noise (ON) Amount is now 1 in ${simulation.noiseRangeValue.toFixed(
-        2
-      )} chance of being born`
-    );
-  } else {
-    log(
-      `Noise (OFF) Amount is now 1 in ${simulation.noiseRangeValue.toFixed(
-        2
-      )} chace of being born`
-    );
-  }
-});
-
-sel("#noiseOn").addEventListener("change", () => {
-  simulation.noiseEnabled = true;
-  log("Noise On - cells will be born randomly");
-});
-
-sel("#noiseOff").addEventListener("change", () => {
-  simulation.noiseEnabled = false;
-  log("Noise Off - cells will be born according to game rules only");
 });
 
 const gameLink = (game: string): string => {
@@ -891,43 +802,4 @@ const gameLink = (game: string): string => {
     case "famine":
       return null;
   }
-};
-
-sel("#gameType").addEventListener("change", (e) => {
-  simulation.game = e.target.value;
-  log("Game changed to ", gameLink(simulation.game), simulation.game);
-});
-
-sel("#prompt").scrollTop = 0;
-
-setInterval(() => {
-  const sum = simulation.data.reduce((a, b) => a + b, 0);
-
-  sel("#currentCount").value = sum.toString();
-}, 250);
-
-const route = (state: ControlValues) => {
-  sel("#gameType").value = state.game;
-
-  // TODO: exponential to linear
-  // sel("#delay").value = state.alpha.toString();
-
-  // Don't set color in UI
-  // sel("").value = state.color;
-
-  sel("#setClickShape").value = state.clickShape;
-  sel("#setHoverShape").value = state.hoverShape;
-  sel("#colorMode").value = state.colorMode;
-  sel("#colorRadix").value = state.colorRadix.toString();
-  (sel("#clearFrame") as HTMLInputElement).checked = state.blurEnabled;
-  (sel("#clearFrame") as HTMLInputElement).checked = state.clearEveryFrame;
-
-  // TODO: exponential to linear
-  // sel("#randCycle").value = state.colorRateFrames;
-
-  (sel("#noiseOn") as HTMLInputElement).checked = state.noiseEnabled;
-  sel("#noiseRangeValue").value = state.noiseRangeValue.toString();
-
-  // TODO: exponential to linear
-  // sel("#seedDensity").value = state.seedDensity;
 };

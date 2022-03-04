@@ -1,18 +1,9 @@
-var INIT_CONTROL_VALUES = {
-    alpha: 0.006,
-    color: "orange",
-    clickShape: "gliderse",
-    hoverShape: "gliderse",
-    colorMode: "full",
-    colorRadix: 16777215,
-    blurEnabled: true,
-    clearEveryFrame: false,
-    colorRateFrames: 120,
-    noiseEnabled: false,
-    noiseRangeValue: 0,
-    game: "life",
-    seedDensity: 1
-};
+var Palette = /** @class */ (function () {
+    function Palette(color) {
+        this.color = color;
+    }
+    return Palette;
+}());
 var CellularAutomatonEngine = /** @class */ (function () {
     function CellularAutomatonEngine(size, canvas, controlValues) {
         this.size = size;
@@ -29,17 +20,8 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.alpha = controlValues.alpha;
         this.blurEnabled = controlValues.blurEnabled;
         this.clearEveryFrame = controlValues.clearEveryFrame;
-        this.color = controlValues.color;
         this.clickShape = controlValues.clickShape;
-        this.hoverShape = controlValues.hoverShape;
-        this.colorMode = controlValues.colorMode;
-        this.colorRadix = controlValues.colorRadix;
-        this.colorRateFrames = controlValues.colorRateFrames;
-        this.colorRateCounter = 0;
-        this.colorCache = this.randColorString();
-        this.noiseEnabled = controlValues.noiseEnabled;
-        this.noiseRangeValue = controlValues.noiseRangeValue;
-        this.game = controlValues.game;
+        this.gameType = controlValues.gameType;
         this.seedDensity = controlValues.seedDensity;
     }
     CellularAutomatonEngine.prototype.seed = function () {
@@ -80,99 +62,184 @@ var CellularAutomatonEngine = /** @class */ (function () {
     CellularAutomatonEngine.prototype.update = function () {
         var _a;
         for (var i = 0; i < this.buffer.length; i++) {
-            // Noise
-            var spontaneousBirth = this.noiseEnabled &&
-                CellularAutomatonEngine.rand(0, 1000, 0) > 985 + this.noiseRangeValue;
-            if (spontaneousBirth) {
-                this.buffer[i] = 1;
-                continue;
-            }
             var row = i % this.size;
             var col = Math.floor(i / this.size);
             // Optimization - array-based algorithm led to GC Pressure and low frame rate
             var liveNeighbors = 0;
-            this.get(row - 1, col - 1) && liveNeighbors++;
-            this.get(row, col - 1) && liveNeighbors++;
-            this.get(row + 1, col - 1) && liveNeighbors++;
-            this.get(row - 1, col) && liveNeighbors++;
-            this.get(row + 1, col) && liveNeighbors++;
-            this.get(row - 1, col + 1) && liveNeighbors++;
-            this.get(row, col + 1) && liveNeighbors++;
-            this.get(row + 1, col + 1) && liveNeighbors++;
+            var amp = 1;
+            this.get(amp * row - 1, amp * (col - 1)) && liveNeighbors++;
+            this.get(amp * row, amp * (col - 1)) && liveNeighbors++;
+            this.get(amp * row + 1, amp * (col - 1)) && liveNeighbors++;
+            this.get(amp * row - 1, amp * col) && liveNeighbors++;
+            this.get(amp * row + 1, amp * col) && liveNeighbors++;
+            this.get(amp * row - 1, amp * (col + 1)) && liveNeighbors++;
+            this.get(amp * row, amp * (col + 1)) && liveNeighbors++;
+            this.get(amp * row + 1, amp * (col + 1)) && liveNeighbors++;
             var status_1 = 0;
             var alive = this.get(row, col);
             // prettier-ignore
-            switch (this.game) {
+            switch (this.gameType) {
                 case "famine":
-                    ( // S6789
-                    (alive && (liveNeighbors > 5)) || spontaneousBirth) && (status_1 = 1);
+                    // S6789
+                    alive &&
+                        liveNeighbors > 5 &&
+                        (status_1 = 1);
                     break;
                 case "anneal":
-                    ( // S35678
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    // S35678
+                    ((alive &&
+                        (liveNeighbors === 3 ||
+                            liveNeighbors === 5 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 7 ||
+                            liveNeighbors === 8)) ||
                         // B4678
-                        (liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 4 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 7 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "morley":
-                    ( // S245
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 4 || liveNeighbors === 5)) ||
+                    // S245
+                    ((alive &&
+                        (liveNeighbors === 2 ||
+                            liveNeighbors === 4 ||
+                            liveNeighbors === 5)) ||
                         // B368
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "day&night":
-                    ( // S34678
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 4 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    // S34678
+                    ((alive &&
+                        (liveNeighbors === 3 ||
+                            liveNeighbors === 4 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 7 ||
+                            liveNeighbors === 8)) ||
                         // B3678
-                        (liveNeighbors === 3 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 7 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "2x2":
-                    ( // S125
-                    (alive && (liveNeighbors === 1 || liveNeighbors === 2 || liveNeighbors === 5)) ||
+                    // S125
+                    ((alive &&
+                        (liveNeighbors === 1 ||
+                            liveNeighbors === 2 ||
+                            liveNeighbors === 5)) ||
                         // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6) &&
+                        (status_1 = 1);
                     break;
                 case "diamoeba":
-                    ( // S5678
-                    (alive && (liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) ||
+                    // S5678
+                    ((alive &&
+                        (liveNeighbors === 5 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 7 ||
+                            liveNeighbors === 8)) ||
                         // B35678
-                        (liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 6 || liveNeighbors === 7 || liveNeighbors === 8)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 6 ||
+                        liveNeighbors === 7 ||
+                        liveNeighbors === 8) &&
+                        (status_1 = 1);
                     break;
                 case "34life":
-                    ( // S34
-                    (alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
+                    // S34
+                    ((alive && (liveNeighbors === 3 || liveNeighbors === 4)) ||
                         // B34
-                        (liveNeighbors === 3 || liveNeighbors === 4) ||
-                        spontaneousBirth) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 4) &&
+                        (status_1 = 1);
                     break;
                 case "B25/S4":
-                    ( // S4
-                    (alive && (liveNeighbors === 4)) ||
+                    // S4
+                    ((alive && liveNeighbors === 4) ||
                         // B25
-                        (liveNeighbors === 2 || liveNeighbors === 5)) && (status_1 = 1);
+                        liveNeighbors === 2 ||
+                        liveNeighbors === 5) &&
+                        (status_1 = 1);
                     break;
                 case "seeds":
-                    ( // S
-                    (alive) ||
+                    // S
+                    (alive ||
                         // B2
-                        (liveNeighbors === 2)) && (status_1 = 1);
+                        liveNeighbors === 2) &&
+                        (status_1 = 1);
                     break;
                 case "replicator":
-                    ( // S1357
-                    (alive && (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) ||
+                    // S1357
+                    ((alive &&
+                        (liveNeighbors === 1 ||
+                            liveNeighbors === 3 ||
+                            liveNeighbors === 5 ||
+                            liveNeighbors === 7)) ||
                         // B1357
-                        (liveNeighbors === 1 || liveNeighbors === 3 || liveNeighbors === 5 || liveNeighbors === 7)) && (status_1 = 1);
+                        liveNeighbors === 1 ||
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 7) &&
+                        (status_1 = 1);
+                    break;
+                case "gems":
+                    // S4568
+                    ((alive &&
+                        (liveNeighbors === 4 ||
+                            liveNeighbors === 5 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 8)) ||
+                        // B3457
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 4 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 7) &&
+                        (status_1 = 1);
+                    break;
+                case "fredkin":
+                    // S1357
+                    ((alive &&
+                        (liveNeighbors === 0 ||
+                            liveNeighbors === 2 ||
+                            liveNeighbors === 4 ||
+                            liveNeighbors === 6 ||
+                            liveNeighbors === 8)) ||
+                        // B1357
+                        liveNeighbors === 1 ||
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 5 ||
+                        liveNeighbors === 7) &&
+                        (status_1 = 1);
+                    break;
+                case "dotlife":
+                    // 023
+                    ((alive && (liveNeighbors === 0 || liveNeighbors === 2)) ||
+                        // B3
+                        liveNeighbors === 3) &&
+                        (status_1 = 1);
                     break;
                 case "highlife":
-                    ( // S23
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    // S23
+                    ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // B36
-                        (liveNeighbors === 3 || liveNeighbors === 6)) && (status_1 = 1);
+                        liveNeighbors === 3 ||
+                        liveNeighbors === 6) &&
+                        (status_1 = 1);
                     break;
                 case "life":
-                    ( // A23
-                    (alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
+                    // A23
+                    ((alive && (liveNeighbors === 2 || liveNeighbors === 3)) ||
                         // B3
-                        liveNeighbors === 3) && (status_1 = 1);
+                        liveNeighbors === 3) &&
+                        (status_1 = 1);
                     break;
             }
             this.buffer[i] = status_1;
@@ -186,10 +253,6 @@ var CellularAutomatonEngine = /** @class */ (function () {
             y: Math.floor(((event.clientX - rect.left) / this.pixelSize) * this.pixelScalar),
             x: Math.floor(((event.clientY - rect.top) / this.pixelSize) * this.pixelScalar)
         };
-    };
-    CellularAutomatonEngine.prototype.hover = function (e) {
-        var _a = this.getMousePos(e), x = _a.x, y = _a.y;
-        this.drawShape(x, y, this.hoverShape);
     };
     CellularAutomatonEngine.prototype.drawShape = function (x, y, shape) {
         switch (shape) {
@@ -267,18 +330,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         var _a = this.getMousePos(e), x = _a.x, y = _a.y;
         this.drawShape(x, y, this.clickShape);
     };
-    CellularAutomatonEngine.prototype.randColor = function () {
-        if (this.colorRateCounter > this.colorRateFrames) {
-            this.colorCache = this.randColorString();
-            this.colorRateCounter = 0;
-        }
-        this.colorRateCounter = this.colorRateCounter + 1;
-        return this.colorCache;
-    };
-    CellularAutomatonEngine.prototype.randColorString = function () {
-        return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
-    };
-    CellularAutomatonEngine.prototype.draw = function (isAnimating) {
+    CellularAutomatonEngine.prototype.draw = function (isAnimating, fillStyle) {
         if (isAnimating === void 0) { isAnimating = true; }
         if (isAnimating) {
             this.ctx.fillStyle = "rgba(1,1,1," + this.alpha + ")";
@@ -286,21 +338,10 @@ var CellularAutomatonEngine = /** @class */ (function () {
         }
         if (this.clearEveryFrame)
             this.ctx.clearRect(0, 0, this.size * this.pixelSize, this.size * this.pixelSize);
-        if (this.colorMode === "full") {
-            this.ctx.fillStyle = this.randColor();
-        }
-        else if (this.colorMode === "picker" || this.colorMode === "hsluv") {
-            this.ctx.fillStyle = this.color;
-        }
+        this.ctx.fillStyle = fillStyle;
         for (var row = 0; row < this.size; row++) {
-            if (this.colorMode === "row") {
-                this.ctx.fillStyle = this.randColor();
-            }
             for (var col = 0; col < this.size; col++) {
                 if (this.get(row, col) === 1) {
-                    if (this.colorMode === "each") {
-                        this.ctx.fillStyle = this.randColor();
-                    }
                     this.ctx.fillRect(col * this.pixelSize, row * this.pixelSize, this.pixelSize, this.pixelSize);
                 }
             }
@@ -308,31 +349,52 @@ var CellularAutomatonEngine = /** @class */ (function () {
     };
     return CellularAutomatonEngine;
 }());
+// DOM Combinators
 var sel = function (selector) { return document.querySelector(selector); };
+var on = function (eventType) {
+    return function (selector, callback, preventDefault) {
+        return sel(selector).addEventListener(eventType, callback, preventDefault);
+    };
+};
+var onClick = on("click");
+var onInput = on("input");
+var onChange = on("change");
 var canvas = sel("canvas");
-var simulation = new CellularAutomatonEngine(750, canvas, INIT_CONTROL_VALUES);
+var palette = new Palette("#ffffff");
+var simulation = new CellularAutomatonEngine(750, canvas, {
+    alpha: 0.00095,
+    clickShape: "gliderse",
+    blurEnabled: true,
+    clearEveryFrame: false,
+    gameType: "life",
+    seedDensity: 1
+});
+canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
 var favicon = sel("#favicon");
 // Update the favicon with the current canvas
 favicon.href = canvas.toDataURL();
 window.setInterval(function () { return (favicon.href = canvas.toDataURL()); }, 5000);
 var msPast = null;
-var msPerFrame = 7;
-var masterOnOff = true;
+var msPerFrame = 100;
+var isSimulationActive = true;
+var fps = 0;
 function tick(now) {
-    // if (!msPast) msPast = now;
-    // if (!msPast || (now - msPast > msPerFrame && masterOnOff)) {
-    //   msPast = now;
-    simulation.draw(simulation.blurEnabled);
-    simulation.update();
-    // }
+    if (!msPast)
+        msPast = now;
+    if (!msPast || (now - msPast > msPerFrame && isSimulationActive)) {
+        fps = now - msPast;
+        msPast = now;
+        simulation.draw(simulation.blurEnabled, palette.color);
+        simulation.update();
+    }
     window.requestAnimationFrame(tick);
 }
 window.requestAnimationFrame(tick);
 var log = function (message, link, linkText) {
-    var prompt = sel("#prompt");
+    var display = sel("#logDisplay");
     var p = document.createElement("p");
     p.innerText = "> " + message;
-    prompt.append(p);
+    display.append(p);
     if (link) {
         var a = document.createElement("a");
         a.href = link;
@@ -340,19 +402,92 @@ var log = function (message, link, linkText) {
         a.target = "_blank";
         p.append(a);
     }
-    prompt.scrollTop = sel("#prompt").scrollHeight;
+    display.scrollTop = sel("#logDisplay").scrollHeight;
 };
 setTimeout(function () { return log("Hover over controls for help"); }, 3000);
+sel("#logDisplay").scrollTop = 0;
+onChange("#masterOn", function () {
+    isSimulationActive = true;
+    log("Simulation ON");
+});
+onChange("#masterOff", function () {
+    isSimulationActive = false;
+    log("Simulation OFF");
+});
+onInput("#msPerFrame", function (_a) {
+    var value = _a.target.value;
+    return (msPerFrame = parseInt(value));
+});
+onChange("#msPerFrame", function () {
+    return log("Speed is now " + msPerFrame + " milliseconds per generation");
+});
+setInterval(function () { return (sel("#fps").innerText = fps.toFixed(1) + "ms/f"); }, 1000);
+onChange("#gameType", function (_a) {
+    var value = _a.target.value;
+    simulation.gameType = value;
+    log("Game changed to ", gameLink(simulation.gameType), simulation.gameType);
+});
+setInterval(function () {
+    var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
+    sel("#currentLiveCellCount").value = sum.toString();
+}, 250);
+var routeColorMode = function (_a) {
+    var value = _a.target.value;
+    switch (value) {
+        case "picker":
+            sel("#hsluv-picker").style.display = "none";
+            sel("#color").style.display = "block";
+            sel('label[for="color"]').style.display = "block";
+            log("Color mode is now the native color picker in your browser");
+            break;
+        case "hsluv":
+            sel('label[for="color"]').style.display = "none";
+            sel("#hsluv-picker").style.display = "block";
+            sel("#color").style.display = "none";
+            log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
+            break;
+        default:
+            sel("#hsluv-picker").style.display = "none";
+            sel("#color").style.display = "block";
+            sel('label[for="color"]').style.display = "block";
+    }
+};
+onChange("#colorMode", routeColorMode);
+routeColorMode({ target: { value: sel("#colorMode").value } });
+onInput("#color", function (_a) {
+    var value = _a.target.value;
+    palette.color = value;
+    // redraw if paused so the user can see what colors
+    isSimulationActive || simulation.draw(false, palette.color);
+}, false);
+onInput("#blurOn", function () {
+    simulation.blurEnabled = true;
+    simulation.clearEveryFrame = false;
+    sel("#delay").disabled = false;
+    log("Blur ON - previous generations will fade out based on Blur Amount");
+});
+onInput("#blurOff", function () {
+    simulation.blurEnabled = false;
+    simulation.clearEveryFrame = false;
+    sel("#delay").disabled = true;
+    log("Overlay ON - new generation will paint on top of previous one");
+});
+onChange("#clearFrame", function () {
+    simulation.clearEveryFrame = true;
+    simulation.blurEnabled = false;
+    sel("#delay").disabled = true;
+    log("Clear Frame ON - draw only current generation, erase previous generations");
+});
+var clamp = function (num) { return Math.min(Math.max(num, 0.0), 1.0); };
 var rangeOver = function (input, max, floor) {
     return expon(input) * max + floor;
 };
-var expon = function (x) {
-    var value = parseFloat(x);
-    value = value < 0.0 ? 0.0 : value;
-    value = value > 1.0 ? 1.0 : value;
-    return -Math.sqrt(-value + 1) + 1;
-};
-sel("#delay").addEventListener("input", function (e) { return (simulation.alpha = rangeOver(e.target.value, 1.0, 0)); }, false);
+var expon = function (x) { return -Math.sqrt(-clamp(parseFloat(x)) + 1) + 1; };
+onInput("#delay", function (_a) {
+    var value = _a.target.value;
+    simulation.alpha = rangeOver(value, 0.004, 0.0000001);
+    log("Delay is now ", simulation.alpha.toString(), "");
+}, false);
 var blendModeLink = {
     "source-over": "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcover",
     "source-atop": "https://drafts.fxtf.org/compositing-1/#porterduffcompositingoperators_srcatop",
@@ -372,40 +507,18 @@ var blendModeLink = {
     saturation: "https://drafts.fxtf.org/compositing-1/#blendingsaturation",
     luminosity: "https://drafts.fxtf.org/compositing-1/#blendingluminosity"
 };
-sel("#setBlendMode").addEventListener("input", function (e) {
-    var currentState = masterOnOff;
+onInput("#setBlendMode", function (_a) {
+    var value = _a.target.value;
+    var currentState = isSimulationActive;
     if (currentState)
-        masterOnOff = false;
-    var blendMode = e.target.value;
+        isSimulationActive = false;
+    var blendMode = value;
     simulation.ctx.globalCompositeOperation = blendMode;
-    masterOnOff = currentState;
+    isSimulationActive = currentState;
     log("Blend Mode is now ", blendModeLink[blendMode], blendMode);
 });
-sel("#rate").addEventListener("input", function (e) { return (msPerFrame = parseInt(e.target.value)); });
-sel("#rate").addEventListener("change", function () {
-    return log("Speed is now " + msPerFrame + " milliseconds per generation");
-});
-var isHovering = false;
-sel("#hoverOn").addEventListener("input", function () {
-    isHovering = true;
-    log("Hover ON - the mouse over the canvas will now draw a shape");
-});
-sel("#hoverOff").addEventListener("input", function () {
-    isHovering = false;
-    log("Hover OFF - the mouse over the canvas will not draw");
-});
-canvas.addEventListener("mousemove", function (e) { return isHovering && simulation.hover(e); }, false);
-canvas.addEventListener("click", function (e) { return simulation.clickDown(e); }, false);
-sel("#masterOn").addEventListener("change", function () {
-    masterOnOff = true;
-    log("Simulation ON");
-});
-sel("#masterOff").addEventListener("change", function () {
-    masterOnOff = false;
-    log("Simulation OFF");
-});
-sel("#modal-capture-preview").addEventListener("click", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
-var takeSnapshot = function () {
+onClick("#modal-capture-preview", function () { return (sel("#modal-capture ").style.display = "none"); }, false);
+var captureScreenshot = function () {
     var img = new Image();
     var dataUrl = canvas.toDataURL("image/png");
     var imgName = "CellularAnimationStudio-" + Date.now();
@@ -419,33 +532,37 @@ var takeSnapshot = function () {
     log("Screenshot captured, the simulation has been paused.");
     sel("#modal-capture").style.display = "flex";
     sel("#modal-capture-preview").prepend(a);
-    masterOnOff = false;
+    isSimulationActive = false;
     sel("#masterOff").checked = true;
 };
-sel("#screencap").addEventListener("click", takeSnapshot);
+onClick("#screencap", captureScreenshot);
 window.addEventListener("keydown", function (event) {
     if (event.defaultPrevented) {
         return; // Do nothing if event already handled
     }
     if (event.code == "Space")
-        takeSnapshot();
+        captureScreenshot();
 });
-sel("#showGallery").addEventListener("click", function () { return (sel("#modal-capture").style.display = "flex"); });
-sel("#seed").addEventListener("click", function () {
+onClick("#showGallery", function () { return (sel("#modal-capture").style.display = "flex"); });
+onClick("#seed", function () {
     simulation.seed();
     log("Simulation seeded - 1 in " + simulation.seedDensity + " odds");
 });
-sel("#clear").addEventListener("click", function () {
+onClick("#clearSimulation", function () {
     simulation.clear();
     log("Screen cleared");
 });
-sel("#kill").addEventListener("click", function () {
+onClick("#kill", function () {
     simulation.kill();
     log("Cells Killed - click Seed or the canvas to add live cells");
 });
-sel("#seedDensity").addEventListener("input", function (e) { return (simulation.seedDensity = parseInt(e.target.value)); });
-sel("#seedDensity").addEventListener("change", function (e) {
-    return log("Seed Density changed to " + e.target.value);
+onInput("#seedDensity", function (_a) {
+    var value = _a.target.value;
+    return (simulation.seedDensity = parseInt(value));
+});
+onChange("#seedDensity", function (_a) {
+    var value = _a.target.value;
+    return log("Seed Density changed to " + value);
 });
 var shapeLink = function (shape) {
     switch (shape) {
@@ -465,88 +582,13 @@ var shapeLink = function (shape) {
             return null;
     }
 };
-sel("#setClickShape").addEventListener("change", function (e) {
-    simulation.clickShape = e.target.value;
+onChange("#setClickShape", function (_a) {
+    var value = _a.target.value;
+    simulation.clickShape = value;
     log("Click Shape is now ", shapeLink(simulation.clickShape), simulation.clickShape);
 });
-sel("#setHoverShape").addEventListener("change", function (e) {
-    simulation.hoverShape = e.target.value;
-    log("Hover Shape (" + (isHovering ? "ON" : "OFF") + ") is now " + simulation.hoverShape, shapeLink(simulation.hoverShape));
-});
-sel("#color").addEventListener("input", function (e) {
-    simulation.color = e.target.value;
-    sel("#colorDisplay").value = e.target.value;
-    // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false);
-}, false);
-// HSLUV picker
-sel(".input-hex").addEventListener("input", function (e) {
-    simulation.color = e.target.value;
-    // redraw if paused so the user can see what colors
-    masterOnOff || simulation.draw(false);
-}, false);
-sel("#colorMode").addEventListener("change", function (e) {
-    simulation.colorMode = e.target.value;
-    switch (e.target.value) {
-        case "picker":
-            sel("#colorRadix").style.display = "none";
-            sel('label[for="colorRadix"]').style.display = "none";
-            sel("#randCycle").style.display = "none";
-            sel('label[for="randCycle"]').style.display = "none";
-            sel("#picker").style.display = "none";
-            sel("#color").style.display = "block";
-            sel('label[for="color"]').style.display = "block";
-            log("Color mode is now the native color picker in your browser");
-            sel("#colorDisplay").style.display = "none";
-            sel('label[for="colorDisplay"]').style.display = "none";
-            break;
-        case "hsluv":
-            sel("#colorRadix").style.display = "none";
-            sel('label[for="colorRadix"]').style.display = "none";
-            sel("#randCycle").style.display = "none";
-            sel('label[for="randCycle"]').style.display = "none";
-            sel('label[for="color"]').style.display = "none";
-            sel("#picker").style.display = "block";
-            sel("#color").style.display = "none";
-            log("Color mode is now HSLUV picker ", "https://www.hsluv.org/");
-            sel("#colorDisplay").style.display = "none";
-            sel('label[for="colorDisplay"]').style.display = "none";
-            break;
-        case "full":
-            sel("#colorDisplay").style.display = "block";
-            sel('label[for="colorDisplay"]').style.display = "block";
-            sel("#picker").style.display = "none";
-            log("Color mode is now Random Frame - all pixels of each frame will be the same random color");
-            break;
-        case "row":
-            sel("#colorDisplay").style.display = "none";
-            sel('label[for="colorDisplay"]').style.display = "none";
-            log("Color mode is now Random Row - all pixels of each row will be the same random color");
-            break;
-        case "each":
-            log("Color mode is now Random Pixel- every pixel is a new random color");
-            sel("#colorDisplay").style.display = "none";
-            sel('label[for="colorDisplay"]').style.display = "none";
-            break;
-        default:
-            sel("#colorRadix").style.display = "block";
-            sel('label[for="colorRadix"]').style.display = "block";
-            sel("#randCycle").style.display = "block";
-            sel('label[for="randCycle"]').style.display = "block";
-            sel("#color").style.display = "none";
-            sel("#picker").style.display = "none";
-            sel('label[for="color"]').style.display = "none";
-            sel("#colorDisplay").style.display = "none";
-    }
-});
-setInterval(function () {
-    if (simulation.colorMode == "full") {
-        sel("#colorDisplay").value = simulation.ctx.fillStyle.toString();
-    }
-}, 250);
-sel("#colorRadix").addEventListener("input", function (e) { return (simulation.colorRadix = parseInt(e.target.value)); });
 var recorders = null;
-sel("#recStart").addEventListener("change", function () {
+onChange("#recStart", function () {
     var chunks = []; // here we will store our recorded media chunks (Blobs)
     var stream = canvas.captureStream();
     var rec = new MediaRecorder(stream);
@@ -558,10 +600,11 @@ sel("#recStart").addEventListener("change", function () {
         var vid = document.createElement("video");
         vid.src = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
         var vidName = "CellularAnimationStudio-" + Date.now();
+        // @ts-ignore
         vid.download = vidName + ".webm";
         vid.controls = true;
         sel("#modal-capture-preview").prepend(vid);
-        masterOnOff = false;
+        isSimulationActive = false;
         sel("#masterOff").checked = true;
     };
     rec.start();
@@ -572,49 +615,10 @@ sel("#recStart").addEventListener("change", function () {
         sel("#recStop").checked = true;
     }, 1000 * 90);
 });
-sel("#recStop").addEventListener("change", function () {
+onChange("#recStop", function () {
     recorders.stop();
     recorders = null;
     log("Recording Stopped, click Gallery to view and download the recording");
-});
-sel("#blurOn").addEventListener("input", function () {
-    simulation.blurEnabled = true;
-    simulation.clearEveryFrame = false;
-    sel("#delay").disabled = false;
-    log("Blur ON - previous generations will fade out based on Blur Amount");
-});
-sel("#blurOff").addEventListener("input", function () {
-    simulation.blurEnabled = false;
-    simulation.clearEveryFrame = false;
-    sel("#delay").disabled = true;
-    log("Overlay ON - new generation will paint on top of previous one");
-});
-sel("#clearFrame").addEventListener("change", function () {
-    simulation.clearEveryFrame = true;
-    simulation.blurEnabled = false;
-    sel("#delay").disabled = true;
-    log("Clear Frame ON - draw only current generation, erase previous generations");
-});
-sel("#randCycle").addEventListener("input", function (e) {
-    simulation.colorRateFrames = rangeOver(e.target.value, 1000, 1);
-    simulation.colorRateCounter = 0;
-});
-sel("#noiseRangeValue").addEventListener("input", function (e) { return (simulation.noiseRangeValue = rangeOver(e.target.value, 3, 12)); });
-sel("#noiseRangeValue").addEventListener("change", function () {
-    if (simulation.noiseEnabled) {
-        log("Noise (ON) Amount is now 1 in " + simulation.noiseRangeValue.toFixed(2) + " chance of being born");
-    }
-    else {
-        log("Noise (OFF) Amount is now 1 in " + simulation.noiseRangeValue.toFixed(2) + " chace of being born");
-    }
-});
-sel("#noiseOn").addEventListener("change", function () {
-    simulation.noiseEnabled = true;
-    log("Noise On - cells will be born randomly");
-});
-sel("#noiseOff").addEventListener("change", function () {
-    simulation.noiseEnabled = false;
-    log("Noise Off - cells will be born according to game rules only");
 });
 var gameLink = function (game) {
     switch (game) {
@@ -637,32 +641,4 @@ var gameLink = function (game) {
         case "famine":
             return null;
     }
-};
-sel("#gameType").addEventListener("change", function (e) {
-    simulation.game = e.target.value;
-    log("Game changed to ", gameLink(simulation.game), simulation.game);
-});
-sel("#prompt").scrollTop = 0;
-setInterval(function () {
-    var sum = simulation.data.reduce(function (a, b) { return a + b; }, 0);
-    sel("#currentCount").value = sum.toString();
-}, 250);
-var route = function (state) {
-    sel("#gameType").value = state.game;
-    // TODO: exponential to linear
-    // sel("#delay").value = state.alpha.toString();
-    // Don't set color in UI
-    // sel("").value = state.color;
-    sel("#setClickShape").value = state.clickShape;
-    sel("#setHoverShape").value = state.hoverShape;
-    sel("#colorMode").value = state.colorMode;
-    sel("#colorRadix").value = state.colorRadix.toString();
-    sel("#clearFrame").checked = state.blurEnabled;
-    sel("#clearFrame").checked = state.clearEveryFrame;
-    // TODO: exponential to linear
-    // sel("#randCycle").value = state.colorRateFrames;
-    sel("#noiseOn").checked = state.noiseEnabled;
-    sel("#noiseRangeValue").value = state.noiseRangeValue.toString();
-    // TODO: exponential to linear
-    // sel("#seedDensity").value = state.seedDensity;
 };

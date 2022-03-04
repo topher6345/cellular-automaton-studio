@@ -1,6 +1,24 @@
 import { createCanvas, loadImage, Canvas } from "canvas";
 import * as fs from "fs";
 
+function getShuffledArr(array) {
+  const newArr = array.slice();
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const rand = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
+  }
+  return newArr;
+}
+
+function* mkRandomGenerator(array) {
+  while (true) {
+    const shuffledArray = getShuffledArr(array);
+    for (let i = 0; i < shuffledArray.length; i++) {
+      yield shuffledArray[i];
+    }
+  }
+}
+
 type ControlValues = {
   alpha: number;
   color: string;
@@ -57,6 +75,7 @@ class CellularAutomatonEngine {
   bufferLength: number;
   game: string;
   seedDensity: number;
+  randomGenerator: any;
 
   constructor(size: number, canvas: Canvas, controlValues: ControlValues) {
     this.size = size;
@@ -92,6 +111,18 @@ class CellularAutomatonEngine {
     this.noiseRangeValue = controlValues.noiseRangeValue;
     this.game = controlValues.game;
     this.seedDensity = controlValues.seedDensity;
+    this.randomGenerator = mkRandomGenerator([
+      "C3A7A2",
+      "5E7469",
+      "181F1E",
+      "C49F5B",
+      "9E7C7B",
+      "AA9190",
+      "303D38",
+      "796F4D",
+      "95957E",
+      "3E5A4C",
+    ]);
   }
 
   seed(): void {
@@ -350,9 +381,11 @@ class CellularAutomatonEngine {
   randColor(): string {
     if (this.colorRateCounter > this.colorRateFrames) {
       this.colorCache = this.randColorString();
+      this.colorCache = `#${this.randomGenerator.next().value.toString()}`;
       this.colorRateCounter = 0;
     }
     this.colorRateCounter = this.colorRateCounter + 1;
+
     return this.colorCache;
   }
 

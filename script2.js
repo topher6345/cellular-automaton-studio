@@ -45,6 +45,21 @@ var CellularAutomatonEngine = /** @class */ (function () {
         this.noiseRangeValue = controlValues.noiseRangeValue;
         this.game = controlValues.game;
         this.seedDensity = controlValues.seedDensity;
+        this.colors = [
+            "bfa09f",
+            "5e7468",
+            "181f1e",
+            "c49e5a",
+            "9e7c7a",
+            "a9908f",
+            "2f3d37",
+            "5a5b5e",
+            "786e4c",
+            "b09f7e",
+            "23302f",
+            "424232",
+        ];
+        this.colorLength = this.colors.length;
     }
     CellularAutomatonEngine.prototype.seed = function () {
         var data = CellularAutomatonEngine.randBoard(this.size, this.seedDensity);
@@ -269,7 +284,7 @@ var CellularAutomatonEngine = /** @class */ (function () {
         return this.colorCache;
     };
     CellularAutomatonEngine.prototype.randColorString = function () {
-        return "#" + Math.floor(Math.random() * this.colorRadix).toString(16);
+        return "#" + this.colors[Math.floor(Math.random() * this.colorLength)];
     };
     CellularAutomatonEngine.prototype.draw = function (isAnimating) {
         if (isAnimating === void 0) { isAnimating = true; }
